@@ -1,0 +1,30 @@
+/* /src/styles/sidebar.css */
+.sidebar {
+  width: 220px; 
+  height: 95vh;
+  background-color: #414a4c;
+  position: fixed;
+  left: 8px;
+  top: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transform: scale(1);
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+}
+
+.sidebar-closed {
+  transform: scale(0); 
+}
+
+.content {
+  margin-left: 250px;
+  padding: 20px;
+}
+
+/* Đảm bảo .content không ảnh hưởng đến trang đăng nhập */
+body.login-page .content {
+  margin-left: 0;
+  padding: 0;
+}
