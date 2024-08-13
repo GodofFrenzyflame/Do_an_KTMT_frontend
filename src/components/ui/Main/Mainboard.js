@@ -12,7 +12,7 @@ const Home = () => {
       </Typography>
 
       {/* Relay Status Section */}
-      <Box sx={{ mb: '2%'}}>
+      <Box sx={{ mb: '2%' }}>
         <Grid container spacing={2}>
           {[1, 2, 3, 4].map((relay) => (
             <Grid item xs={12} sm={6} md={3} key={relay}> 

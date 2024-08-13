@@ -10,24 +10,54 @@ export default function Login({ onLogin }) {
   const [openSignup, setOpenSignup] = useState(false); // Trạng thái để điều khiển hộp thoại đăng ký
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    fetch('http://localhost:5000/users')
-      .then(response => response.json())
-      .then(users => {
-        const user = users.find(user => user.username === username && user.password === password);
-        if (user) {
-          localStorage.setItem('isLoggedIn', 'true');
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    // Validate passwords match
+    try {
+      const response = await fetch('http://localhost:8080/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('isLoggedIn', 'true');
           onLogin(true);
           navigate('/home');
-        } else {
-          setError('Invalid username or password');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        setError('Failed to connect to the server');
-      });
+      } else {
+        console.error('Error:', result.message);
+        setError(result.message || 'Failed to create account');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Failed to connect to the server');
+    }
   };
+
+
+  // const handleLogin = () => {
+  //   fetch('http://localhost:5000/users')
+  //     .then(response => response.json())
+  //     .then(users => {
+  //       const user = users.find(user => user.username === username && user.password === password);
+  //       if (user) {
+  //         localStorage.setItem('isLoggedIn', 'true');
+  //         onLogin(true);
+  //         navigate('/home');
+  //       } else {
+  //         setError('Invalid username or password');
+  //       }
+  //     })
+  //     .catch(error => {
+  //       console.error('Error:', error);
+  //       setError('Failed to connect to the server');
+  //     });
+  // };
 
   const handleOpenSignup = () => setOpenSignup(true); // Mở hộp thoại đăng ký
   const handleCloseSignup = () => setOpenSignup(false); // Đóng hộp thoại đăng ký

@@ -33,7 +33,7 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
         setSuccess('Account created successfully!');
         setError('');
 
-        // Đóng hộp thoại sau 2 giây
+        // Đóng hộp thoại sau 1 giây
         setTimeout(() => {
           setSuccess('');
           onClose(); // Gọi hàm onClose để đóng hộp thoại đăng ký
