@@ -39,26 +39,6 @@ export default function Login({ onLogin }) {
     }
   };
 
-
-  // const handleLogin = () => {
-  //   fetch('http://localhost:5000/users')
-  //     .then(response => response.json())
-  //     .then(users => {
-  //       const user = users.find(user => user.username === username && user.password === password);
-  //       if (user) {
-  //         localStorage.setItem('isLoggedIn', 'true');
-  //         onLogin(true);
-  //         navigate('/home');
-  //       } else {
-  //         setError('Invalid username or password');
-  //       }
-  //     })
-  //     .catch(error => {
-  //       console.error('Error:', error);
-  //       setError('Failed to connect to the server');
-  //     });
-  // };
-
   const handleOpenSignup = () => setOpenSignup(true); // Mở hộp thoại đăng ký
   const handleCloseSignup = () => setOpenSignup(false); // Đóng hộp thoại đăng ký
 

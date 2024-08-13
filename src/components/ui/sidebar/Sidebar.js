@@ -88,6 +88,27 @@ export default function Sidebar({ onLogout, isOpen }) {
           </Button>
         </Link>
 
+        <Link to="/relay" style={{ textDecoration: 'none' }}>
+          <Button variant="contained" fullWidth sx={{
+            bgcolor: isActive('/relay') ? '#ff9800' : '#414a4c',
+            color: '#fff',
+            padding: '4% 8%',
+            fontSize: '1.2vw',
+            height: '7%',
+            width: '90%',
+            marginLeft: '5%',
+            borderRadius: '8px',
+            justifyContent: 'flex-start',
+            textAlign: 'left',
+            '&:hover': {
+              bgcolor: '#ff9800',
+            },
+            mt: '2%'
+          }}>
+            🔘 Relay
+          </Button>
+        </Link>
+
         <Link to="/profile" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
             bgcolor: isActive('/profile') ? '#ff9800' : '#414a4c',
@@ -108,9 +129,33 @@ export default function Sidebar({ onLogout, isOpen }) {
             📑Profile
           </Button>
         </Link>
+        <Link to="/setting" style={{ textDecoration: 'none' }}>
+          <Button variant="contained" fullWidth sx={{
+            bgcolor: isActive('/setting') ? '#ff9800' : '#414a4c',
+            color: '#fff',
+            padding: '4% 8%',
+            fontSize: '1.2vw',
+            height: '7%',
+            width: '90%',
+            marginLeft: '5%',
+            borderRadius: '8px',
+            justifyContent: 'flex-start',
+            textAlign: 'left',
+            '&:hover': {
+              bgcolor: '#ff9800',
+            },
+            mt: '2%'
+          }}>
+            📐 Setting
+          </Button>
+        </Link>
+      
       </Box>
 
+      
       {/* Nút Logout không cần thay đổi màu theo trang */}
+
+          
       <Button variant="contained" fullWidth sx={{
         bgcolor: '#f44336',
         color: '#fff',

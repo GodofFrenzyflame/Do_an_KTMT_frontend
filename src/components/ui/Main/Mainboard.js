@@ -6,9 +6,9 @@ import { Box, Container, Typography, Grid, Paper } from '@mui/material';
 
 const Home = () => {
   return (
-    <Container maxWidth="xxl" sx={{ px: { xs: '1%', sm: '10%', md: '5%' }, py: { xs: '5%', sm: '1%' } }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: '2%' }}>
-       Home
+    <Container maxWidth="xxl" sx={{ px: { xs: '1%', sm: '1%', md: '1%' }, py: { xs: '5%', sm: '1%' } }}>
+      <Typography variant="h4" gutterBottom sx={{ mb: '1%' }}>
+       Home 
       </Typography>
 
       {/* Relay Status Section */}
@@ -18,7 +18,7 @@ const Home = () => {
             <Grid item xs={12} sm={6} md={3} key={relay}> 
               <Paper elevation={3} sx={{ p: '2%', textAlign: 'center' }}>
                 <Typography variant="h6">Relay {relay}</Typography>
-                <Typography variant="body1">Status: ON/OFF</Typography>
+                <Typography variant="body1">Status: OFF</Typography>
               </Paper>
             </Grid>
           ))}

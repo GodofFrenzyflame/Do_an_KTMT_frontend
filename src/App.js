@@ -8,7 +8,8 @@ import Profile from './components/ui/User/Profile';
 import History from './components/ui/historyboard/History';
 import AuthenticatedLayout from './components/ui/sidebar/Sidebarlayout';
 import { Box } from '@mui/material'; // Import Box ở đây
-
+import Relay from './components/ui/Relayboard/Relay';
+import Setting from './components/ui/Settingboard/Settingboard'
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -96,8 +97,35 @@ function App() {
             : <Navigate to="/" />
           } 
         />
+        <Route 
+          path="/relay" 
+          element={
+            isLoggedIn ? 
+              <AuthenticatedLayout 
+                isSidebarOpen={isSidebarOpen} 
+                toggleSidebar={toggleSidebar} 
+                onLogout={handleLogout}
+              >
+                <Relay />
+              </AuthenticatedLayout> 
+            : <Navigate to="/" />
+          } 
+        />
 
-
+        <Route 
+          path="/setting" 
+          element={
+            isLoggedIn ? 
+              <AuthenticatedLayout 
+                isSidebarOpen={isSidebarOpen} 
+                toggleSidebar={toggleSidebar} 
+                onLogout={handleLogout}
+              >
+                <Setting />
+              </AuthenticatedLayout> 
+            : <Navigate to="/" />
+          } 
+        />
         
       </Routes>
     </Router>
