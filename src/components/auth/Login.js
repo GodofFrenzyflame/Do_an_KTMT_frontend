@@ -26,10 +26,14 @@ export default function Login({ onLogin }) {
       const result = await response.json();
 
       if (response.ok) {
+        const { userId } = result;
+        localStorage.setItem('userId', userId);
+        console.log('User ID:', localStorage.getItem('userId'));
         localStorage.setItem('isLoggedIn', 'true');
-          onLogin(true);
-          navigate('/home');
-      } else {
+        onLogin(true);
+        navigate('/home');
+      }
+      else {
         console.error('Error:', result.message);
         setError(result.message || 'Failed to create account');
       }

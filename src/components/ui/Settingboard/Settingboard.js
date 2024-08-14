@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import { AppContext } from '../../../AppContext'; // Import context
+import  AppContext  from '../../../AppContext'; // Import context
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);
@@ -8,7 +8,7 @@ const Settings = () => {
   const [language, setLanguage] = useState(settings.language);
 
   const handleSave = () => {
-    setSettings({ color, language });
+    setSettings({ color, language }); // Gọi hàm để cập nhật ngôn ngữ và màu sắc
   };
 
   return (
@@ -34,18 +34,18 @@ const Settings = () => {
             label="Language"
           >
             <MenuItem value="en">English</MenuItem>
-            <MenuItem value="es">Vietnamese</MenuItem>
+            <MenuItem value="vi">Vietnamese</MenuItem>
           </Select>
         </FormControl>
         <Box sx={{ mt: 2, textAlign: 'center' }}> 
-        <Button
-          variant="contained"
-          color="primary"
-          sx={{ mt: 1 }}
-          onClick={handleSave} // Đảm bảo handleSave được gọi khi nhấn nút
-        >
-          Save Settings
-        </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 1 }}
+            onClick={handleSave} // Đảm bảo handleSave được gọi khi nhấn nút
+          >
+            Save Settings
+          </Button>
         </Box>
       </Box>
     </Box>

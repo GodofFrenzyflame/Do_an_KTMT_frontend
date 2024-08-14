@@ -1,56 +1,46 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import '../../../styles/sidebar.css'; 
+import  AppContext  from '../../../AppContext';
+import '../../../styles/sidebar.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Sidebar({ onLogout, isOpen }) {
+  const { settings } = useContext(AppContext);
   const location = useLocation();
   const sidebarWidth = isOpen ? '12%' : '5%';
 
-  // Hàm để kiểm tra xem trang hiện tại có phải là trang được liên kết với đường dẫn không
   const isActive = (path) => location.pathname === path;
 
-  return (
-    <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{ width: sidebarWidth, display: 'flex', flexDirection: 'column', height: '95%' }}>
+  const getBackgroundColor = (active) => settings.color === 'dark' ? (active ? '#4361ee' : '#414a4c') : (active ? '#0013ff' : '#d6d6d6');
+  const getButtonColor = () => settings.color === 'dark' ? '#fff' : '#000';
+  const getSidebarBackgroundColor = () => settings.color === 'dark' ? '#333' : '#e6e3e3';
+  const { t } = useTranslation();
 
-      <Box 
-        sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          mb: '20%' ,
-          mt: '5%'
-        }}
-      >
+
+
+  return (
+    <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{ width: sidebarWidth, display: 'flex', flexDirection: 'column', height: '95%', backgroundColor: getSidebarBackgroundColor() }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: '20%', mt: '5%' }}>
         <img 
-          src="/static/hcmut.png" 
+          src="/static/Bku.ico" 
           alt="" 
           style={{ 
-            maxWidth: '15%', // Nhỏ lại kích thước hình ảnh
-            height: 'auto', 
-            borderRadius: '0%', // Điều chỉnh để hình tròn hơn
-            marginRight: '2%', // Khoảng cách giữa ảnh và chữ
+            maxWidth: '25%',
+            height: 'auto',
+            borderRadius: '0%',
+            marginRight: '0%'
           }} 
         />
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            color: '#ffffff', 
-            fontSize: '1.2vw' 
-          }}
-        >
+        <Typography variant="h6" sx={{ color: getButtonColor(), fontSize: '1.2vw' }}>
           Dashboard IoT
         </Typography>
-
-
       </Box>
-
-
       <Box sx={{ width: '100%', flexGrow: 1 }}>
         <Link to="/home" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/home') ? '#4361ee' : '#414a4c',
-            color: '#fff',
+            bgcolor: getBackgroundColor(isActive('/home')),
+            color: getButtonColor(),
             padding: '4% 8%',
             fontSize: '1.2vw',
             height: '7%',
@@ -60,17 +50,16 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#2b35af',
+              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
           }}>
-            🏠Home
+            🏠 {t('Home')}
           </Button>
         </Link>
-
         <Link to="/history" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/history') ? '#4361ee' : '#414a4c',
-            color: '#fff',
+            bgcolor: getBackgroundColor(isActive('/history')),
+            color: getButtonColor(),
             padding: '4% 8%',
             fontSize: '1.2vw',
             height: '7%',
@@ -80,18 +69,17 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#2b35af',
+              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
             mt: '2%'
           }}>
-            🧾History
+            🧾 {t('History')}
           </Button>
         </Link>
-
         <Link to="/relay" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/relay') ? '#4361ee' : '#414a4c',
-            color: '#fff',
+            bgcolor: getBackgroundColor(isActive('/relay')),
+            color: getButtonColor(),
             padding: '4% 8%',
             fontSize: '1.2vw',
             height: '7%',
@@ -101,18 +89,17 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#2b35af',
+              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
             mt: '2%'
           }}>
-            🔘 Relay
+            🔘 {t('Relay')}
           </Button>
         </Link>
-
         <Link to="/profile" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/profile') ? '#4361ee' : '#414a4c',
-            color: '#fff',
+            bgcolor: getBackgroundColor(isActive('/profile')),
+            color: getButtonColor(),
             padding: '4% 8%',
             fontSize: '1.2vw',
             height: '7%',
@@ -122,17 +109,17 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#2b35af',
+              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
             mt: '2%'
           }}>
-            📑Profile
+            📑 {t('Profile')}
           </Button>
         </Link>
         <Link to="/setting" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/setting') ? '#4361ee' : '#414a4c',
-            color: '#fff',
+            bgcolor: getBackgroundColor(isActive('/setting')),
+            color: getButtonColor(),
             padding: '4% 8%',
             fontSize: '1.2vw',
             height: '7%',
@@ -142,20 +129,14 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#2b35af',
+              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
             mt: '2%'
           }}>
-            📐 Setting
+            📐 {t('Settings')}
           </Button>
         </Link>
-      
       </Box>
-
-      
-      {/* Nút Logout không cần thay đổi màu theo trang */}
-
-          
       <Button variant="contained" fullWidth sx={{
         bgcolor: '#f44336',
         color: '#fff',
@@ -170,7 +151,7 @@ export default function Sidebar({ onLogout, isOpen }) {
         },
         mt: 'auto'
       }} onClick={onLogout}>
-        Log out
+        {t('Log out')}
       </Button>
       <Box sx={{ height: '2%' }} />
     </Box>

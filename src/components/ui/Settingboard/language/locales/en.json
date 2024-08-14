@@ -1,5 +1,23 @@
 [
     {
-    "welcome": "Welcome"
+    "Home": "Home",
+    "History": "History",
+    "Profile":"Profile",
+    "Relay":"Relay",
+    "Settings":"Settings",
+    "Logout":"Logout",
+    "Login":"Login",
+    "Username":"Username",
+    "Password":"Password",
+    "Create new account":"Create new account",
+    "Sign up":"Sign up",
+    "Confirm password":"Confirm password",
+    "Create account":"Create account",
+    "Close":"Close",
+    "Invalid username or password":"Invalid username or password",
+    "Temperature ":"Temperature",
+    "Humidity ":"Humidity",
+    "Wayfinding":"Wayfinding",
+    "Status":"Status"
     }
 ]    
