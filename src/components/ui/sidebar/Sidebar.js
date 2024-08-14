@@ -49,7 +49,7 @@ export default function Sidebar({ onLogout, isOpen }) {
       <Box sx={{ width: '100%', flexGrow: 1 }}>
         <Link to="/home" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/home') ? '#ff9800' : '#414a4c',
+            bgcolor: isActive('/home') ? '#4361ee' : '#414a4c',
             color: '#fff',
             padding: '4% 8%',
             fontSize: '1.2vw',
@@ -60,7 +60,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#ff9800',
+              bgcolor: '#2b35af',
             },
           }}>
             🏠Home
@@ -69,7 +69,7 @@ export default function Sidebar({ onLogout, isOpen }) {
 
         <Link to="/history" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/history') ? '#ff9800' : '#414a4c',
+            bgcolor: isActive('/history') ? '#4361ee' : '#414a4c',
             color: '#fff',
             padding: '4% 8%',
             fontSize: '1.2vw',
@@ -80,7 +80,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#ff9800',
+              bgcolor: '#2b35af',
             },
             mt: '2%'
           }}>
@@ -90,7 +90,7 @@ export default function Sidebar({ onLogout, isOpen }) {
 
         <Link to="/relay" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/relay') ? '#ff9800' : '#414a4c',
+            bgcolor: isActive('/relay') ? '#4361ee' : '#414a4c',
             color: '#fff',
             padding: '4% 8%',
             fontSize: '1.2vw',
@@ -101,7 +101,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#ff9800',
+              bgcolor: '#2b35af',
             },
             mt: '2%'
           }}>
@@ -111,7 +111,7 @@ export default function Sidebar({ onLogout, isOpen }) {
 
         <Link to="/profile" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/profile') ? '#ff9800' : '#414a4c',
+            bgcolor: isActive('/profile') ? '#4361ee' : '#414a4c',
             color: '#fff',
             padding: '4% 8%',
             fontSize: '1.2vw',
@@ -122,7 +122,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#ff9800',
+              bgcolor: '#2b35af',
             },
             mt: '2%'
           }}>
@@ -131,7 +131,7 @@ export default function Sidebar({ onLogout, isOpen }) {
         </Link>
         <Link to="/setting" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
-            bgcolor: isActive('/setting') ? '#ff9800' : '#414a4c',
+            bgcolor: isActive('/setting') ? '#4361ee' : '#414a4c',
             color: '#fff',
             padding: '4% 8%',
             fontSize: '1.2vw',
@@ -142,7 +142,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             justifyContent: 'flex-start',
             textAlign: 'left',
             '&:hover': {
-              bgcolor: '#ff9800',
+              bgcolor: '#2b35af',
             },
             mt: '2%'
           }}>

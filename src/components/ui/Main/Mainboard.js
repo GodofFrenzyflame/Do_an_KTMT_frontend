@@ -25,8 +25,10 @@ const Home = () => {
         </Grid>
       </Box>
 
+
       {/* Charts and Map Section */}
       <Grid container spacing={2}>
+
         <Grid item xs={12} sm={4}>
           <Paper elevation={3} 
             sx={{ 
@@ -38,6 +40,7 @@ const Home = () => {
             <TemperatureChart />
           </Paper>
         </Grid>
+
         <Grid item xs={12} sm={4}>
           <Paper elevation={3} 
             sx={{ 
@@ -49,6 +52,7 @@ const Home = () => {
             <HumidityChart />
           </Paper>
         </Grid>
+
         <Grid item xs={12} sm={4}>
           <Paper elevation={10} 
             sx={{ 
@@ -60,6 +64,7 @@ const Home = () => {
             <Map />
           </Paper>
         </Grid>
+        
       </Grid>
 
       {/* History Section */}
