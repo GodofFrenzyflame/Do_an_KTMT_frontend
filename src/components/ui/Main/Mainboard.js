@@ -2,13 +2,13 @@ import React from 'react';
 import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
 import Map from '../Charts/Map';
-import { Box, Container, Typography, Grid, Paper } from '@mui/material';
+import { Box, Container, Typography, Grid, Paper, Button } from '@mui/material';
 
 const Home = () => {
   return (
     <Container maxWidth="xxl" sx={{ px: { xs: '1%', sm: '1%', md: '1%' }, py: { xs: '5%', sm: '1%' } }}>
       <Typography variant="h4" gutterBottom sx={{ mb: '1%' }}>
-       Home 
+        Home 
       </Typography>
 
       {/* Relay Status Section */}
@@ -27,45 +27,54 @@ const Home = () => {
 
       {/* Charts and Map Section */}
       <Grid container spacing={2}>
-        <Grid item xs={12} md={8}>
-          <Grid container spacing={2} direction="column">
-            <Grid item xs={12}>
-              <Paper elevation={3} 
-                sx={{ 
-                  p: '2%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'left', 
-                  height: '40vh' 
-                }}>
-                <TemperatureChart />
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper elevation={3} 
-                sx={{ 
-                  p: '2%', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'left', 
-                  height: '40vh' }}>
-                <HumidityChart />
-              </Paper>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Paper elevation={10} 
+        <Grid item xs={12} sm={4}>
+          <Paper elevation={3} 
             sx={{ 
-              p: '1%', 
-              height: '88.5vh', 
+              p: '2%', 
+              height: '35vh', 
               display: 'flex', 
               alignItems: 'center', 
-              justifyContent: 'left' }}>
+              justifyContent: 'center' }}>
+            <TemperatureChart />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Paper elevation={3} 
+            sx={{ 
+              p: '2%', 
+              height: '35vh', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center' }}>
+            <HumidityChart />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Paper elevation={10} 
+            sx={{ 
+              p: '2%', 
+              height: '35vh', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center' }}>
             <Map />
           </Paper>
         </Grid>
       </Grid>
+
+      {/* History Section */}
+      <Box sx={{ mt: '2%' }}>
+        <Paper elevation={3} sx={{ p: '2%', textAlign: 'left' }}>
+          <Typography variant="h6" sx={{ mb: '1%' }}>History</Typography>
+          <Typography variant="body1" sx={{ mb: '2%' }}>
+            {/* Placeholder cho lịch sử thay đổi biểu đồ */}
+            Here will be the history of chart changes.
+          </Typography>
+          <Button variant="contained" color="primary">
+            Refresh History
+          </Button>
+        </Paper>
+      </Box>
     </Container>
   );
 };

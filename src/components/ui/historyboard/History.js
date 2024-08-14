@@ -14,7 +14,20 @@ const History = () => {
       </Typography>
 
       {/* Container cho các ô lịch sử */}
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3, height: 'calc(100% - 64px)' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, height: 'calc(100% - 64px)' }}>
+        {/* Ô Lịch sử relay on/of */}
+        <Paper sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
+          <Typography variant="h4" gutterBottom>
+            Relay History
+          </Typography>
+          <List>
+            {temperatureHistory.map((record, index) => (
+              <ListItem key={index}>
+                <ListItemText primary={`Time: ${record.timestamp}, Temperature: ${record.temperature}°C`} />
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
         {/* Ô Lịch sử Nhiệt độ */}
         <Paper sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
           <Typography variant="h4" gutterBottom>
