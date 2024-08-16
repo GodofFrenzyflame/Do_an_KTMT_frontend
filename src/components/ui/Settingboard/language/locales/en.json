@@ -1,5 +1,4 @@
-[
-    {
+{
     "Home": "Home",
     "History": "History",
     "Profile":"Profile",
@@ -19,5 +18,5 @@
     "Humidity ":"Humidity",
     "Wayfinding":"Wayfinding",
     "Status":"Status"
-    }
-]    
+}
+   

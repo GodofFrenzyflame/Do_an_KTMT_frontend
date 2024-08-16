@@ -1,23 +1,22 @@
-[
-    {
+{
     "Home": "Trang chủ",
     "History": "Lịch sử",
-    "Profile":"Thông tin",
-    "Relay":"Rơ le",
-    "Settings":"Cài đặt",
-    "Logout":"Đăng xuất",
-    "Login":"Đăng nhập",
-    "Username":"Tên người dùng",
-    "Password":"Mật khẩu",
-    "Create new account":"Tạo tài khoản mới",
-    "Sign up":"Đăng kí",
-    "Confirm password":"Nhập lại mật khẩu",
-    "Create account":"Tạo tài khoản",
-    "Close":"Đóng",
-    "Invalid username or password":"Sai tên đăng nhập hoặc mật khẩu",
-    "Temperature ":"Nhiệt độ",
-    "Humidity ":"Độ ẩm",
-    "Wayfinding":"Tìm đường",
-    "Status":"Trạng thái"
-    }
-]
+    "Profile": "Thông tin",
+    "Relay": "Rơ-le",
+    "Settings": "Cài đặt",
+    "Log out": "Đăng xuất",
+    "Login": "Đăng nhập",
+    "Username": "Tên người dùng",
+    "Password": "Mật khẩu",
+    "Create new account": "Tạo tài khoản mới",
+    "Sign up": "Đăng kí",
+    "Confirm password": "Nhập lại mật khẩu",
+    "Create account": "Tạo tài khoản",
+    "Close": "Đóng",
+    "Invalid username or password": "Sai tên đăng nhập hoặc mật khẩu",
+    "Temperature ": "Nhiệt độ",
+    "Humidity ": "Độ ẩm",
+    "Wayfinding": "Tìm đường",
+    "Status": "Trạng thái"
+  }
+  

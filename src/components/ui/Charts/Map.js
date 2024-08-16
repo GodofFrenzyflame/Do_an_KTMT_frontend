@@ -71,7 +71,7 @@ const Map = () => {
           borderRadius: '5px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
           cursor: 'pointer',
-          zIndex: 1000 // Đảm bảo nút xuất hiện trên cùng
+          zIndex: 1000
         }}
       >
         Wayfinding 

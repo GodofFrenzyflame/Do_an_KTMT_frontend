@@ -1,32 +1,40 @@
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import  AppContext  from '../../../AppContext';
-import '../../../styles/sidebar.css';
+import AppContext from '../../../AppContext';
+import '../../../styles/globalStyles.css';
 import { useTranslation } from 'react-i18next';
 
 export default function Sidebar({ onLogout, isOpen }) {
   const { settings } = useContext(AppContext);
+  const { t } = useTranslation();
   const location = useLocation();
-  const sidebarWidth = isOpen ? '12%' : '5%';
+  const sidebarWidth = isOpen ? '19%' : '0%';
 
   const isActive = (path) => location.pathname === path;
 
   const getBackgroundColor = (active) => settings.color === 'dark' ? (active ? '#4361ee' : '#414a4c') : (active ? '#0013ff' : '#d6d6d6');
   const getButtonColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getSidebarBackgroundColor = () => settings.color === 'dark' ? '#333' : '#e6e3e3';
-  const { t } = useTranslation();
-
-
 
   return (
-    <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{ width: sidebarWidth, display: 'flex', flexDirection: 'column', height: '95%', backgroundColor: getSidebarBackgroundColor() }}>
+    <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{
+      width: sidebarWidth, 
+      display: 'flex', 
+      flexDirection: 'column', 
+      height: '97vh',
+      backgroundColor: getSidebarBackgroundColor(),
+      position: 'fixed',
+      top: 10,
+      left: 10,
+      zIndex: 1200 // Ensure it is above other content
+    }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: '20%', mt: '5%' }}>
         <img 
           src="/static/Bku.ico" 
           alt="" 
           style={{ 
-            maxWidth: '25%',
+            maxWidth: '15%',
             height: 'auto',
             borderRadius: '0%',
             marginRight: '0%'
@@ -53,7 +61,7 @@ export default function Sidebar({ onLogout, isOpen }) {
               bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
           }}>
-            🏠 {t('Home')}
+            🏠{t('Home')}
           </Button>
         </Link>
         <Link to="/history" style={{ textDecoration: 'none' }}>
@@ -73,7 +81,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            🧾 {t('History')}
+            🧾{t('History')}
           </Button>
         </Link>
         <Link to="/relay" style={{ textDecoration: 'none' }}>
@@ -113,7 +121,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            📑 {t('Profile')}
+            📑{t('Profile')}
           </Button>
         </Link>
         <Link to="/setting" style={{ textDecoration: 'none' }}>
@@ -133,7 +141,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            📐 {t('Settings')}
+            📐{t('Settings')}
           </Button>
         </Link>
       </Box>

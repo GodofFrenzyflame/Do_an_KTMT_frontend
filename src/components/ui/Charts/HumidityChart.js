@@ -1,23 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useContext } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import { Box, Typography } from '@mui/material';
+import AppContext from '../../../AppContext';
+// import { useTranslation } from 'react-i18next';
+
 
 const HumidityGauge = () => {
-  const [humidity, setHumidity] = useState(0); // State để lưu trữ giá trị độ ẩm
+    const { settings } = useContext(AppContext);
+  // const { t } = useTranslation();
 
+
+  //const getBackgroundColor = (active) => settings.color === 'dark' ? (active ? '#4361ee' : '#000f1f') : (active ? '#0013ff' : '#ffffff');
+  const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
+  //const getboxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
+
+  const [humidity, setHumidity] = useState(null);
+  
   useEffect(() => {
-    // Hàm để fetch dữ liệu từ backend
     const fetchData = async () => {
+      const userid = localStorage.getItem('userId');
+      console.log(userid);
+
       try {
-        const response = await fetch('/feeds/humidity'); // URL API của backend
-        const data = await response.json();
-        setHumidity(data.humidity); // Cập nhật state với giá trị độ ẩm mới
+        // Use query parameters for GET requests
+        const response = await fetch(`http://localhost:8080/sensor/humi?userId=${encodeURIComponent(userid)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        console.log(result);
+        
+        if (response.ok) {
+          setHumidity(result.data);
+        } else {
+          console.error('Error:', result.message);
+        }
       } catch (error) {
         console.error('Error fetching humidity data:', error);
       }
     };
 
-    fetchData(); // Gọi hàm fetch dữ liệu
+    fetchData(); // Call the fetch function
   }, []);
 
   // Đặt các giá trị ngưỡng cho từng vùng
@@ -37,23 +63,12 @@ const HumidityGauge = () => {
         right: '20px',
       }}
     >
-      <Box
-        sx={{
-          width: '100%',
-          height: '100%',
-          border: '3px solid #000000',
-          borderRadius: '50%',
-          position: 'absolute',
-          top: '0%',
-          left: '0%',
-          zIndex: '1%',
-        }}
-      />
+      <Box/>
       <GaugeChart
         id="gauge-chart-humidity"
         nrOfLevels={3}
         colors={['#00FF00', '#FFFF00', '#FF0000']} 
-        arcWidth={0.4} 
+        arcWidth={0.2} 
         percent={humidity / 100} // Chuyển đổi giá trị độ ẩm thành phần trăm
         textColor="#000000"
         formatTextValue={value => `${value}%`}
@@ -68,7 +83,7 @@ const HumidityGauge = () => {
           height: '100%', 
           left: '1%', 
           position: 'relative',
-          zIndex: '0%'
+          zIndex: 1000
         }}
       />
       <Typography
@@ -76,7 +91,8 @@ const HumidityGauge = () => {
         sx={{
           position: 'absolute',
           bottom: '65px',
-          zIndex: '3%',
+          zIndex: 1000,
+          color: getWordColor ()
         }}
       >
         - 💧Humidity - 
@@ -89,20 +105,20 @@ const HumidityGauge = () => {
           alignItems: 'flex-start',
           top: '10px',
           left: '270px',
-          zIndex: '3% ',
+          zIndex: 1000
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: '4px' }}>
           <Box sx={{ width: '15px', height: '15px', backgroundColor: '#00FF00', borderRadius: '50%', mr: '8px' }} />
-          <Typography variant="caption">Safe</Typography>
+          <Typography variant="caption" sx={{color: getWordColor ()}}>Safe</Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: '4px' }}>
           <Box sx={{ width: '15px', height: '15px', backgroundColor: '#FFFF00', borderRadius: '50%', mr: '8px' }} />
-          <Typography variant="caption">Low</Typography>
+          <Typography variant="caption" sx={{color: getWordColor ()}}>Low</Typography>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ width: '15px', height: '15px', backgroundColor: '#FF0000', borderRadius: '50%', mr: '8px' }} />
-          <Typography variant="caption">High</Typography>
+            <Box sx={{ width: '15px', height: '15px', backgroundColor: '#FF0000', borderRadius: '50%', mr: '8px' }} />
+          <Typography variant="caption" sx={{color: getWordColor ()}}>High</Typography>
         </Box>
       </Box>
     </Box>
