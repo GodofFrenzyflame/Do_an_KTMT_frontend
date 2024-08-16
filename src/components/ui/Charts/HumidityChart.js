@@ -54,7 +54,7 @@ const HumidityGauge = () => {
         id="gauge-chart-humidity"
         nrOfLevels={3}
         colors={['#00FF00', '#FFFF00', '#FF0000']}
-        arcWidth={0.2}
+        arcWidth={0.1}
         percent={humidity / 100}
         textColor="#000000"
         formatTextValue={value => `${value}%`}
@@ -65,7 +65,7 @@ const HumidityGauge = () => {
           (100 - highHumidityZone) / 100,
         ]}
         style={{
-          width: '90%', // Giảm kích thước để vừa với container
+          width: '100%', // Giảm kích thước để vừa với container
           height: 'auto',
         }}
       />
@@ -76,7 +76,7 @@ const HumidityGauge = () => {
           color: getWordColor()
         }}
       >
-        - 💧Humidity -
+        💧Humidity 
       </Typography>
     </Box>
   );

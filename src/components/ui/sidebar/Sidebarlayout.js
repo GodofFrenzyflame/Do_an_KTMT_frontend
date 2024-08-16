@@ -14,7 +14,7 @@ const AuthenticatedLayout = ({ isSidebarOpen, toggleSidebar, onLogout, children 
         sx={{ 
           flexGrow: 1, 
           paddingLeft: sidebarWidth, // Adjust main content padding based on sidebar width
-          transition: 'padding-left 0.4s ease', 
+          // transition: 'padding-left 10s ease', 
           padding: '3%', 
           height: '100%',
           boxSizing: 'border-box',
@@ -27,13 +27,14 @@ const AuthenticatedLayout = ({ isSidebarOpen, toggleSidebar, onLogout, children 
         onClick={toggleSidebar} 
         sx={{ 
           position: 'fixed', 
-          top: '1%', 
-          left: isSidebarOpen ? sidebarWidth : '0%',
-          zIndex: 1300, // Ensure the button is above the sidebar
-          transition: 'left 0.3s ease' // Transition for button movement
+          top: '0%', 
+          left: isSidebarOpen ? '17%' : '0%',
+          zIndex: 1300, // Đảm bảo nút nằm trên cùng
+          transition: 'left 0.3s ease',
+          fontSize: '2.5rem', // Tăng kích thước ký tự '<' và '≡'
         }}
       >
-        {isSidebarOpen ? '<' : '≡'}
+        {isSidebarOpen ? '×' : '≡'}
       </IconButton>
     </Box>
   );

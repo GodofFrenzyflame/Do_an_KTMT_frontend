@@ -43,7 +43,7 @@ const TemperatureGauge = () => {
         id="gauge-chart-temperature"
         nrOfLevels={3}
         colors={['#FFFF00', '#00FF00', '#FF0000']} 
-        arcWidth={0.2} 
+        arcWidth={0.1} 
         percent={temperature / 100} // Chuyển đổi giá trị nhiệt độ thành phần trăm
         textColor="#000000"
         formatTextValue={value => `${value}°C`}
@@ -54,7 +54,7 @@ const TemperatureGauge = () => {
           (100 - highTemperatureZone) / 100,
         ]}
         style={{
-          width: '90%', // Giảm kích thước để vừa với container
+          width: '100%', // Giảm kích thước để vừa với container
           height: 'auto',
         }}
       />
@@ -65,7 +65,7 @@ const TemperatureGauge = () => {
           color: getWordColor()
         }}
       >
-        - 🔥 Temperature -
+        🔥Temperature 
       </Typography>
     </Box>
   );
