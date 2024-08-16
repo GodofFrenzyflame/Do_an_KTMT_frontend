@@ -1,30 +1,22 @@
-import React, { useEffect, useState, useContext  } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import { Box, Typography } from '@mui/material';
 import AppContext from '../../../AppContext';
-//import { useTranslation } from 'react-i18next';
-
 
 const TemperatureGauge = () => {
-  const [temperature, setTemperature] = useState(0); // State để lưu trữ giá trị độ ẩm
+  const [temperature, setTemperature] = useState(0); // State để lưu trữ giá trị nhiệt độ
   const { settings } = useContext(AppContext);
-  // const { t } = useTranslation();
-
-
-  //const getBackgroundColor = (active) => settings.color === 'dark' ? (active ? '#4361ee' : '#000f1f') : (active ? '#0013ff' : '#ffffff');
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
-  //const getboxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
-
 
   useEffect(() => {
     // Hàm để fetch dữ liệu từ backend
     const fetchData = async () => {
       try {
-        const response = await fetch('/feeds/tempurature'); // URL API của backend
+        const response = await fetch('/feeds/temperature'); // URL API của backend
         const data = await response.json();
-        setTemperature(data.humidity); // Cập nhật state với giá trị độ ẩm mới
+        setTemperature(data.temperature); // Cập nhật state với giá trị nhiệt độ mới
       } catch (error) {
-        console.error('Error fetching Tempurature data:', error);
+        console.error('Error fetching Temperature data:', error);
       }
     };
 
@@ -42,13 +34,11 @@ const TemperatureGauge = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
+        height: '100%',
         position: 'relative',
-        width: '270px',
-        height: '270px',
-        right: '20px',
       }}
     >
-      <Box/>
       <GaugeChart
         id="gauge-chart-temperature"
         nrOfLevels={3}
@@ -64,48 +54,19 @@ const TemperatureGauge = () => {
           (100 - highTemperatureZone) / 100,
         ]}
         style={{
-          width: '135%',
-          height: '100%',
-          left: '1%',
-          position: 'relative',
-          zIndex: 1000
-          }}
+          width: '90%', // Giảm kích thước để vừa với container
+          height: 'auto',
+        }}
       />
       <Typography
         variant="h6"
         sx={{
-          position: 'absolute',
-          bottom: '65px',
-          zIndex: 1000,
-          color: getWordColor ()
+          mt: 2,
+          color: getWordColor()
         }}
       >
-        - 🔥Temperature - 
+        - 🔥 Temperature -
       </Typography>
-      <Box
-        sx={{
-          position: 'absolute',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          top: '10px',
-          left: '270px',
-          zIndex: 1000
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: '4px' }}>
-          <Box sx={{ width: '15px', height: '15px', backgroundColor: '#00FF00', borderRadius: '50%', mr: '8px' }} />
-          <Typography variant="caption" sx={{color: getWordColor ()}}>Safe</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: '4px' }}>
-          <Box sx={{ width: '15px', height: '15px', backgroundColor: '#FFFF00', borderRadius: '50%', mr: '8px' }} />
-          <Typography variant="caption" sx={{color: getWordColor ()}}>Low</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Box sx={{ width: '15px', height: '15px', backgroundColor: '#FF0000', borderRadius: '50%', mr: '8px' }} />
-          <Typography variant="caption" sx={{color: getWordColor ()}}>High</Typography>
-        </Box>
-      </Box>
     </Box>
   );
 };

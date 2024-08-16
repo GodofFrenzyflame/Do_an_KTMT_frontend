@@ -1,117 +1,16 @@
-Reset các giá trị mặc định của trình duyệt để đảm bảo sự đồng nhất
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html, body {
-  height: 100%;
+/* Ensure the overall layout behaves correctly */
+body {
   font-family: 'Roboto', sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-  background-color: #f5f5f5;
-  color: #333;
 }
 
-/* Thiết lập các kiểu chung cho các phần tử */
-a {
-  text-decoration: none;
-  color: inherit;
+.sidebar-closed {
+  transform: translateX(-240px);
 }
-
-ul {
-  list-style: none;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-}
-
-/* Flexbox utilities */
-.flex {
-  display: flex;
-}
-
-.flex-center {
+.chart-container {
+  height: 35vh;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Grid utilities */
-.grid {
-  display: grid;
-  gap: 1rem;
-}
-
-/* Padding and Margin Utilities */
-.p-1 { padding: 0.5rem; }
-.p-2 { padding: 1rem; }
-.p-3 { padding: 1.5rem; }
-.m-1 { margin: 0.5rem; }
-.m-2 { margin: 1rem; }
-.m-3 { margin: 1.5rem; }
-
-/* Typography */
-h1, h2, h3, h4, h5, h6 {
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-p {
-  margin-bottom: 1rem;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* Utility Classes for Borders and Radius */
-.sidebar-closed {
-  transform: scale(0); 
-}
-.rounded {
-  border-radius: 8px;
-}
-
-.shadow {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Media Queries for Responsive Design */
-@media (max-width: 768px) {
-  .hide-on-mobile {
-    display: none;
-  }
-
-  .responsive-container {
-    padding: 0 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  html {
-    font-size: 14px;
-  }
+  border-radius: 10px;
+  padding: 1rem;
 }

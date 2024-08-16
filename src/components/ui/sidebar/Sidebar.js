@@ -27,7 +27,9 @@ export default function Sidebar({ onLogout, isOpen }) {
       position: 'fixed',
       top: 10,
       left: 10,
+      borderRadius: '12px',
       zIndex: 1200 // Ensure it is above other content
+      
     }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: '20%', mt: '5%' }}>
         <img 
