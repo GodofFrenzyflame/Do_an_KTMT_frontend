@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import GaugeChart from 'react-gauge-chart';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import { Box, Typography } from '@mui/material';
 import AppContext from '../../../AppContext';
 
@@ -35,9 +36,6 @@ const HumidityGauge = () => {
     fetchData();
   }, []);
 
-  const lowHumidityZone = 40; // Ngưỡng độ ẩm thấp
-  const highHumidityZone = 70; // Ngưỡng độ ẩm cao
-
   return (
     <Box
       sx={{
@@ -50,33 +48,27 @@ const HumidityGauge = () => {
         position: 'relative',
       }}
     >
-      <GaugeChart
-        id="gauge-chart-humidity"
-        nrOfLevels={3}
-        colors={['#00FF00', '#FFFF00', '#FF0000']}
-        arcWidth={0.1}
-        percent={humidity / 100}
-        textColor="#000000"
-        formatTextValue={value => `${value}%`}
-        needleColor="#345243"
-        arcsLength={[
-          lowHumidityZone / 100,
-          (highHumidityZone - lowHumidityZone) / 100,
-          (100 - highHumidityZone) / 100,
-        ]}
+      <CircularProgressbar 
+        value={humidity === null ? 0 : humidity} 
+        text={`${humidity === null ? 0 : humidity}%`}
+        styles={buildStyles({
+          textColor: getWordColor(),
+          pathColor: humidity < 40 ? '#FF0000' : humidity < 70 ? '#FFFF00' : '#00FF00',
+          trailColor: '#eee',
+        })}
         style={{
-          width: '100%', // Giảm kích thước để vừa với container
-          height: 'auto',
+          width: '150px',
+          height: '150px',
         }}
       />
       <Typography
         variant="h6"
         sx={{
           mt: 2,
-          color: getWordColor()
+          color: getWordColor(),
         }}
       >
-        💧Humidity 
+        💧Humidity
       </Typography>
     </Box>
   );

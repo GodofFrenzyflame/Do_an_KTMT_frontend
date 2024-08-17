@@ -1,31 +1,40 @@
 import React, { useEffect, useState, useContext } from 'react';
-import GaugeChart from 'react-gauge-chart';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import { Box, Typography } from '@mui/material';
 import AppContext from '../../../AppContext';
 
 const TemperatureGauge = () => {
-  const [temperature, setTemperature] = useState(0); // State để lưu trữ giá trị nhiệt độ
   const { settings } = useContext(AppContext);
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
+  const [temperature, setTemperature] = useState(null);
 
   useEffect(() => {
-    // Hàm để fetch dữ liệu từ backend
     const fetchData = async () => {
+      const userid = localStorage.getItem('userId');
+
       try {
-        const response = await fetch('/feeds/temperature'); // URL API của backend
-        const data = await response.json();
-        setTemperature(data.temperature); // Cập nhật state với giá trị nhiệt độ mới
+        const response = await fetch(`http://localhost:8080/sensor/temp?userId=${encodeURIComponent(userid)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const result = await response.json();
+        
+        if (response.ok) {
+          setTemperature(result.data);
+        } else {
+          console.error('Error:', result.message);
+        }
       } catch (error) {
-        console.error('Error fetching Temperature data:', error);
+        console.error('Error fetching temperature data:', error);
       }
     };
 
-    fetchData(); // Gọi hàm fetch dữ liệu
+    fetchData();
   }, []);
-
-  // Đặt các giá trị ngưỡng cho từng vùng
-  const lowTemperatureZone = 10; // Ngưỡng nhiệt độ thấp (ví dụ: dưới 10°C)
-  const highTemperatureZone = 50; // Ngưỡng nhiệt độ cao (ví dụ: trên 50°C)
 
   return (
     <Box
@@ -39,33 +48,27 @@ const TemperatureGauge = () => {
         position: 'relative',
       }}
     >
-      <GaugeChart
-        id="gauge-chart-temperature"
-        nrOfLevels={3}
-        colors={['#FFFF00', '#00FF00', '#FF0000']} 
-        arcWidth={0.1} 
-        percent={temperature / 100} // Chuyển đổi giá trị nhiệt độ thành phần trăm
-        textColor="#000000"
-        formatTextValue={value => `${value}°C`}
-        needleColor="#345243"
-        arcsLength={[
-          lowTemperatureZone / 100,
-          (highTemperatureZone - lowTemperatureZone) / 100,
-          (100 - highTemperatureZone) / 100,
-        ]}
+      <CircularProgressbar 
+        value={temperature === null ? 0 : temperature}
+        text={`${temperature === null ? 0 : temperature}°C`}
+        styles={buildStyles({
+          textColor: getWordColor(),
+          pathColor: temperature < 15 ? '#00BFFF' : temperature < 25 ? '#FFD700' : '#FF4500',
+          trailColor: '#eee',
+        })}
         style={{
-          width: '100%', // Giảm kích thước để vừa với container
-          height: 'auto',
+          width: '150px',
+          height: '150px',
         }}
       />
       <Typography
         variant="h6"
         sx={{
           mt: 2,
-          color: getWordColor()
+          color: getWordColor(),
         }}
       >
-        🔥Temperature 
+        🌡️ Temperature
       </Typography>
     </Box>
   );
