@@ -1,3 +1,4 @@
+// src/components/ui/Main/Mainboard.js
 import React, { useContext } from 'react';
 import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
@@ -6,17 +7,17 @@ import { Box, Container, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../../../AppContext';
 import { useTranslation } from 'react-i18next';
 
-const Home = ({ isOpen }) => {
+const Home = () => {
   const { settings } = useContext(AppContext);
   const { t } = useTranslation();
 
-  const getBackgroundColor = (active) => settings.color === 'dark' ? (active ? '#4361ee' : '#000f1f') : (active ? '#0013ff' : '#ffffff');
+  const getBackgroundColor = () => settings.color === 'dark' ? '#000f1f' : '#ffffff';
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
 
   return (
-    <Box sx={{ backgroundColor: getBackgroundColor(), zIndex: 1000 }}>
-      <Container maxWidth="xxl" sx={{ px: { xs: '1%', sm: '1%', md: '1%' }, py: { xs: '5%', sm: '1%' } }}>
+    <Box sx={{ backgroundColor: getBackgroundColor(), zIndex: 1000, position: 'relative', minHeight: '100vh' }}>
+      <Container maxWidth="xxl" sx={{ px: { xs: 0, sm: 0, md: 0 }, py: { xs: 0, sm: 0 } }}>
         <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
           {t('Home')}
         </Typography>
@@ -33,25 +34,20 @@ const Home = ({ isOpen }) => {
         </Grid>
 
         <Grid container spacing={2}>
-
           <Grid item xs={12} sm={4}>
-            <Paper elevation={3} className="chart-container"
-              sx={{ bgcolor: getBoxBackgroundColor() }}>
+            <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
               <TemperatureChart />
             </Paper>
           </Grid>
 
-
           <Grid item xs={12} sm={4}>
-            <Paper elevation={3} className="chart-container"
-              sx={{ bgcolor: getBoxBackgroundColor() }}>
+            <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
               <HumidityChart />
             </Paper>
           </Grid>
 
           <Grid item xs={12} sm={4}>
-            <Paper elevation={10} className="chart-container"
-              sx={{ bgcolor: getBoxBackgroundColor() }}>
+            <Paper elevation={10} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
               <Map />
             </Paper>
           </Grid>

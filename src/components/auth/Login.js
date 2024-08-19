@@ -45,7 +45,11 @@ export default function Login({ onLogin }) {
 
   const handleOpenSignup = () => setOpenSignup(true); // Mở hộp thoại đăng ký
   const handleCloseSignup = () => setOpenSignup(false); // Đóng hộp thoại đăng ký
-
+  const handleKeyDown = (e) =>{
+    if (e.key === 'Enter'){
+      handleLogin(e);
+    }
+  };
   return (
     <Box
       sx={{
@@ -89,6 +93,7 @@ export default function Login({ onLogin }) {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={handleKeyDown}
           fullWidth
           sx={{ mb: 2 }}
         />
