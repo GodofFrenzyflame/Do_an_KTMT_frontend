@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client'; // Sử dụng `react-dom/client` thay vì `react-dom`
 import App from './App';
-import './styles/globalStyles.css';
+import './styles/Styles.css';
 import { AppProvider } from './AppContext'; // Import AppProvider
 import './i18n';
 

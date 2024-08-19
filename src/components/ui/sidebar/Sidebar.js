@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
 import AppContext from '../../../AppContext';
-import '../../../styles/globalStyles.css';
+import '../../../styles/Styles.css';
 import { useTranslation } from 'react-i18next';
 
 export default function Sidebar({ onLogout, isOpen }) {

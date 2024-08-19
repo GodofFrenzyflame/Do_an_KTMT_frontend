@@ -3,9 +3,10 @@ import React, { useContext } from 'react';
 import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
 import Map from '../Charts/Map';
-import { Box, Container, Typography, Grid, Paper } from '@mui/material';
+import { Container, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../../../AppContext';
 import { useTranslation } from 'react-i18next';
+
 
 const Home = () => {
   const { settings } = useContext(AppContext);
@@ -16,53 +17,49 @@ const Home = () => {
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
 
   return (
-    <Box sx={{ backgroundColor: getBackgroundColor(), zIndex: 1000, position: 'relative', minHeight: '100vh' }}>
-      <Container maxWidth="xxl" sx={{ px: { xs: 0, sm: 0, md: 0 }, py: { xs: 0, sm: 0 } }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
-          {t('Home')}
-        </Typography>
+    <Container maxWidth="xxxl"  sx={{ backgroundColor: getBackgroundColor()}}>
+      <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
+        {t('Home')}
+      </Typography>
 
-        <Grid container spacing={2} sx={{ mb: '1%' }}>
-          {[1, 2, 3, 4].map((relay) => (
-            <Grid item xs={12} sm={6} md={3} key={relay}>
-              <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', bgcolor: getBoxBackgroundColor(), color: getWordColor() }}>
-                <Typography variant="h6">Relay {relay}</Typography>
-                <Typography variant="body1">Status: OFF</Typography>
-              </Paper>
-            </Grid>
-          ))}
-        </Grid>
-
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={4}>
-            <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
-              <TemperatureChart />
+      <Grid container spacing={2} sx={{ mb: '1%' }}>
+        {[1, 2, 3, 4].map((relay) => (
+          <Grid item xs={12} sm={6} md={3} key={relay}>
+            <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', bgcolor: getBoxBackgroundColor(), color: getWordColor() }}>
+              <Typography variant="h6">Relay {relay}</Typography>
+              <Typography variant="body1">Status: OFF</Typography>
             </Paper>
           </Grid>
+        ))}
+      </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
-              <HumidityChart />
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <Paper elevation={10} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
-              <Map />
-            </Paper>
-          </Grid>
-        </Grid>
-        
-        <Box sx={{ mt: '1%' }}>
-          <Paper elevation={3} sx={{ p: '2%', textAlign: 'left', bgcolor: getBoxBackgroundColor(), color: getWordColor() }}>
-            <Typography variant="h6" sx={{ mb: '1%' }}>History</Typography>
-            <Typography variant="body1" sx={{ mb: '2%' }}>
-              Here will be the history of chart changes.
-            </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={4}>
+          <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
+            <TemperatureChart />
           </Paper>
-        </Box>
-      </Container>
-    </Box>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
+            <HumidityChart />
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <Paper elevation={10} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
+            <Map />
+          </Paper>
+        </Grid>
+      </Grid>
+      
+      <Paper elevation={3} sx={{ p: '2%', textAlign: 'left', bgcolor: getBoxBackgroundColor(), color: getWordColor(), mt: '1%' }}>
+        <Typography variant="h6" sx={{ mb: '1%' }}>History</Typography>
+        <Typography variant="body1" sx={{ mb: '2%' }}>
+          Here will be the history of chart changes.
+        </Typography>
+      </Paper>
+    </Container>
   );
 };
 
