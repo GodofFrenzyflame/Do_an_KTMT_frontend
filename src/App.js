@@ -4,30 +4,29 @@ import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import Home from './components/ui/Main/Mainboard';
 import Profile from './components/ui/User/Profile';
-// import Sidebar from './components/ui/Sidebar';
 import History from './components/ui/historyboard/History';
 import AuthenticatedLayout from './components/ui/sidebar/Sidebarlayout';
-import { Box } from '@mui/material'; // Import Box ở đây
+import { Box } from '@mui/material';
 import Relay from './components/ui/Relayboard/Relay';
-import Setting from './components/ui/Settingboard/Settingboard'
+import Setting from './components/ui/Settingboard/Settingboard';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   const fetchConnectMqtt = async (token) => {
-    console.log('connect')
+    console.log('Connecting to MQTT...');
     try {
       const response = await fetch('http://localhost:8080/mqtt/connect', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Sử dụng token
+          'Authorization': `Bearer ${token}`,
         },
       });
       const result = await response.json();
       if (response.ok) {
-        console.log('Connect mqtt successful')
+        console.log('Connected to MQTT successfully');
       } else {
         console.error('Error:', result.message);
         if (response.status === 403) {
@@ -35,23 +34,23 @@ function App() {
         }
       }
     } catch (error) {
-      console.error('Error fetching humidity data:', error);
+      console.error('Error connecting to MQTT:', error);
     }
   };
 
   const fetchDisconnectMqtt = async (token) => {
-    console.log('disconnect')
+    console.log('Disconnecting from MQTT...');
     try {
       const response = await fetch('http://localhost:8080/mqtt/disconect', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Sử dụng token
+          'Authorization': `Bearer ${token}`,
         },
       });
       const result = await response.json();
       if (response.ok) {
-        console.log('Connect mqtt successful')
+        console.log('Disconnected from MQTT successfully');
       } else {
         console.error('Error:', result.message);
         if (response.status === 403) {
@@ -59,7 +58,7 @@ function App() {
         }
       }
     } catch (error) {
-      console.error('Error fetching humidity data:', error);
+      console.error('Error disconnecting from MQTT:', error);
     }
   };
 
@@ -72,7 +71,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ refreshToken }), // Gửi refreshToken để lấy accessToken mới
+        body: JSON.stringify({ refreshToken }),
       });
 
       const result = await response.json();
@@ -80,7 +79,7 @@ function App() {
       if (response.ok) {
         const { accessToken } = result;
         localStorage.setItem('accessToken', accessToken);
-        await fetchConnectMqtt(accessToken); // Gọi lại API với accessToken mới
+        await fetchConnectMqtt(accessToken);
       } else {
         console.error('Error refreshing access token:', result.message);
       }
@@ -93,7 +92,6 @@ function App() {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
     if (storedLoggedInStatus === 'true') {
       setIsLoggedIn(true);
-      console.log(localStorage.getItem('refreshToken'))
       fetchConnectMqtt(localStorage.getItem('accessToken'));
     }
   }, []);
@@ -103,15 +101,16 @@ function App() {
   };
 
   const handleLogout = () => {
+    const accessToken = localStorage.getItem('accessToken');
+    fetchDisconnectMqtt(accessToken);
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    fetchDisconnectMqtt(localStorage.getItem('accessToken'));
     setIsLoggedIn(false);
   };
 
   const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
+    setSidebarOpen((prev) => !prev);
   };
 
   return (
@@ -190,7 +189,6 @@ function App() {
               : <Navigate to="/" />
           }
         />
-
         <Route
           path="/setting"
           element={
@@ -205,7 +203,6 @@ function App() {
               : <Navigate to="/" />
           }
         />
-
       </Routes>
     </Router>
   );

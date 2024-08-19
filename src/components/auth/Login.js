@@ -13,7 +13,6 @@ export default function Login({ onLogin }) {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Validate passwords match
     try {
       const response = await fetch('http://localhost:8080/login', {
         method: 'POST',
@@ -26,14 +25,15 @@ export default function Login({ onLogin }) {
       const result = await response.json();
 
       if (response.ok) {
-        const { userId } = result;
-        localStorage.setItem('userId', userId);
-        console.log('User ID:', localStorage.getItem('userId'));
+        const { accessToken, refreshToken } = result;
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('isLoggedIn', 'true');
+        console.log('Access Token:', localStorage.getItem('accessToken'));
+        console.log('Refresh Token:', localStorage.getItem('refreshToken'));
         onLogin(true);
         navigate('/home');
-      }
-      else {
+      } else {
         console.error('Error:', result.message);
         setError(result.message || 'Failed to create account');
       }
