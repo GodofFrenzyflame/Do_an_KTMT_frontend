@@ -9,31 +9,33 @@ const TemperatureGauge = () => {
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const [temperature, setTemperature] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const userid = localStorage.getItem('userId');
-
-      try {
-        const response = await fetch(`http://localhost:8080/sensor/temp?userId=${encodeURIComponent(userid)}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const result = await response.json();
-        
-        if (response.ok) {
-          setTemperature(result.data);
-        } else {
-          console.error('Error:', result.message);
-        }
-      } catch (error) {
-        console.error('Error fetching temperature data:', error);
+  const fetchTemperaturData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/sensor/temp', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setTemperature(result.data);
+      } else {
+        console.error('Error:', result.message);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching temperature data:', error);
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    fetchTemperaturData(accessToken);
+    const intervalId = setInterval(() => {
+      fetchTemperaturData(accessToken);
+    }, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -48,7 +50,7 @@ const TemperatureGauge = () => {
         position: 'relative',
       }}
     >
-      <CircularProgressbar 
+      <CircularProgressbar
         value={temperature === null ? 0 : temperature}
         text={`${temperature === null ? 0 : temperature}°C`}
         styles={buildStyles({

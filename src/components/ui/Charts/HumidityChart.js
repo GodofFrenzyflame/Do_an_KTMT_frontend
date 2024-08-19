@@ -6,34 +6,36 @@ import AppContext from '../../../AppContext';
 
 const HumidityGauge = () => {
   const { settings } = useContext(AppContext);
-  const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
+  const getWordColor = () => (settings.color === 'dark' ? '#fff' : '#000');
   const [humidity, setHumidity] = useState(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const userid = localStorage.getItem('userId');
-
-      try {
-        const response = await fetch(`http://localhost:8080/sensor/humi?userId=${encodeURIComponent(userid)}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        const result = await response.json();
-        
-        if (response.ok) {
-          setHumidity(result.data);
-        } else {
-          console.error('Error:', result.message);
-        }
-      } catch (error) {
-        console.error('Error fetching humidity data:', error);
+  const fetchHumidityData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/sensor/humi', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setHumidity(result.data);
+      } else {
+        console.error('Error:', result.message);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching humidity data:', error);
+    }
+  };
 
-    fetchData();
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    fetchHumidityData(accessToken);
+    const intervalId = setInterval(() => {
+      fetchHumidityData(accessToken);
+    }, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
@@ -48,8 +50,8 @@ const HumidityGauge = () => {
         position: 'relative',
       }}
     >
-      <CircularProgressbar 
-        value={humidity === null ? 0 : humidity} 
+      <CircularProgressbar
+        value={humidity === null ? 0 : humidity}
         text={`${humidity === null ? 0 : humidity}%`}
         styles={buildStyles({
           textColor: getWordColor(),

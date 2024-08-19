@@ -15,10 +15,86 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
+  const fetchConnectMqtt = async (token) => {
+    console.log('connect')
+    try {
+      const response = await fetch('http://localhost:8080/mqtt/connect', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Sử dụng token
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Connect mqtt successful')
+      } else {
+        console.error('Error:', result.message);
+        if (response.status === 403) {
+          await refreshAccessToken();
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching humidity data:', error);
+    }
+  };
+
+  const fetchDisconnectMqtt = async (token) => {
+    console.log('disconnect')
+    try {
+      const response = await fetch('http://localhost:8080/mqtt/disconect', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Sử dụng token
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Connect mqtt successful')
+      } else {
+        console.error('Error:', result.message);
+        if (response.status === 403) {
+          await refreshAccessToken();
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching humidity data:', error);
+    }
+  };
+
+  const refreshAccessToken = async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    try {
+      const response = await fetch('http://localhost:8080/refresh-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }), // Gửi refreshToken để lấy accessToken mới
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        const { accessToken } = result;
+        localStorage.setItem('accessToken', accessToken);
+        await fetchConnectMqtt(accessToken); // Gọi lại API với accessToken mới
+      } else {
+        console.error('Error refreshing access token:', result.message);
+      }
+    } catch (error) {
+      console.error('Error during access token refresh:', error);
+    }
+  };
+
   useEffect(() => {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
     if (storedLoggedInStatus === 'true') {
       setIsLoggedIn(true);
+      console.log(localStorage.getItem('refreshToken'))
+      fetchConnectMqtt(localStorage.getItem('accessToken'));
     }
   }, []);
 
@@ -28,6 +104,9 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    fetchDisconnectMqtt(localStorage.getItem('accessToken'));
     setIsLoggedIn(false);
   };
 
@@ -38,95 +117,95 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route 
-          path="/" 
+        <Route
+          path="/"
           element={
-            isLoggedIn ? <Navigate to="/home" /> : 
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-              <Login onLogin={handleLogin} />
-            </Box>
-          } 
+            isLoggedIn ? <Navigate to="/home" /> :
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Login onLogin={handleLogin} />
+              </Box>
+          }
         />
-        <Route 
-          path="/signup" 
+        <Route
+          path="/signup"
           element={
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
               <Signup />
             </Box>
-          } 
+          }
         />
-        <Route 
-          path="/home" 
+        <Route
+          path="/home"
           element={
-            isLoggedIn ? 
-              <AuthenticatedLayout 
-                isSidebarOpen={isSidebarOpen} 
-                toggleSidebar={toggleSidebar} 
+            isLoggedIn ?
+              <AuthenticatedLayout
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
                 onLogout={handleLogout}
               >
                 <Home />
-              </AuthenticatedLayout> 
-            : <Navigate to="/" />
-          } 
+              </AuthenticatedLayout>
+              : <Navigate to="/" />
+          }
         />
-        <Route 
-          path="/profile" 
+        <Route
+          path="/profile"
           element={
-            isLoggedIn ? 
-              <AuthenticatedLayout 
-                isSidebarOpen={isSidebarOpen} 
-                toggleSidebar={toggleSidebar} 
+            isLoggedIn ?
+              <AuthenticatedLayout
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
                 onLogout={handleLogout}
               >
                 <Profile />
-              </AuthenticatedLayout> 
-            : <Navigate to="/" />
-          } 
+              </AuthenticatedLayout>
+              : <Navigate to="/" />
+          }
         />
-        <Route 
-          path="/history" 
+        <Route
+          path="/history"
           element={
-            isLoggedIn ? 
-              <AuthenticatedLayout 
-                isSidebarOpen={isSidebarOpen} 
-                toggleSidebar={toggleSidebar} 
+            isLoggedIn ?
+              <AuthenticatedLayout
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
                 onLogout={handleLogout}
               >
                 <History />
-              </AuthenticatedLayout> 
-            : <Navigate to="/" />
-          } 
+              </AuthenticatedLayout>
+              : <Navigate to="/" />
+          }
         />
-        <Route 
-          path="/relay" 
+        <Route
+          path="/relay"
           element={
-            isLoggedIn ? 
-              <AuthenticatedLayout 
-                isSidebarOpen={isSidebarOpen} 
-                toggleSidebar={toggleSidebar} 
+            isLoggedIn ?
+              <AuthenticatedLayout
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
                 onLogout={handleLogout}
               >
                 <Relay />
-              </AuthenticatedLayout> 
-            : <Navigate to="/" />
-          } 
+              </AuthenticatedLayout>
+              : <Navigate to="/" />
+          }
         />
 
-        <Route 
-          path="/setting" 
+        <Route
+          path="/setting"
           element={
-            isLoggedIn ? 
-              <AuthenticatedLayout 
-                isSidebarOpen={isSidebarOpen} 
-                toggleSidebar={toggleSidebar} 
+            isLoggedIn ?
+              <AuthenticatedLayout
+                isSidebarOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
                 onLogout={handleLogout}
               >
                 <Setting />
-              </AuthenticatedLayout> 
-            : <Navigate to="/" />
-          } 
+              </AuthenticatedLayout>
+              : <Navigate to="/" />
+          }
         />
-        
+
       </Routes>
     </Router>
   );

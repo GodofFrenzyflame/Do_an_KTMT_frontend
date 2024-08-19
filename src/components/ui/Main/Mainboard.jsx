@@ -21,7 +21,7 @@ const Home = ({ isOpen }) => {
           {t('Home')}
         </Typography>
 
-        <Grid container spacing={2} sx={{ mb: '2%' }}>
+        <Grid container spacing={2} sx={{ mb: '1%' }}>
           {[1, 2, 3, 4].map((relay) => (
             <Grid item xs={12} sm={6} md={3} key={relay}>
               <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', bgcolor: getBoxBackgroundColor(), color: getWordColor() }}>
@@ -57,7 +57,7 @@ const Home = ({ isOpen }) => {
           </Grid>
         </Grid>
         
-        <Box sx={{ mt: '2%' }}>
+        <Box sx={{ mt: '1%' }}>
           <Paper elevation={3} sx={{ p: '2%', textAlign: 'left', bgcolor: getBoxBackgroundColor(), color: getWordColor() }}>
             <Typography variant="h6" sx={{ mb: '1%' }}>History</Typography>
             <Typography variant="body1" sx={{ mb: '2%' }}>

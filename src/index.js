@@ -7,9 +7,9 @@ import './i18n';
 
 const root = ReactDOM.createRoot(document.getElementById('root')); // Tạo root
 root.render(
-  <React.StrictMode>
+  //<React.StrictMode>
     <AppProvider>
       <App />
     </AppProvider>
-  </React.StrictMode>
+  //</React.StrictMode>
 );
