@@ -1,5 +1,5 @@
 // src/components/ui/Charts/Map.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -24,21 +24,54 @@ const destinationIcon = new L.Icon({
 
 const Map = () => {
   const position = [10.772138, 106.658016]; // Tọa độ hiện tại
-
-  const destination = [10.77270023022209, 106.65917701616793]; // Tọa độ đích
-
-  // Tạo URL chỉ đường
-  const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(position.join(','))}&destination=${encodeURIComponent(destination.join(','))}`;
+  const [destination, setDestination] = useState([10.77270023022209, 106.65917701616793]);
+  const [googleMapsUrl, setGoogleMapsUrl] = useState('');
 
   const handleButtonClick = () => {
-    window.open(googleMapsUrl, '_blank');
+    if (googleMapsUrl) {
+      window.open(googleMapsUrl, '_blank');
+    } else {
+      console.error('Google Maps URL is not set');
+    }
   };
+
+  const fetchLocationData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/sensor/location', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        const newDestination = [result.X, result.Y];
+        setDestination(newDestination);
+        const newGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(position.join(','))}&destination=${encodeURIComponent(newDestination.join(','))}`;
+        setGoogleMapsUrl(newGoogleMapsUrl);
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching location data:', error);
+    }
+  };
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    fetchLocationData(accessToken);
+    const intervalId = setInterval(() => {
+      fetchLocationData(accessToken);
+    }, 5000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%' }}>
-      <MapContainer 
-        center={position} 
-        zoom={13} 
+      <MapContainer
+        center={position}
+        zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
@@ -74,7 +107,7 @@ const Map = () => {
           zIndex: 1000
         }}
       >
-        Wayfinding 
+        Wayfinding
       </button>
     </div>
   );

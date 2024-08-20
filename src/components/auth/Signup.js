@@ -6,6 +6,8 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [aioUser, setAioUser] = useState('');
+  const [aioKey, setAioKey] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -24,7 +26,7 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, aioUser, aioKey }),
       });
 
       const result = await response.json();
@@ -82,7 +84,21 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
         fullWidth
         sx={{ mb: 2 }}
       />
-      
+      <TextField
+        label="AIO-User"
+        value={aioUser}
+        onChange={(e) => setAioUser(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+      />
+      <TextField
+        label="AIO-Key"
+        value={aioKey}
+        onChange={(e) => setAioKey(e.target.value)}
+        fullWidth
+        sx={{ mb: 2 }}
+      />
+
       {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
       {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
 
