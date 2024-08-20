@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Box, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { TextField, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'; // Đảm bảo đã nhập khẩu các thành phần cần thiết
 import Signup from './Signup';
+import Forget from './Forget'; // Import component Forget
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [openSignup, setOpenSignup] = useState(false);
+  const [openForget, setOpenForget] = useState(false); // Thêm trạng thái để mở/đóng cửa sổ Forget
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
@@ -67,6 +69,9 @@ export default function Login({ onLogin }) {
   const handleOpenSignup = () => setOpenSignup(true);
   const handleCloseSignup = () => setOpenSignup(false);
 
+  const handleOpenForget = () => setOpenForget(true); // Mở cửa sổ Forget
+  const handleCloseForget = () => setOpenForget(false); // Đóng cửa sổ Forget
+
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleLogin(e);
@@ -76,10 +81,6 @@ export default function Login({ onLogin }) {
   const handleMouseMove = (e) => {
     const { clientX: x, clientY: y } = e;
     setBackgroundPosition({ x, y });
-  };
-
-  const handleForgotPasswordOrUsername = () => {
-    navigate('/forget'); // Điều hướng đến trang Forget
   };
 
   const gradientStyle = {
@@ -132,20 +133,24 @@ export default function Login({ onLogin }) {
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
           fullWidth
-          sx={{ mb: 2 }}
+          sx={{ mb: 0 }}
         />
-        {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
-        <Button variant="contained" color="primary" onClick={handleLogin} fullWidth>
+        <Box sx={{ mt: 0, textAlign: 'right' }}>
+          <Button onClick={handleOpenForget} sx={{ textTransform: 'lowercase' }}>
+            Forgot password?
+          </Button>
+        </Box>
+        {error && <Typography color="error" sx={{ mb: 3 }}>{error}</Typography>}
+        <Button sx={{ mt: 3}}variant="contained" color="primary" onClick={handleLogin} fullWidth>
           Login
         </Button>
+        
         <Typography sx={{ mt: 2 }}>
           <Button onClick={handleOpenSignup}>Create new account</Button>
         </Typography>
-        <Typography sx={{ mt: 2 }}>
-          <Button onClick={handleForgotPasswordOrUsername}>Forgot password or username?</Button>
-        </Typography>
       </Box>
 
+      {/* Cửa sổ Signup */}
       <Dialog open={openSignup} onClose={handleCloseSignup}>
         <DialogTitle>Sign Up</DialogTitle>
         <DialogContent>
@@ -155,6 +160,9 @@ export default function Login({ onLogin }) {
           <Button onClick={handleCloseSignup}>Close</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Cửa sổ Forget */}
+      <Forget open={openForget} onClose={handleCloseForget} />
     </Box>
   );
 }

@@ -1,25 +1,27 @@
-// Forget.js
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography} from '@mui/material';
+import { TextField, Button, Box, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
-export default function Forget() {
-  const [step, setStep] = useState('main'); // Quản lý bước hiện tại (chọn quên mật khẩu hay quên tài khoản)
-  const [emailOrUsername, setEmailOrUsername] = useState('');
+export default function Forget({ open, onClose }) {
+  const [step, setStep] = useState('request'); // Các bước: 'request', 'verify'
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleForgotPassword = async () => {
+  // Xử lý yêu cầu reset mật khẩu
+  const handleRequest = async () => {
     try {
-      // Gửi yêu cầu lấy lại mật khẩu
       const response = await fetch('http://localhost:8080/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ emailOrUsername }),
+        body: JSON.stringify({ emailOrPhone }),
       });
       const result = await response.json();
       if (response.ok) {
-        alert('Instructions for resetting your password have been sent.');
+        setStep('verify');
+        setSuccess('Instructions for resetting your password have been sent.');
       } else {
         setError(result.message || 'Failed to request password reset');
       }
@@ -28,21 +30,22 @@ export default function Forget() {
     }
   };
 
-  const handleForgotUsername = async () => {
+  // Xử lý xác thực mã
+  const handleVerify = async () => {
     try {
-      // Gửi yêu cầu lấy lại tài khoản
-      const response = await fetch('http://localhost:8080/forgot-username', {
+      const response = await fetch('http://localhost:8080/verify-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ emailOrUsername }),
+        body: JSON.stringify({ emailOrPhone, verificationCode }),
       });
       const result = await response.json();
       if (response.ok) {
-        alert('Instructions for retrieving your username have been sent.');
+        setSuccess('Verification successful. Please follow the instructions sent to your email or phone.');
+        setStep('completed');
       } else {
-        setError(result.message || 'Failed to request username retrieval');
+        setError(result.message || 'Failed to verify code');
       }
     } catch (error) {
       setError('Failed to connect to the server');
@@ -50,46 +53,62 @@ export default function Forget() {
   };
 
   return (
-    <Box sx={{ padding: 4, textAlign: 'center' }}>
-      {step === 'main' ? (
-        <>
-          <Typography variant="h6" sx={{ mb: 3 }}>
-            Forgot Password or Username?
-          </Typography>
-          <Button variant="contained" color="primary" onClick={() => setStep('forgot-password')}>
-            Forgot Password
-          </Button>
-          <Button variant="contained" color="secondary" onClick={() => setStep('forgot-username')}>
-            Forgot Username
-          </Button>
-        </>
-      ) : (
-        <>
-          <Typography variant="h6" sx={{ mb: 3 }}>
-            Enter your email or username:
-          </Typography>
-          <TextField
-            label="Email or Username"
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-            fullWidth
-            sx={{ mb: 2 }}
-          />
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Forgot Password</DialogTitle>
+      <DialogContent>
+        <Box sx={{ padding: 2, textAlign: 'center' }}>
+          {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
           {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
-          {step === 'forgot-password' ? (
-            <Button variant="contained" color="primary" onClick={handleForgotPassword}>
-              Submit
-            </Button>
+          {step === 'request' ? (
+            <>
+              <Typography variant="h6" sx={{ mb: 3 }}>
+                Enter your email or phone number to reset your password
+              </Typography>
+              <TextField
+                label="Email or Phone"
+                value={emailOrPhone}
+                onChange={(e) => setEmailOrPhone(e.target.value)}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+            </>
+          ) : step === 'verify' ? (
+            <>
+              <Typography variant="h6" sx={{ mb: 3 }}>
+                Enter the verification code sent to your email or phone
+              </Typography>
+              <TextField
+                label="Verification Code"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                fullWidth
+                sx={{ mb: 2 }}
+              />
+            </>
           ) : (
-            <Button variant="contained" color="primary" onClick={handleForgotUsername}>
-              Submit
-            </Button>
+            <Typography variant="h6" sx={{ mb: 3 }}>
+              Your password has been reset. Please follow the instructions sent to your email or phone.
+            </Typography>
           )}
-          <Button variant="outlined" color="inherit" onClick={() => setStep('main')} sx={{ mt: 2 }}>
-            Back
+        </Box>
+      </DialogContent>
+      <DialogActions
+        sx={{
+          justifyContent: 'flex-end', // Căn lề phải các nút
+        }}
+      >
+        <Button onClick={onClose}>Close</Button>
+        {step === 'request' && (
+          <Button variant="contained" color="primary" onClick={handleRequest}>
+            Submit
           </Button>
-        </>
-      )}
-    </Box>
+        )}
+        {step === 'verify' && (
+          <Button variant="contained" color="primary" onClick={handleVerify}>
+            Verify
+          </Button>
+        )}
+      </DialogActions>
+    </Dialog>
   );
 }
