@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { TextField, Button, Box, Typography, Modal, Paper } from '@mui/material';
 
-export default function Signup({ onClose }) {  // Nhận prop onClose từ Login component
+export default function Signup({ onClose }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -10,6 +10,8 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
   const [aioKey, setAioKey] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
     }
 
     try {
-      const response = await fetch('http://localhost:8080/register', {
+      const response = await fetch('http://localhost:8080/request-verification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,17 +34,46 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
       const result = await response.json();
 
       if (response.ok) {
+        setSuccess('Verification code sent to your email.');
+        setError('');
+        setIsModalOpen(true);  // Open verification modal
+      } else {
+        console.error('Error:', result.message);
+        setError(result.message || 'Failed to request verification code');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setError('Failed to connect to the server');
+    }
+  };
+
+  const handleVerifyCode = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch('http://localhost:8080/verify-code', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, verificationCode }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
         setSuccess('Account created successfully!');
         setError('');
 
-        // Đóng hộp thoại sau 1 giây
+        // Close modal after 1 second
         setTimeout(() => {
           setSuccess('');
-          onClose(); // Gọi hàm onClose để đóng hộp thoại đăng ký
+          setIsModalOpen(false);
+          onClose(); // Call onClose to close the signup dialog
         }, 1000);
       } else {
         console.error('Error:', result.message);
-        setError(result.message || 'Failed to create account');
+        setError(result.message || 'Failed to verify code');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -51,60 +82,87 @@ export default function Signup({ onClose }) {  // Nhận prop onClose từ Login
   };
 
   return (
-    <Box sx={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>Sign Up</Typography>
+    <>
+      <Box sx={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
+        <Typography variant="h4" sx={{ mb: 3 }}>Sign Up</Typography>
 
-      <TextField
-        label="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="Confirm Password"
-        type="password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="AIO-User"
-        value={aioUser}
-        onChange={(e) => setAioUser(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-      <TextField
-        label="AIO-Key"
-        value={aioKey}
-        onChange={(e) => setAioKey(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
+        <TextField
+          label="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Confirm Password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="AIO User"
+          value={aioUser}
+          onChange={(e) => setAioUser(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="AIO Key"
+          value={aioKey}
+          onChange={(e) => setAioKey(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
 
-      {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
-      {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
+        {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+        {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
 
-      <Button variant="contained" color="primary" onClick={handleSignup} fullWidth>
-        Create Account
-      </Button>
-    </Box>
+        <Button variant="contained" color="primary" onClick={handleSignup} fullWidth>
+          Create Account
+        </Button>
+      </Box>
+
+      <Modal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        aria-labelledby="verification-modal-title"
+        aria-describedby="verification-modal-description"
+      >
+        <Paper sx={{ p: 4, maxWidth: '400px', margin: 'auto', mt: '10%', textAlign: 'center' }}>
+          <Typography id="verification-modal-title" variant="h6" component="h2">
+            Enter Verification Code
+          </Typography>
+          <TextField
+            label="Verification Code"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            fullWidth
+            sx={{ mb: 2 }}
+          />
+          {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
+          {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
+          <Button variant="contained" color="primary" onClick={handleVerifyCode} fullWidth>
+            Verify Code
+          </Button>
+        </Paper>
+      </Modal>
+    </>
   );
 }

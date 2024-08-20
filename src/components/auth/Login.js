@@ -10,6 +10,27 @@ export default function Login({ onLogin }) {
   const [openSignup, setOpenSignup] = useState(false); // Trạng thái để điều khiển hộp thoại đăng ký
   const navigate = useNavigate();
 
+  const fetchConnectMqtt = async (token) => {
+    console.log('Connecting to MQTT...');
+    try {
+      const response = await fetch('http://localhost:8080/mqtt/connect', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Connected to MQTT successfully');
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error connecting to MQTT:', error);
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -29,8 +50,7 @@ export default function Login({ onLogin }) {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('isLoggedIn', 'true');
-        console.log('Access Token:', localStorage.getItem('accessToken'));
-        console.log('Refresh Token:', localStorage.getItem('refreshToken'));
+        fetchConnectMqtt(accessToken);
         onLogin(true);
         navigate('/home');
       } else {
@@ -45,11 +65,13 @@ export default function Login({ onLogin }) {
 
   const handleOpenSignup = () => setOpenSignup(true); // Mở hộp thoại đăng ký
   const handleCloseSignup = () => setOpenSignup(false); // Đóng hộp thoại đăng ký
-  const handleKeyDown = (e) =>{
-    if (e.key === 'Enter'){
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
       handleLogin(e);
     }
   };
+
   return (
     <Box
       sx={{

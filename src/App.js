@@ -13,7 +13,7 @@ import Setting from './components/ui/Settingboard/Settingboard';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-  
+
   const fetchConnectMqtt = async (token) => {
     console.log('Connecting to MQTT...');
     try {
@@ -30,7 +30,7 @@ function App() {
       } else {
         console.error('Error:', result.message);
         if (response.status === 403) {
-          await refreshAccessToken();
+          await refreshAccessToken('connect');
         }
       }
     } catch (error) {
@@ -41,7 +41,7 @@ function App() {
   const fetchDisconnectMqtt = async (token) => {
     console.log('Disconnecting from MQTT...');
     try {
-      const response = await fetch('http://localhost:8080/mqtt/disconect', {
+      const response = await fetch('http://localhost:8080/mqtt/disconnect', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ function App() {
       } else {
         console.error('Error:', result.message);
         if (response.status === 403) {
-          await refreshAccessToken();
+          await refreshAccessToken('disconnect');
         }
       }
     } catch (error) {
@@ -62,7 +62,35 @@ function App() {
     }
   };
 
-  const refreshAccessToken = async () => {
+  const fechLogout = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/logout', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        fetchDisconnectMqtt(token);
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setIsLoggedIn(false);
+        console.log('Logged out successfully');
+      } else {
+        console.error('Error:', result.message);
+        if (response.status === 403) {
+          await refreshAccessToken('disconnect');
+        }
+      }
+    } catch (error) {
+      console.error('Error disconnecting from server:', error);
+    }
+  }
+
+  const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
 
     try {
@@ -79,9 +107,13 @@ function App() {
       if (response.ok) {
         const { accessToken } = result;
         localStorage.setItem('accessToken', accessToken);
-        await fetchConnectMqtt(accessToken);
+        if (state === 'connect') await fetchConnectMqtt(accessToken);
+        else if (state === 'disconnect') await fetchDisconnectMqtt(accessToken);
       } else {
-        console.error('Error refreshing access token:', result.message);
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setIsLoggedIn(false);
       }
     } catch (error) {
       console.error('Error during access token refresh:', error);
@@ -102,11 +134,7 @@ function App() {
 
   const handleLogout = () => {
     const accessToken = localStorage.getItem('accessToken');
-    fetchDisconnectMqtt(accessToken);
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    setIsLoggedIn(false);
+    fechLogout(accessToken);
   };
 
   const toggleSidebar = () => {
