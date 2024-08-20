@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Box, Typography, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import Signup from './Signup'; // Import component Signup
+import Signup from './Signup';
 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [openSignup, setOpenSignup] = useState(false); // Trạng thái để điều khiển hộp thoại đăng ký
+  const [openSignup, setOpenSignup] = useState(false);
+  const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
   const fetchConnectMqtt = async (token) => {
@@ -63,8 +64,8 @@ export default function Login({ onLogin }) {
     }
   };
 
-  const handleOpenSignup = () => setOpenSignup(true); // Mở hộp thoại đăng ký
-  const handleCloseSignup = () => setOpenSignup(false); // Đóng hộp thoại đăng ký
+  const handleOpenSignup = () => setOpenSignup(true);
+  const handleCloseSignup = () => setOpenSignup(false);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -72,23 +73,31 @@ export default function Login({ onLogin }) {
     }
   };
 
+  const handleMouseMove = (e) => {
+    const { clientX: x, clientY: y } = e;
+    setBackgroundPosition({ x, y });
+  };
+
+  const gradientStyle = {
+    background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #ff7f50, #1e90ff)`,
+  };
+
   return (
     <Box
+      onMouseMove={handleMouseMove}
       sx={{
         height: '100vh',
         width: '100vw',
-        backgroundImage: 'url(/static/imagelogin.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        position: 'relative',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         margin: 0,
         padding: 0,
-        position: 'relative'
+        ...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
       }}
     >
+      {/* Form đăng nhập */}
       <Box
         sx={{
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -97,7 +106,9 @@ export default function Login({ onLogin }) {
           boxShadow: 3,
           width: '100%',
           maxWidth: '400px',
-          textAlign: 'center'
+          textAlign: 'center',
+          position: 'relative',
+          zIndex: 3,
         }}
       >
         <Typography variant="h4" sx={{ mb: 3 }}>
@@ -124,15 +135,14 @@ export default function Login({ onLogin }) {
           Login
         </Button>
         <Typography sx={{ mt: 2 }}>
-          <Button onClick={handleOpenSignup}>Create new account</Button> {/* Mở hộp thoại đăng ký */}
+          <Button onClick={handleOpenSignup}>Create new account</Button>
         </Typography>
       </Box>
 
-      {/* Hộp thoại đăng ký */}
       <Dialog open={openSignup} onClose={handleCloseSignup}>
         <DialogTitle>Sign Up</DialogTitle>
         <DialogContent>
-          <Signup onClose={handleCloseSignup} /> {/* Truyền hàm đóng hộp thoại */}
+          <Signup onClose={handleCloseSignup} />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseSignup}>Close</Button>

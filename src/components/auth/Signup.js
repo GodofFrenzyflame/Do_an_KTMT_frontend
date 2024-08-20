@@ -8,6 +8,7 @@ export default function Signup({ onClose }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [aioUser, setAioUser] = useState('');
   const [aioKey, setAioKey] = useState('');
+  const [phone, setPhone] = useState(''); // Thêm state cho số điện thoại
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +29,7 @@ export default function Signup({ onClose }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password, aioUser, aioKey }),
+        body: JSON.stringify({ username, email, password, aioUser, aioKey, phone }), // Thêm số điện thoại vào request
       });
 
       const result = await response.json();
@@ -127,6 +128,13 @@ export default function Signup({ onClose }) {
           label="AIO Key"
           value={aioKey}
           onChange={(e) => setAioKey(e.target.value)}
+          fullWidth
+          sx={{ mb: 2 }}
+        />
+        <TextField
+          label="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
           fullWidth
           sx={{ mb: 2 }}
         />
