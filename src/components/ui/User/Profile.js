@@ -1,19 +1,50 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
 
 const Profile = () => {
-  const [username, setUsername] = useState('john_doe');
-  const [fullName, setFullName] = useState('John Doe');
-  const [email, setEmail] = useState('john.doe@example.com');
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [aioUser, setAioUser] = useState('aio_user');
-  const [aiokey, setAioPassword] = useState('aio_key');
+  const [aioUser, setAioUser] = useState('')
+  const [aiokey, setAioPassword] = useState('');
   const [avatar, setAvatar] = useState('https://via.placeholder.com/100'); // Placeholder for avatar
   const [isEditable, setIsEditable] = useState(false);
+
+  const fetchProfileData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/profile', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setUsername(result.data.username);
+        setFullName(result.data.fullName);
+        setEmail(result.data.email);
+        setAioUser(result.data.AIO_USERNAME)
+        setAioPassword(result.data.AIO_KEY);
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching humidity data:', error);
+    }
+  };
+
 
   const handleSave = () => {
     // Handle save logic here
     alert('Profile saved!');
+    setIsEditable(false);
+  };
+
+  const handleCancel = () => {
+    // Reset fields or other necessary state here
     setIsEditable(false);
   };
 
@@ -27,6 +58,11 @@ const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    fetchProfileData(accessToken);
+  }, []);
 
   return (
     <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto' }}>
@@ -87,7 +123,8 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Phone Number"
-              value="123-456-7890" // Static value as it cannot be changed
+              value={phone} // Static value as it cannot be changed
+              onChange={(e) => setPhone(e.target.value)}
               InputProps={{
                 readOnly: true,
               }}
@@ -142,20 +179,24 @@ const Profile = () => {
             />
           </Grid>
           <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <Button
-              variant="contained"
-              onClick={() => setIsEditable(!isEditable)}
-            >
-              {isEditable ? 'Cancel' : 'Edit'}
-            </Button>
-            {isEditable && (
-              <Button variant="contained" onClick={handleSave}>
-                Save
+            {!isEditable ? (
+              <Button variant="contained" onClick={() => setIsEditable(true)}>
+                Edit
               </Button>
+            ) : (
+              <>
+                <Button variant="outlined" sx={{  bgcolor: '#f44336', color: '#fff',}} onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button variant="contained" color="primary" onClick={handleSave}>
+                  Save
+                </Button>
+                
+              </>
             )}
           </Grid>
         </Grid>
-      </Paper>
+      </Paper>  
     </Box>
   );
 };
