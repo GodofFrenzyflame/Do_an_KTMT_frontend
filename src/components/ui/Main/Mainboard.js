@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
-import Map from '../Charts/Map';
+import Map from '../Map/Map';
 import { Container, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../../../AppContext';
 import { useTranslation } from 'react-i18next';

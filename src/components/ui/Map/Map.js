@@ -1,8 +1,8 @@
-// src/components/ui/Charts/Map.js
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { fetchUserLocation } from './locationService'; // Import service
 
 // Biểu tượng cho vị trí hiện tại
 const currentIcon = new L.Icon({
@@ -22,14 +22,27 @@ const destinationIcon = new L.Icon({
   shadowSize: [41, 41]                // Kích thước của bóng
 });
 
+// Component để cập nhật trung tâm bản đồ
+const MapCenterUpdater = ({ position }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (position) {
+      map.setView(position, map.getZoom()); // Cập nhật vị trí trung tâm của bản đồ
+    }
+  }, [position, map]);
+
+  return null;
+};
+
 const Map = () => {
-  const position = [10.772138, 106.658016]; // Tọa độ hiện tại
+  const [position, setPosition] = useState(null); // Không có giá trị khởi tạo
   const [destination, setDestination] = useState([10.77270023022209, 106.65917701616793]);
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
 
   const handleButtonClick = () => {
     if (googleMapsUrl) {
-      window.open(googleMapsUrl, '_blank');
+      window.open(googleMapsUrl, '_blank'); // Mở Google Maps trong tab mới
     } else {
       console.error('Google Maps URL is not set');
     }
@@ -48,8 +61,12 @@ const Map = () => {
       if (response.ok) {
         const newDestination = [result.X, result.Y];
         setDestination(newDestination);
-        const newGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(position.join(','))}&destination=${encodeURIComponent(newDestination.join(','))}`;
-        setGoogleMapsUrl(newGoogleMapsUrl);
+
+        // Tạo URL với tọa độ cập nhật từ IP
+        if (position) {
+          const newGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(position.join(','))}&destination=${encodeURIComponent(newDestination.join(','))}`;
+          setGoogleMapsUrl(newGoogleMapsUrl);
+        }
       } else {
         console.error('Error:', result.message);
       }
@@ -60,9 +77,24 @@ const Map = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    fetchLocationData(accessToken);
+    const ipinfoApiKey = 'YOUR_IPINFO_API_KEY'; // Thay thế bằng API key thực tế của bạn
+
+    const fetchData = async () => {
+        try {
+            const location = await fetchUserLocation(ipinfoApiKey);
+            const newPosition = [location.latitude, location.longitude];
+            setPosition(newPosition);
+
+            // Cập nhật destination và Google Maps URL sau khi vị trí người dùng được cập nhật
+            await fetchLocationData(accessToken);
+        } catch (error) {
+            console.error('Error updating location:', error);
+        }
+    };
+
+    fetchData();
     const intervalId = setInterval(() => {
-      fetchLocationData(accessToken);
+        fetchData();
     }, 5000);
     return () => clearInterval(intervalId);
   }, []);
@@ -70,7 +102,7 @@ const Map = () => {
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%' }}>
       <MapContainer
-        center={position}
+        center={position || [0, 0]} // Đặt trung tâm bản đồ nếu position đã có
         zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
@@ -79,17 +111,21 @@ const Map = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         {/* Marker cho vị trí hiện tại */}
-        <Marker position={position} icon={currentIcon}>
-          <Popup>
-            Vị trí hiện tại: {position[0]}, {position[1]}
-          </Popup>
-        </Marker>
+        {position && (
+          <Marker position={position} icon={currentIcon}>
+            <Popup>
+              Vị trí hiện tại: {position[0]}, {position[1]}
+            </Popup>
+          </Marker>
+        )}
         {/* Marker cho địa chỉ đích */}
         <Marker position={destination} icon={destinationIcon}>
           <Popup>
             Địa chỉ đích: {destination[0]}, {destination[1]}
           </Popup>
         </Marker>
+        {/* Cập nhật trung tâm bản đồ */}
+        {position && <MapCenterUpdater position={position} />}
       </MapContainer>
       <button
         onClick={handleButtonClick}
