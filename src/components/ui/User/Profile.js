@@ -234,7 +234,7 @@ const Profile = () => {
 
           <Grid item xs={12}>
             <TextField
-              label="AIO-User"
+              label="AIO User"
               value={aioUser}
               onChange={(e) => setAioUser(e.target.value)}
               fullWidth
@@ -248,7 +248,7 @@ const Profile = () => {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="AIO-key"
+              label="AIO key"
               value={aioKey}
               onChange={(e) => setAioPassword(e.target.value)}
               fullWidth

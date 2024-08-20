@@ -37,22 +37,22 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
           onConfirm(true); // Xác nhận mật khẩu đã được đổi
           onClose();
         } else {
-          setError('Có lỗi xảy ra khi đổi mật khẩu, vui lòng thử lại.');
+          setError('Error !!!');
         }
       } else {
-        setError('Mật khẩu hiện tại không đúng.');
+        setError('Password is incorrect');
       }
     } catch (error) {
-      setError('Có lỗi xảy ra, vui lòng thử lại sau.');
+      setError('Eror !!!');
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Đổi mật khẩu</DialogTitle>
+      <DialogTitle>Chang Password</DialogTitle>
       <DialogContent>
         <TextField
-          label="Mật khẩu hiện tại"
+          label="Current password"
           type="password"
           fullWidth
           value={currentPassword}
@@ -62,7 +62,7 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
           margin="normal"
         />
         <TextField
-          label="Mật khẩu mới"
+          label="New password"
           type="password"
           fullWidth
           value={newPassword}
@@ -70,7 +70,7 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
           margin="normal"
         />
         <TextField
-          label="Xác nhận mật khẩu mới"
+          label="Confirm new password"
           type="password"
           fullWidth
           value={confirmPassword}
@@ -80,10 +80,10 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="primary">
-          Hủy
+          Cancel
         </Button>
         <Button onClick={handleConfirm} color="primary">
-          Xác nhận
+          Confirm
         </Button>
       </DialogActions>
     </Dialog>
