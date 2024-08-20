@@ -37,13 +37,13 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
           onConfirm(true); // Xác nhận mật khẩu đã được đổi
           onClose(); // Đóng hộp thoại sau khi đổi mật khẩu thành công
         } else {
-          setError('Có lỗi xảy ra khi đổi mật khẩu.');
+          setError('EROR !!!!');
         }
       } else {
         setError('Mật khẩu hiện tại không đúng.');
       }
     } catch (error) {
-      setError('Lỗi xảy ra. Vui lòng thử lại.');
+      setError('ERROR !!!!');
     }
   };
   
