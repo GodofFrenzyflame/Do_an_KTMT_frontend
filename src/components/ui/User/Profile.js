@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
 import PasswordDialog from './PasswordDialog';
+import { InputAdornment } from '@mui/material';
+
 
 const Profile = () => {
   const [username, setUsername] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [fullname, setFullName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [phone_number, setPhone] = useState('');
+  
   const [aioUser, setAioUser] = useState('');
-  const [aiokey, setAioPassword] = useState('');
-  const [avatar, setAvatar] = useState('https://via.placeholder.com/100');
+  const [aioKey, setAioPassword] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [originalAvatar, setOriginalAvatar] = useState('');
   const [isEditable, setIsEditable] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const [ setIsPasswordConfirmed] = useState(false);
+  const [setIsPasswordConfirmed] = useState(false);
 
   const fetchProfileData = async (token) => {
     try {
@@ -27,11 +30,56 @@ const Profile = () => {
       const result = await response.json();
       if (response.ok) {
         setUsername(result.data.username);
-        setFullName(result.data.fullName);
+        setFullName(result.data.fullname);
         setEmail(result.data.email);
-        setPhone(result.data.phone); // Assuming phone is fetched from the backend
+        setPhone(result.data.phone_number);
         setAioUser(result.data.AIO_USERNAME);
         setAioPassword(result.data.AIO_KEY);
+        if (result.data.avatar) {
+          const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
+          setAvatar(avatarSrc);
+          setOriginalAvatar(avatarSrc); // Save original avatar
+        }
+        else {
+          setAvatar('');
+          setOriginalAvatar(''); // No avatar
+        }
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    }
+  };
+
+  const fetchProfileEdit = async (token) => {
+    try {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('fullname', fullname);
+      formData.append('email', email);
+      formData.append('phone_number', phone_number);
+      formData.append('AIO_USERNAME', aioUser);
+      formData.append('AIO_KEY', aioKey);
+
+      const fileInput = document.querySelector('input[type="file"]');
+      if (fileInput && fileInput.files[0]) {
+        formData.append('avatar', fileInput.files[0]);
+      }
+
+      const response = await fetch('http://localhost:8080/profile/edit', {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData, // Use FormData instead of JSON.stringify
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert('Profile saved!');
+        setIsEditable(false);
+        fetchProfileData(token);
       } else {
         console.error('Error:', result.message);
       }
@@ -41,14 +89,13 @@ const Profile = () => {
   };
 
   const handleSave = () => {
-    // Handle save logic here
-    alert('Profile saved!');
-    setIsEditable(false);
+    fetchProfileEdit(localStorage.getItem('accessToken'));
   };
 
   const handleCancel = () => {
-    // Reset fields or other necessary state here
+    fetchProfileData(localStorage.getItem('accessToken'));
     setIsEditable(false);
+    setAvatar(originalAvatar); // Reset to original avatar
   };
 
   const handleAvatarChange = (event) => {
@@ -62,30 +109,29 @@ const Profile = () => {
     }
   };
 
-  const handlePasswordClick = () => {
+  const handlePasswordChangeClick = () => {
     if (isEditable) {
       setIsPasswordDialogOpen(true);
     }
   };
+  
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     fetchProfileData(accessToken);
   }, []);
 
-  const obfuscatePhone = (phone) => {
-    if (!phone) return '';
-    const digits = phone.replace(/\D/g, ''); // Remove non-digit characters
+  const obfuscatePhone = (phone_number) => {
+    if (!phone_number) return '';
+    const digits = phone_number.replace(/\D/g, ''); // Remove non-digit characters
     return `${digits.slice(0, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
   };
-  
+
   const obfuscateEmail = (email) => {
     if (!email) return '';
     const [user, domain] = email.split('@');
     return `${user.slice(0, 2)}${'*'.repeat(user.length - 2)}@${domain}`;
   };
-  
-
   return (
     <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto' }}>
       <Paper sx={{ p: 3 }}>
@@ -99,7 +145,7 @@ const Profile = () => {
             </Button>
           )}
         </Box>
-  
+
         {/* Profile Form */}
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -119,7 +165,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Full Name"
-              value={fullName}
+              value={fullname}
               onChange={(e) => setFullName(e.target.value)}
               fullWidth
               InputProps={{
@@ -147,7 +193,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Phone Number"
-              value={isEditable ? phone : obfuscatePhone(phone)}
+              value={isEditable ? phone_number : obfuscatePhone(phone_number)}
               fullWidth
               InputProps={{
                 readOnly: true, // Phone number is always read-only
@@ -161,18 +207,31 @@ const Profile = () => {
             <TextField
               label="Password"
               type="password"
-              value={isEditable ? password : '****'}
-              onClick={handlePasswordClick}
-              onChange={(e) => setPassword(e.target.value)}
+              value="**** ****"
               fullWidth
               InputProps={{
-                readOnly: !isEditable,
+                readOnly: true,
+                endAdornment: isEditable && (
+                  <InputAdornment position="end">
+                    <Button
+                      variant="text"
+                      sx={{ textTransform: 'none' }}
+                      onClick={handlePasswordChangeClick}
+                    >
+                      Click here to change password
+                    </Button>
+                  </InputAdornment>
+                ),
               }}
               InputLabelProps={{
-                shrink: true, // Always keep the label on top
+                shrink: true, // Luôn giữ nhãn trên đầu
               }}
             />
           </Grid>
+
+
+
+
           <Grid item xs={12}>
             <TextField
               label="AIO-User"
@@ -190,7 +249,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="AIO-key"
-              value={aiokey}
+              value={aioKey}
               onChange={(e) => setAioPassword(e.target.value)}
               fullWidth
               InputProps={{
@@ -219,7 +278,7 @@ const Profile = () => {
           </Grid>
         </Grid>
       </Paper>
-  
+
       {/* Password Dialog */}
       <PasswordDialog
         open={isPasswordDialogOpen}
@@ -228,5 +287,5 @@ const Profile = () => {
       />
     </Box>
   );
-};  
+};
 export default Profile;
