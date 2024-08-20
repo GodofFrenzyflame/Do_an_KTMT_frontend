@@ -5,11 +5,7 @@ const Profile = () => {
   const [username, setUsername] = useState('john_doe');
   const [fullName, setFullName] = useState('John Doe');
   const [email, setEmail] = useState('john.doe@example.com');
-  
-  
   const [password, setPassword] = useState('');
-
-
   const [aioUser, setAioUser] = useState('aio_user');
   const [aiokey, setAioPassword] = useState('aio_key');
   const [avatar, setAvatar] = useState('https://via.placeholder.com/100'); // Placeholder for avatar
@@ -55,6 +51,9 @@ const Profile = () => {
               InputProps={{
                 readOnly: !isEditable,
               }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -65,6 +64,9 @@ const Profile = () => {
               fullWidth
               InputProps={{
                 readOnly: !isEditable,
+              }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
               }}
             />
           </Grid>
@@ -77,6 +79,9 @@ const Profile = () => {
               InputProps={{
                 readOnly: !isEditable,
               }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -87,6 +92,9 @@ const Profile = () => {
                 readOnly: true,
               }}
               fullWidth
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -99,6 +107,9 @@ const Profile = () => {
               InputProps={{
                 readOnly: !isEditable,
               }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -109,6 +120,9 @@ const Profile = () => {
               fullWidth
               InputProps={{
                 readOnly: !isEditable,
+              }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
               }}
             />
           </Grid>
@@ -121,6 +135,9 @@ const Profile = () => {
               fullWidth
               InputProps={{
                 readOnly: !isEditable,
+              }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
               }}
             />
           </Grid>
