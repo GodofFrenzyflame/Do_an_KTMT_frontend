@@ -12,7 +12,7 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
       setError('Mật khẩu mới và xác nhận mật khẩu không khớp.');
       return;
     }
-
+  
     try {
       const response = await fetch('http://localhost:8080/login', {
         method: 'POST',
@@ -21,7 +21,7 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
         },
         body: JSON.stringify({ password: currentPassword }), // Đặt username ở đây nếu cần thiết
       });
-
+  
       if (response.ok) {
         // Gửi mật khẩu mới tới backend
         const changeResponse = await fetch('http://localhost:8080/change-password', {
@@ -32,20 +32,21 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
           },
           body: JSON.stringify({ newPassword }),
         });
-
+  
         if (changeResponse.ok) {
           onConfirm(true); // Xác nhận mật khẩu đã được đổi
-          onClose();
+          onClose(); // Đóng hộp thoại sau khi đổi mật khẩu thành công
         } else {
-          setError('Error !!!');
+          setError('Có lỗi xảy ra khi đổi mật khẩu.');
         }
       } else {
-        setError('Password is incorrect');
+        setError('Mật khẩu hiện tại không đúng.');
       }
     } catch (error) {
-      setError('Eror !!!');
+      setError('Lỗi xảy ra. Vui lòng thử lại.');
     }
   };
+  
 
   return (
     <Dialog open={open} onClose={onClose}>

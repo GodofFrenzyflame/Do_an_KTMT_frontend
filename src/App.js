@@ -9,6 +9,8 @@ import AuthenticatedLayout from './components/ui/sidebar/Sidebarlayout';
 import { Box } from '@mui/material';
 import Relay from './components/ui/Relayboard/Relay';
 import Setting from './components/ui/Settingboard/Settingboard';
+import Forget from './components/auth/Forget'; // Import trang Forget
+
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -217,6 +219,7 @@ function App() {
               : <Navigate to="/" />
           }
         />
+        <Route path="/forget" element={<Forget />} />
         <Route
           path="/setting"
           element={

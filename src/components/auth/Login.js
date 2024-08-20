@@ -78,6 +78,10 @@ export default function Login({ onLogin }) {
     setBackgroundPosition({ x, y });
   };
 
+  const handleForgotPasswordOrUsername = () => {
+    navigate('/forget'); // Điều hướng đến trang Forget
+  };
+
   const gradientStyle = {
     background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #ff7f50, #1e90ff)`,
   };
@@ -136,6 +140,9 @@ export default function Login({ onLogin }) {
         </Button>
         <Typography sx={{ mt: 2 }}>
           <Button onClick={handleOpenSignup}>Create new account</Button>
+        </Typography>
+        <Typography sx={{ mt: 2 }}>
+          <Button onClick={handleForgotPasswordOrUsername}>Forgot password or username?</Button>
         </Typography>
       </Box>
 
