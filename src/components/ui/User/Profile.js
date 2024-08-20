@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
+import PasswordDialog from './PasswordDialog';
 
 const Profile = () => {
   const [username, setUsername] = useState('');
@@ -7,10 +8,12 @@ const Profile = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [aioUser, setAioUser] = useState('')
+  const [aioUser, setAioUser] = useState('');
   const [aiokey, setAioPassword] = useState('');
-  const [avatar, setAvatar] = useState('https://via.placeholder.com/100'); // Placeholder for avatar
+  const [avatar, setAvatar] = useState('https://via.placeholder.com/100');
   const [isEditable, setIsEditable] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [ setIsPasswordConfirmed] = useState(false);
 
   const fetchProfileData = async (token) => {
     try {
@@ -26,16 +29,16 @@ const Profile = () => {
         setUsername(result.data.username);
         setFullName(result.data.fullName);
         setEmail(result.data.email);
-        setAioUser(result.data.AIO_USERNAME)
+        setPhone(result.data.phone); // Assuming phone is fetched from the backend
+        setAioUser(result.data.AIO_USERNAME);
         setAioPassword(result.data.AIO_KEY);
       } else {
         console.error('Error:', result.message);
       }
     } catch (error) {
-      console.error('Error fetching humidity data:', error);
+      console.error('Error fetching profile data:', error);
     }
   };
-
 
   const handleSave = () => {
     // Handle save logic here
@@ -59,10 +62,29 @@ const Profile = () => {
     }
   };
 
+  const handlePasswordClick = () => {
+    if (isEditable) {
+      setIsPasswordDialogOpen(true);
+    }
+  };
+
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     fetchProfileData(accessToken);
   }, []);
+
+  const obfuscatePhone = (phone) => {
+    if (!phone) return '';
+    const firstPart = phone.slice(0, 4);
+    const rest = phone.slice(4).replace(/\d/g, 'x');
+    return `${firstPart}-${rest}`;
+  };
+
+  const obfuscateEmail = (email) => {
+    if (!email) return '';
+    const [user, domain] = email.split('@');
+    return `${user.slice(0, 2)}${'*'.repeat(user.length - 2)}@${domain}`;
+  };
 
   return (
     <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto' }}>
@@ -70,10 +92,12 @@ const Profile = () => {
         {/* Avatar Section */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Avatar src={avatar} sx={{ width: 100, height: 100, mr: 2 }} />
-          <Button variant="contained" component="label">
-            Upload Avatar
-            <input type="file" hidden onChange={handleAvatarChange} />
-          </Button>
+          {isEditable && (
+            <Button variant="contained" component="label">
+              Upload Avatar
+              <input type="file" hidden onChange={handleAvatarChange} />
+            </Button>
+          )}
         </Box>
 
         {/* Profile Form */}
@@ -109,7 +133,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Email"
-              value={email}
+              value={obfuscateEmail(email)}
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               InputProps={{
@@ -123,12 +147,11 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Phone Number"
-              value={phone} // Static value as it cannot be changed
-              onChange={(e) => setPhone(e.target.value)}
+              value={obfuscatePhone(phone)}
+              fullWidth
               InputProps={{
                 readOnly: true,
               }}
-              fullWidth
               InputLabelProps={{
                 shrink: true, // Always keep the label on top
               }}
@@ -139,6 +162,7 @@ const Profile = () => {
               label="Password"
               type="password"
               value={password}
+              onClick={handlePasswordClick}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
               InputProps={{
@@ -166,7 +190,6 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="AIO-key"
-              type="key"
               value={aiokey}
               onChange={(e) => setAioPassword(e.target.value)}
               fullWidth
@@ -185,7 +208,7 @@ const Profile = () => {
               </Button>
             ) : (
               <>
-                <Button variant="outlined" sx={{  bgcolor: '#f44336', color: '#fff',}} onClick={handleCancel}>
+                <Button variant="outlined" sx={{ bgcolor: '#f44336', color: '#fff' }} onClick={handleCancel}>
                   Cancel
                 </Button>
                 <Button variant="contained" color="primary" onClick={handleSave}>
@@ -196,7 +219,14 @@ const Profile = () => {
             )}
           </Grid>
         </Grid>
-      </Paper>  
+      </Paper>
+
+      {/* Password Dialog */}
+      <PasswordDialog
+        open={isPasswordDialogOpen}
+        onClose={() => setIsPasswordDialogOpen(false)}
+        onConfirm={(confirmed) => setIsPasswordConfirmed(confirmed)}
+      />
     </Box>
   );
 };
