@@ -55,7 +55,7 @@ const TemperatureGauge = () => {
         text={`${temperature === null ? 0 : temperature}°C`}
         styles={buildStyles({
           textColor: getWordColor(),
-          pathColor: temperature < 15 ? '#00BFFF' : temperature < 25 ? '#FFD700' : '#FF4500',
+          pathColor: temperature < 15 ? '#00BFFF' : temperature < 80 ? '#FFD700' : '#FF4500',
           trailColor: '#eee',
         })}
         style={{
