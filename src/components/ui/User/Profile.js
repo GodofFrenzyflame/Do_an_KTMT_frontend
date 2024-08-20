@@ -75,16 +75,16 @@ const Profile = () => {
 
   const obfuscatePhone = (phone) => {
     if (!phone) return '';
-    const firstPart = phone.slice(0, 4);
-    const rest = phone.slice(4).replace(/\d/g, 'x');
-    return `${firstPart}-${rest}`;
+    const digits = phone.replace(/\D/g, ''); // Remove non-digit characters
+    return `${digits.slice(0, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
   };
-
+  
   const obfuscateEmail = (email) => {
     if (!email) return '';
     const [user, domain] = email.split('@');
     return `${user.slice(0, 2)}${'*'.repeat(user.length - 2)}@${domain}`;
   };
+  
 
   return (
     <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto' }}>
@@ -99,7 +99,7 @@ const Profile = () => {
             </Button>
           )}
         </Box>
-
+  
         {/* Profile Form */}
         <Grid container spacing={2}>
           <Grid item xs={12}>
@@ -133,7 +133,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Email"
-              value={obfuscateEmail(email)}
+              value={isEditable ? email : obfuscateEmail(email)}
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               InputProps={{
@@ -147,10 +147,10 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Phone Number"
-              value={obfuscatePhone(phone)}
+              value={isEditable ? phone : obfuscatePhone(phone)}
               fullWidth
               InputProps={{
-                readOnly: true,
+                readOnly: true, // Phone number is always read-only
               }}
               InputLabelProps={{
                 shrink: true, // Always keep the label on top
@@ -161,7 +161,7 @@ const Profile = () => {
             <TextField
               label="Password"
               type="password"
-              value={password}
+              value={isEditable ? password : '****'}
               onClick={handlePasswordClick}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
@@ -214,13 +214,12 @@ const Profile = () => {
                 <Button variant="contained" color="primary" onClick={handleSave}>
                   Save
                 </Button>
-                
               </>
             )}
           </Grid>
         </Grid>
       </Paper>
-
+  
       {/* Password Dialog */}
       <PasswordDialog
         open={isPasswordDialogOpen}
@@ -229,6 +228,5 @@ const Profile = () => {
       />
     </Box>
   );
-};
-
+};  
 export default Profile;
