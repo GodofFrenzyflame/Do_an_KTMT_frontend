@@ -14,22 +14,50 @@ export default function Signup({ onClose }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
 
-    // Validate passwords match
+  const Signup = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password, aioUser, aioKey, phone }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setSuccess('Account created successfully!');
+        setError('');
+
+        // Close modal after 1 second
+        setTimeout(() => {
+          setSuccess('');
+          setIsModalOpen(false);
+          onClose(); // Call onClose to close the signup dialog
+        }, 1000);
+      } else {
+        setError(result.message || 'Failed to create account');
+      }
+    }
+    catch (error) {
+      setError('Failed to connect to the server');
+    }
+  }
+
+  const handleSendCode = async (e) => {
+    e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:8080/request-verification', {
+      const response = await fetch('http://localhost:8080/email/send-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password, aioUser, aioKey, phone }), // Thêm số điện thoại vào request
+        body: JSON.stringify({ email })
       });
 
       const result = await response.json();
@@ -52,7 +80,7 @@ export default function Signup({ onClose }) {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8080/verify-code', {
+      const response = await fetch('http://localhost:8080/email/confirm-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,15 +91,7 @@ export default function Signup({ onClose }) {
       const result = await response.json();
 
       if (response.ok) {
-        setSuccess('Account created successfully!');
-        setError('');
-
-        // Close modal after 1 second
-        setTimeout(() => {
-          setSuccess('');
-          setIsModalOpen(false);
-          onClose(); // Call onClose to close the signup dialog
-        }, 1000);
+        Signup();
       } else {
         console.error('Error:', result.message);
         setError(result.message || 'Failed to verify code');
@@ -142,7 +162,7 @@ export default function Signup({ onClose }) {
         {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
         {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
 
-        <Button variant="contained" color="primary" onClick={handleSignup} fullWidth>
+        <Button variant="contained" color="primary" onClick={handleSendCode} fullWidth>
           Create Account
         </Button>
       </Box>
