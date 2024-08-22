@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, IconButton } from '@mui/material';
 import Sidebar from './Sidebar';
 import Clock from '../clockset/clock'; // Import Clock component
 
-const AuthenticatedLayout = ({ isSidebarOpen, toggleSidebar, onLogout, children }) => {
+const AuthenticatedLayout = ({ onLogout, children }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    // Load sidebar state from localStorage when component mounts
+    const savedState = localStorage.getItem('sidebarOpen');
+    if (savedState !== null) {
+      setIsSidebarOpen(JSON.parse(savedState));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save sidebar state to localStorage when it changes
+    localStorage.setItem('sidebarOpen', JSON.stringify(isSidebarOpen));
+  }, [isSidebarOpen]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(prevState => !prevState);
+  };
+
   const sidebarWidth = isSidebarOpen ? '18%' : '0%';
+
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
       <Sidebar 
@@ -31,7 +51,7 @@ const AuthenticatedLayout = ({ isSidebarOpen, toggleSidebar, onLogout, children 
           top: '0%', 
           left: isSidebarOpen ? '17%' : '0%',
           zIndex: 1300, // Ensure button is on top
-          transition: 'left 0.3s ease',
+          transition: 'left 0s ease',
           fontSize: '2.5rem',
         }}
       >
