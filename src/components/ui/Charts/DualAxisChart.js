@@ -1,72 +1,104 @@
 import React, { useEffect, useState } from 'react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import dayjs from 'dayjs';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-const DualAxisChart = ({ token }) => {
-  const [data, setData] = useState(null); // Set initial state to null
+
+const DualAxisChart = () => {
+  const [data, setData] = useState(null);
+  const [time, setTime] = useState(7);
+
+  const fetchTemperatureHumidityData = async (token) => {
+    try {
+      const [tempResponse, humiResponse] = await Promise.all([
+        fetch('http://localhost:8080/log/temp', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ time }),
+        }),
+        fetch('http://localhost:8080/log/humi', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ time }),
+        }),
+      ]);
+
+      const tempResult = await tempResponse.json();
+      const humiResult = await humiResponse.json();
+
+      if (tempResponse.ok && humiResponse.ok) {
+        const combinedData = tempResult.map((tempEntry, index) => ({
+          time: tempEntry.date,
+          temperature: tempEntry.value,
+          humidity: humiResult[index]?.value || 0,
+        }));
+
+        setData(combinedData);
+      } else {
+        console.error('Error:', tempResult.message || humiResult.message);
+      }
+    } catch (error) {
+      console.error('Error fetching temperature and humidity data:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchTemperatureHumidityData = async () => {
-      try {
-        const [tempResponse, humiResponse] = await Promise.all([
-          fetch('http://localhost:8080/sensor/temp', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-          }),
-          fetch('http://localhost:8080/sensor/humi', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-          }),
-        ]);
+    const accessToken = localStorage.getItem('accessToken');
+    fetchTemperatureHumidityData(accessToken);
+    const intervalId = setInterval(() => {
+      fetchTemperatureHumidityData(accessToken);
+    }, 5000);
+    return () => clearInterval(intervalId);
+  }, [time]);
 
-        const tempResult = await tempResponse.json();
-        const humiResult = await humiResponse.json();
+  const handleTimeChange = (newTime) => {
+    setTime(newTime);
+  };
 
-        if (tempResponse.ok && humiResponse.ok) {
-          const combinedData = tempResult.data.map((tempEntry, index) => ({
-            time: tempEntry.time,
-            temperature: tempEntry.value,
-            humidity: humiResult.data[index]?.value || 0,
-          }));
-
-          const filteredData = combinedData.filter(entry => 
-            dayjs(entry.time).isAfter(dayjs().subtract(7, 'day'))
-          );
-
-          setData(filteredData);
-        } else {
-          console.error('Error:', tempResult.message || humiResult.message);
-        }
-      } catch (error) {
-        console.error('Error fetching temperature and humidity data:', error);
-      }
-    };
-
-    fetchTemperatureHumidityData();
-  }, [token]);
-
-  // If data is null or empty, use default data
   const displayData = data && data.length > 0 ? data : [{ time: 'No Data', temperature: 0, humidity: 0 }];
 
+  // Find the maximum values for temperature and humidity
+  const maxTemperature = Math.max(...displayData.map(d => d.temperature), 0);
+  const maxHumidity = Math.max(...displayData.map(d => d.humidity), 0);
+
+  // Add padding to the maximum values for better visibility
+  const temperatureDomain = [0, maxTemperature + (maxTemperature * 0.1)];
+  const humidityDomain = [0, maxHumidity + (maxHumidity * 0.1)];
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={displayData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="time" />
-        <YAxis yAxisId="left" orientation="left" stroke="#f50a0a" />
-        <YAxis yAxisId="right" orientation="right" stroke="#0a16f5" />
-        <Tooltip />
-        <Legend />
-        <Bar yAxisId="left" dataKey="temperature" fill="#f50a0a" />
-        <Bar yAxisId="right" dataKey="humidity" fill="#0a16f5" />
-      </BarChart>
-    </ResponsiveContainer>
+    <div>
+      <div>
+        <button onClick={() => handleTimeChange(7)}>7 Days</button>
+        <button onClick={() => handleTimeChange(30)}>30 Days</button>
+        <button onClick={() => handleTimeChange(90)}>90 Days</button>
+      </div>
+      <ResponsiveContainer width="100%" height={300}>
+        <LineChart data={displayData}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="time" />
+          <YAxis 
+            yAxisId="left" 
+            orientation="left" 
+            stroke="#ff0000" 
+            domain={temperatureDomain} 
+          />
+          <YAxis 
+            yAxisId="right" 
+            orientation="right" 
+            stroke="#0000ff" 
+            domain={humidityDomain} 
+          />
+          <Tooltip />
+          <Legend />
+          <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#ff0000" strokeWidth={3} />
+          <Line yAxisId="right" type="monotone" dataKey="humidity" stroke="#0000ff" strokeWidth={3} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 

@@ -7,7 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 const initialRelays = [
   { id: 1, name: 'Relay 1', status: false },
-  ];
+];
 
 const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
   <Box
@@ -52,6 +52,7 @@ const RelayGrid = () => {
   const [newCard, setNewCard] = useState({ name: '', relayName: '' });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editRelay, setEditRelay] = useState(null);
+  const [status, setStatus] = useState(null); // Thêm state cho status
 
   useEffect(() => {
     const savedRelays = JSON.parse(localStorage.getItem('relays'));
@@ -64,6 +65,31 @@ const RelayGrid = () => {
     localStorage.setItem('relays', JSON.stringify(relays));
   }, [relays]);
 
+  const fetchStatus = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/sensor/status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        setStatus(result.status); // Lưu giá trị trạng thái
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching status:', error);
+    }
+  };
+
+  useEffect(() => {
+    const token = 'your-auth-token'; // Thay thế bằng cách lấy token thực tế
+    fetchStatus(token);
+  }, []);
+
   const handleToggle = (id) => {
     setRelays(relays.map((relay) =>
       relay.id === id ? { ...relay, status: !relay.status } : relay
@@ -75,12 +101,10 @@ const RelayGrid = () => {
   };
 
   const handleSaveCard = () => {
-    // Check if relay with the same name already exists
     if (relays.some(relay => relay.name === newCard.name)) {
       alert('Relay with this name already exists.');
       return;
     }
-    // Generate unique ID
     const newId = relays.length ? Math.max(...relays.map(relay => relay.id)) + 1 : 1;
     setRelays([...relays, { id: newId, name: newCard.name, status: false }]);
     setNewCard({ name: '', relayName: '' });
@@ -106,7 +130,7 @@ const RelayGrid = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '16px' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '16px', alignItems: 'center' }}>
       {relays.map((relay) => (
         <RelayCard
           key={relay.id}
