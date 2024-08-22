@@ -25,8 +25,8 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
       if (response.ok) {
         console.log('Password changed successfully.');
         setError('');
-        onConfirm(true);
-        onClose();
+        onConfirm(true); // Gọi onConfirm với giá trị true
+        onClose(); // Đóng cửa sổ sau khi đổi mật khẩu thành công
       } else {
         setError('Mật khẩu hiện tại không đúng.');
       }
@@ -36,10 +36,9 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
     }
   };
 
-
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Chang Password</DialogTitle>
+      <DialogTitle>Change Password</DialogTitle>
       <DialogContent>
         <TextField
           label="Current password"
@@ -81,3 +80,4 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
 };
 
 export default PasswordDialog;
+  

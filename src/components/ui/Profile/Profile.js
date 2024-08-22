@@ -3,7 +3,6 @@ import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
 import PasswordDialog from './PasswordDialog';
 import { InputAdornment } from '@mui/material';
 
-
 const Profile = () => {
   const [username, setUsername] = useState('');
   const [fullname, setFullName] = useState('');
@@ -16,7 +15,7 @@ const Profile = () => {
   const [originalAvatar, setOriginalAvatar] = useState('');
   const [isEditable, setIsEditable] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const [setIsPasswordConfirmed] = useState(false);
+  const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false); 
 
   const fetchProfileData = async (token) => {
     try {
@@ -114,7 +113,6 @@ const Profile = () => {
       setIsPasswordDialogOpen(true);
     }
   };
-  
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -132,6 +130,7 @@ const Profile = () => {
     const [user, domain] = email.split('@');
     return `${user.slice(0, 2)}${'*'.repeat(user.length - 2)}@${domain}`;
   };
+
   return (
     <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto' }}>
       <Paper sx={{ p: 3 }}>
@@ -224,13 +223,10 @@ const Profile = () => {
                 ),
               }}
               InputLabelProps={{
-                shrink: true, // Luôn giữ nhãn trên đầu
+                shrink: true, // Always keep the label on top
               }}
             />
           </Grid>
-
-
-
 
           <Grid item xs={12}>
             <TextField
@@ -282,10 +278,22 @@ const Profile = () => {
       {/* Password Dialog */}
       <PasswordDialog
         open={isPasswordDialogOpen}
-        onClose={() => setIsPasswordDialogOpen(false)}
-        onConfirm={(confirmed) => setIsPasswordConfirmed(confirmed)}
+        onClose={() => {
+          setIsPasswordDialogOpen(false);
+          if (isPasswordConfirmed) {
+            // Refresh profile data if the password was confirmed
+            fetchProfileData(localStorage.getItem('accessToken'));
+          }
+        }}
+        onConfirm={(confirmed) => {
+          setIsPasswordConfirmed(confirmed); // Đảm bảo setIsPasswordConfirmed được gọi đúng cách
+          if (confirmed) {
+            setIsPasswordDialogOpen(false); // Close the dialog if password is confirmed
+          }
+        }}
       />
     </Box>
   );
 };
+
 export default Profile;

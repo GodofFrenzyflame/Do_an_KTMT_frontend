@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-
 const DualAxisChart = () => {
   const [data, setData] = useState(null);
   const [time, setTime] = useState(7);
@@ -61,13 +60,14 @@ const DualAxisChart = () => {
 
   const displayData = data && data.length > 0 ? data : [{ time: 'No Data', temperature: 0, humidity: 0 }];
 
-  // Find the maximum values for temperature and humidity
   const maxTemperature = Math.max(...displayData.map(d => d.temperature), 0);
   const maxHumidity = Math.max(...displayData.map(d => d.humidity), 0);
 
-  // Add padding to the maximum values for better visibility
   const temperatureDomain = [0, maxTemperature + (maxTemperature * 0.1)];
   const humidityDomain = [0, maxHumidity + (maxHumidity * 0.1)];
+
+  const formatTemperature = (value) => `${value} °C`;
+  const formatHumidity = (value) => `${value} %`;
 
   return (
     <div>
@@ -85,12 +85,14 @@ const DualAxisChart = () => {
             orientation="left" 
             stroke="#ff0000" 
             domain={temperatureDomain} 
+            tickFormatter={formatTemperature}
           />
           <YAxis 
             yAxisId="right" 
             orientation="right" 
             stroke="#0000ff" 
             domain={humidityDomain} 
+            tickFormatter={formatHumidity}
           />
           <Tooltip />
           <Legend />
