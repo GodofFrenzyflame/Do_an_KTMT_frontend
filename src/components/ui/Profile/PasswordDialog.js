@@ -12,41 +12,30 @@ const PasswordDialog = ({ open, onClose, onConfirm }) => {
       setError('Mật khẩu mới và xác nhận mật khẩu không khớp.');
       return;
     }
-  
     try {
-      const response = await fetch('http://localhost:8080/login', {
-        method: 'POST',
+      const response = await fetch('http://localhost:8080/profile/change-password', {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
-        body: JSON.stringify({ password: currentPassword }), // Đặt username ở đây nếu cần thiết
+        body: JSON.stringify({ password: currentPassword, newpassword: newPassword }),
       });
-  
+
       if (response.ok) {
-        // Gửi mật khẩu mới tới backend
-        const changeResponse = await fetch('http://localhost:8080/change-password', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
-          },
-          body: JSON.stringify({ newPassword }),
-        });
-  
-        if (changeResponse.ok) {
-          onConfirm(true); // Xác nhận mật khẩu đã được đổi
-          onClose(); // Đóng hộp thoại sau khi đổi mật khẩu thành công
-        } else {
-          setError('EROR !!!!');
-        }
+        console.log('Password changed successfully.');
+        setError('');
+        onConfirm(true);
+        onClose();
       } else {
         setError('Mật khẩu hiện tại không đúng.');
       }
     } catch (error) {
+      console.error('An error occurred:', error);
       setError('ERROR !!!!');
     }
   };
-  
+
 
   return (
     <Dialog open={open} onClose={onClose}>

@@ -61,8 +61,8 @@ export default function Forget({ open, onClose }) {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8080/email/reset-password', {
-        method: 'POST',
+      const response = await fetch('http://localhost:8080/forgot-password', {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -74,7 +74,7 @@ export default function Forget({ open, onClose }) {
         setTimeout(() => {
           onClose(); // Đóng dialog
           // Redirect to login page
-          window.location.href = '/login';
+          window.location.href = '/';
         }, 2000);
       } else {
         setError(result.message || 'Failed to reset password');

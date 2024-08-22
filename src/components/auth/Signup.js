@@ -105,8 +105,7 @@ export default function Signup({ onClose }) {
   return (
     <>
       <Box sx={{ maxWidth: '400px', margin: '0 auto', textAlign: 'center' }}>
-        <Typography variant="h4" sx={{ mb: 3 }}>Sign Up</Typography>
-
+        <Typography variant="h4" sx={{ mb: 3 }}></Typography>
         <TextField
           label="Username"
           value={username}

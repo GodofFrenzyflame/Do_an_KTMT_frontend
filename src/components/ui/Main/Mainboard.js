@@ -1,12 +1,11 @@
-// src/components/ui/Main/Mainboard.js
 import React, { useContext } from 'react';
 import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
+import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart component
 import Map from '../Map/Map';
 import { Container, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../../../AppContext';
 import { useTranslation } from 'react-i18next';
-
 
 const Home = () => {
   const { settings } = useContext(AppContext);
@@ -17,7 +16,7 @@ const Home = () => {
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
 
   return (
-    <Container maxWidth="xxxl"  sx={{ backgroundColor: getBackgroundColor()}}>
+    <Container maxWidth="xxxl" sx={{ backgroundColor: getBackgroundColor() }}>
       <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
         {t('Home')}
       </Typography>
@@ -54,10 +53,8 @@ const Home = () => {
       </Grid>
       
       <Paper elevation={3} sx={{ p: '2%', textAlign: 'left', bgcolor: getBoxBackgroundColor(), color: getWordColor(), mt: '1%' }}>
-        <Typography variant="h6" sx={{ mb: '1%' }}>History</Typography>
-        <Typography variant="body1" sx={{ mb: '2%' }}>
-          Here will be the history of chart changes.
-        </Typography>
+        <Typography variant="h6" sx={{ mb: '1%' }}>Temperature & Humidity</Typography>
+        <DualAxisChart /> {/* Replace History with DualAxisChart */}
       </Paper>
     </Container>
   );

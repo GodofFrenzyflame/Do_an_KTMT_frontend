@@ -5,7 +5,7 @@ import Signup from './Signup';
 import Forget from './Forget'; // Import component Forget
 
 export default function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
+  const [emailOrusername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [openSignup, setOpenSignup] = useState(false);
@@ -43,7 +43,7 @@ export default function Login({ onLogin }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ emailOrusername, password }),
       });
 
       const result = await response.json();
@@ -121,8 +121,8 @@ export default function Login({ onLogin }) {
         </Typography>
         <TextField
           label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={emailOrusername}
+          onChange={(e) => setEmailOrUsername(e.target.value)}
           fullWidth
           sx={{ mb: 2 }}
         />
@@ -137,14 +137,14 @@ export default function Login({ onLogin }) {
         />
         <Box sx={{ mt: 0, textAlign: 'right' }}>
           <Button onClick={handleOpenForget} sx={{ textTransform: 'lowercase' }}>
-            Forgot password?
+            Forgot password ?
           </Button>
         </Box>
         {error && <Typography color="error" sx={{ mb: 3 }}>{error}</Typography>}
-        <Button sx={{ mt: 3}}variant="contained" color="primary" onClick={handleLogin} fullWidth>
+        <Button sx={{ mt: 3 }} variant="contained" color="primary" onClick={handleLogin} fullWidth>
           Login
         </Button>
-        
+
         <Typography sx={{ mt: 2 }}>
           <Button onClick={handleOpenSignup}>Create new account</Button>
         </Typography>

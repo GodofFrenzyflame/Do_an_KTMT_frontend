@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import Home from './components/ui/Main/Mainboard';
-import Profile from './components/ui/User/Profile';
+import Profile from './components/ui/Profile/Profile';
 import History from './components/ui/historyboard/History';
 import AuthenticatedLayout from './components/ui/sidebar/Sidebarlayout';
 import { Box } from '@mui/material';
@@ -13,6 +13,7 @@ import Forget from './components/auth/Forget'; // Import trang Forget
 
 
 function App() {
+  
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
@@ -39,9 +40,7 @@ function App() {
       console.error('Error connecting to MQTT:', error);
     }
   };
-
   const fetchDisconnectMqtt = async (token) => {
-    console.log('Disconnecting from MQTT...');
     try {
       const response = await fetch('http://localhost:8080/mqtt/disconnect', {
         method: 'GET',
@@ -52,7 +51,6 @@ function App() {
       });
       const result = await response.json();
       if (response.ok) {
-        console.log('Disconnected from MQTT successfully');
       } else {
         console.error('Error:', result.message);
         if (response.status === 403) {

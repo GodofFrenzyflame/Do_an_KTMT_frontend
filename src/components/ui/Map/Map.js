@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { fetchUserLocation } from './locationService'; // Import service
+
 
 // Biểu tượng cho vị trí hiện tại
 const currentIcon = new L.Icon({
@@ -35,10 +35,12 @@ const MapCenterUpdater = ({ position }) => {
   return null;
 };
 
+const apikey = process.env.REACT_APP_IPINFO_API_KEY;
+
 const Map = () => {
-  const [position, setPosition] = useState(null); // Không có giá trị khởi tạo
+  const [position, setPosition] = useState(null);
   const [destination, setDestination] = useState([10.77270023022209, 106.65917701616793]);
-  const [googleMapsUrl, setGoogleMapsUrl] = useState('');
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(null);
 
   const handleButtonClick = () => {
     if (googleMapsUrl) {
@@ -61,8 +63,6 @@ const Map = () => {
       if (response.ok) {
         const newDestination = [result.X, result.Y];
         setDestination(newDestination);
-
-        // Tạo URL với tọa độ cập nhật từ IP
         if (position) {
           const newGoogleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(position.join(','))}&destination=${encodeURIComponent(newDestination.join(','))}`;
           setGoogleMapsUrl(newGoogleMapsUrl);
@@ -74,30 +74,40 @@ const Map = () => {
       console.error('Error fetching location data:', error);
     }
   };
+  const fetchUserLocation = async () => {
+    try {
+      const response = await fetch(`https://ipinfo.io/json?token=${apikey}`);
+      const data = await response.json();
+      if (response.ok) {
+        const [latitude, longitude] = data.loc.split(',');
+        const newPosition = [latitude, longitude];
+        setPosition(newPosition);
+      } else {
+        throw new Error(data.error || 'Unable to fetch location');
+      }
+    } catch (error) {
+      console.error('Error fetching IP location:', error);
+      throw error;
+    }
+  };
+
+  const fetchData = async (accessToken) => {
+    try {
+      await fetchUserLocation();
+      await fetchLocationData(accessToken);
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    const ipinfoApiKey = 'YOUR_IPINFO_API_KEY'; // Thay thế bằng API key thực tế của bạn
-
-    const fetchData = async () => {
-        try {
-            const location = await fetchUserLocation(ipinfoApiKey);
-            const newPosition = [location.latitude, location.longitude];
-            setPosition(newPosition);
-
-            // Cập nhật destination và Google Maps URL sau khi vị trí người dùng được cập nhật
-            await fetchLocationData(accessToken);
-        } catch (error) {
-            console.error('Error updating location:', error);
-        }
-    };
-
-    fetchData();
+    fetchData(accessToken);
     const intervalId = setInterval(() => {
-        fetchData();
-    }, 5000);
+      fetchData(accessToken);
+    }, 1000);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [position]);
 
   return (
     <div style={{ position: 'relative', height: '100%', width: '100%' }}>
