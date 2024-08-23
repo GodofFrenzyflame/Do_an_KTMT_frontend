@@ -66,9 +66,6 @@ const DualAxisChart = () => {
   const temperatureDomain = [0, maxTemperature + (maxTemperature * 0.1)];
   const humidityDomain = [0, maxHumidity + (maxHumidity * 0.1)];
 
-  const formatTemperature = (value) => `${value} °C`;
-  const formatHumidity = (value) => `${value} %`;
-
   return (
     <div>
       <div>
@@ -84,15 +81,37 @@ const DualAxisChart = () => {
             yAxisId="left" 
             orientation="left" 
             stroke="#ff0000" 
-            domain={temperatureDomain} 
-            tickFormatter={formatTemperature}
+            domain={temperatureDomain}
+            label={{ 
+              value: '°C', 
+              angle: -90, 
+              position: 'insideLeft', 
+              style: { 
+                textAnchor: 'middle', 
+                fill: '#ff0000', 
+                fontSize: 14, 
+                fontWeight: 'bold' 
+              },
+              offset: 15
+            }}
           />
           <YAxis 
             yAxisId="right" 
             orientation="right" 
             stroke="#0000ff" 
-            domain={humidityDomain} 
-            tickFormatter={formatHumidity}
+            domain={humidityDomain}
+            label={{ 
+              value: '%', 
+              angle: 90, 
+              position: 'insideRight', 
+              style: { 
+                textAnchor: 'middle', 
+                fill: '#0000ff', 
+                fontSize: 14, 
+                fontWeight: 'bold' 
+              },
+              offset: 15
+            }}
           />
           <Tooltip />
           <Legend />

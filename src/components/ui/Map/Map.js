@@ -23,7 +23,7 @@ const destinationIcon = new L.Icon({
 });
 
 // Component để cập nhật trung tâm bản đồ
-const MapCenterUpdater = ({ position }) => {
+const MapCenterUpdater = ({ position }) => {  
   const map = useMap();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const apikey = process.env.REACT_APP_IPINFO_API_KEY;
 
 const Map = () => {
   const [position, setPosition] = useState(null);
-  const [destination, setDestination] = useState([10.77270023022209, 106.65917701616793]);
+  const [destination, setDestination] = useState([10.772768634927345, 106.65924413319098]);
   const [googleMapsUrl, setGoogleMapsUrl] = useState(null);
 
   const handleButtonClick = () => {

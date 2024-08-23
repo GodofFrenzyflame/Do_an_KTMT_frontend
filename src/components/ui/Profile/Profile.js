@@ -263,9 +263,20 @@ const Profile = () => {
               </Button>
             ) : (
               <>
-                <Button variant="outlined" sx={{ bgcolor: '#f44336', color: '#fff' }} onClick={handleCancel}>
+                <Button
+                  variant="outlined"
+                  sx={{
+                    bgcolor: '#ff0505',
+                    color: '#fff',
+                    '&:hover': {
+                      bgcolor: '#b50000', // Màu đỏ đậm khi di chuột vào
+                    },
+                  }}
+                  onClick={handleCancel}
+                >
                   Cancel
                 </Button>
+
                 <Button variant="contained" color="primary" onClick={handleSave}>
                   Save
                 </Button>

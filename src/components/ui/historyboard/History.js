@@ -34,6 +34,34 @@ const History = () => {
     setFilteredHistory(mergedData);
   };
 
+  const fetchLogGet = async (token) => {//Hàm này để lấy lịch sử từ ngày startDate đến ngày endDate
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    try {
+      const response = await fetch('http://localhost:8080/log/get', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ start: start, end: end })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log(result);
+      }
+      else {
+        console.error('Error:', result.message);
+      }
+    }
+    catch (error) {
+      console.error('Error fetching status:', error);
+    }
+  }
+
   return (
     <Box sx={{ p: 3, ml: '1.5cm', height: '80vh' }}>
       {/* Tiêu đề của trang */}
