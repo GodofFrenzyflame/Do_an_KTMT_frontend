@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import historyData from './HistoryData';
 import { Box, Typography, TextField, Button, Paper, List, ListItem, ListItemText } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const History = () => {
   const [startDate, setStartDate] = useState('');
@@ -33,34 +32,6 @@ const History = () => {
 
     setFilteredHistory(mergedData);
   };
-
-  const fetchLogGet = async (token) => {//Hàm này để lấy lịch sử từ ngày startDate đến ngày endDate
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    try {
-      const response = await fetch('http://localhost:8080/log/get', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ start: start, end: end })
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        console.log(result);
-      }
-      else {
-        console.error('Error:', result.message);
-      }
-    }
-    catch (error) {
-      console.error('Error fetching status:', error);
-    }
-  }
 
   return (
     <Box sx={{ p: 3, ml: '1.5cm', height: '80vh' }}>
@@ -96,37 +67,19 @@ const History = () => {
         </Button>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 3, height: 'calc(100% - 64px)' }}>
-        {/* Biểu đồ */}
-        <Paper sx={{ p: 3, flex: 2 }}>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={filteredHistory}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="timestamp" />
-              <YAxis yAxisId="left" orientation="left" stroke="#8884d8" label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }} />
-              <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" label={{ value: 'Humidity (%)', angle: -90, position: 'insideRight' }} />
-              <Tooltip />
-              <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line yAxisId="right" type="monotone" dataKey="humidity" stroke="#82ca9d" />
-            </LineChart>
-          </ResponsiveContainer>
-        </Paper>
-
-        {/* Lịch sử */}
-        <Paper sx={{ p: 3, flex: 1, overflowY: 'auto' }}>
-          <Typography variant="h4" gutterBottom>
-            Lịch sử
-          </Typography>
-          <List>
-            {filteredHistory.map((record, index) => (
-              <ListItem key={index}>
-                <ListItemText primary={`Time: ${record.timestamp}, Temperature: ${record.temperature}°C, Humidity: ${record.humidity}%`} />
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-      </Box>
+      {/* Lịch sử */}
+      <Paper sx={{ p: 3, height: 'calc(100% - 64px)', overflowY: 'auto' }}>
+        <Typography variant="h4" gutterBottom>
+          Lịch sử
+        </Typography>
+        <List>
+          {filteredHistory.map((record, index) => (
+            <ListItem key={index}>
+              <ListItemText primary={`Time: ${record.timestamp}, Temperature: ${record.temperature}°C, Humidity: ${record.humidity}%`} />
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
     </Box>
   );
 };

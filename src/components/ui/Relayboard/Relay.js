@@ -16,8 +16,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
-const initialRelays = [];
-
 const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
   <Box
     sx={{
@@ -56,11 +54,41 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
 );
 
 const RelayGrid = () => {
-  const [relays, setRelays] = useState(initialRelays);
+  const [relays, setRelays] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newCard, setNewCard] = useState({ name: '', relayName: '' });
+  const [newCard, setNewCard] = useState({ name: '', relayId: '' });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editRelay, setEditRelay] = useState(null);
+
+  const loadRelays = () => {
+    const savedRelays = localStorage.getItem('relays');
+    if (savedRelays) {
+      setRelays(JSON.parse(savedRelays));
+    }
+  };
+
+  const saveRelays = (newRelays) => {
+    localStorage.setItem('relays', JSON.stringify(newRelays));
+  };
+
+  useEffect(() => {
+    loadRelays();
+
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken) {
+      fetchRelayGet(accessToken);
+
+      const intervalId = setInterval(() => {
+        fetchRelayGet(accessToken);
+      }, 5000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, []);
+
+  useEffect(() => {
+    saveRelays(relays);
+  }, [relays]);
 
   const fetchRelayGet = async (token) => {
     try {
@@ -166,19 +194,6 @@ const RelayGrid = () => {
     }
   }
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      fetchRelayGet(accessToken);
-
-      const intervalId = setInterval(() => {
-        fetchRelayGet(accessToken);
-      }, 5000);
-
-      return () => clearInterval(intervalId);
-    }
-  }, []);
-
   const handleToggle = (id) => {
     setRelays(relays.map((relay) =>
       relay.id === id ? { ...relay, status: !relay.status } : relay
@@ -199,15 +214,16 @@ const RelayGrid = () => {
       alert('Relay with this name already exists.');
       return;
     }
-    const newId = relays.length ? Math.max(...relays.map(relay => relay.id)) + 1 : 1;
-    setRelays([...relays, { id: newId, name: newCard.name, status: false }]);
+
+    const newId = newCard.relayId ? Number(newCard.relayId) : (relays.length ? Math.max(...relays.map(relay => relay.id)) + 1 : 1);
+    setRelays([...relays, { id: newId, name: newCard.name, status: false }].sort((a, b) => a.id - b.id));
 
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
       fetchRelayAdd(accessToken, newId, newCard.name, false);
     }
 
-    setNewCard({ name: '', relayName: '' });
+    setNewCard({ name: '', relayId: '' });
     setDialogOpen(false);
   };
 
@@ -220,7 +236,7 @@ const RelayGrid = () => {
   const handleSaveEdit = () => {
     setRelays(relays.map(relay =>
       relay.id === editRelay.id ? { ...relay, name: editRelay.name } : relay
-    ));
+    ).sort((a, b) => a.id - b.id));
 
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
@@ -232,7 +248,7 @@ const RelayGrid = () => {
   };
 
   const handleDelete = (id) => {
-    setRelays(relays.filter(relay => relay.id !== id));
+    setRelays(relays.filter(relay => relay.id !== id).sort((a, b) => a.id - b.id));
 
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
@@ -251,8 +267,22 @@ const RelayGrid = () => {
           onDelete={handleDelete}
         />
       ))}
+
       <Tooltip title="Add Relay" aria-label="add">
-        <Button variant="contained" color="primary" onClick={handleAddCard} sx={{ marginTop: '16px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddCard}
+          sx={{
+            position: 'fixed',
+            bottom: '16px',
+            right: '16px',
+            borderRadius: '50%',
+            minWidth: '56px',
+            minHeight: '56px',
+            padding: 0
+          }}
+        >
           <AddIcon />
         </Button>
       </Tooltip>
@@ -268,6 +298,14 @@ const RelayGrid = () => {
             fullWidth
             value={newCard.name}
             onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Relay ID"
+            type="number"
+            fullWidth
+            value={newCard.relayId}
+            onChange={(e) => setNewCard({ ...newCard, relayId: e.target.value })}
           />
         </DialogContent>
         <DialogActions>
