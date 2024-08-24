@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Button,
-  TextField,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Typography,
-  IconButton,
-  Switch,
-  Tooltip
+  Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
+  Typography, IconButton, Switch, Tooltip
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+
+const token = localStorage.getItem('accessToken');
 
 const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
   <Box
@@ -36,18 +29,20 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
       },
     }}
   >
-    <Typography sx={{ flex: 2, fontWeight: 'bold', fontSize: '1.1rem' }}>{relay.name}</Typography>
-    <IconButton onClick={() => onEdit(relay.id)} sx={{ marginRight: '16px' }}>
+    <Typography sx={{ flex: 2, fontWeight: 'bold', fontSize: '1.2rem' }}>{relay.relay_name}</Typography>
+    <IconButton onClick={() => onEdit(relay.relay_id)} sx={{ marginRight: '16px' }}>
       <EditIcon color="primary" />
     </IconButton>
-    <Typography sx={{ flex: 3, color: '#555' }}>{`Relay ${relay.id}`}</Typography>
-    <Typography sx={{ flex: 1, color: relay.status ? 'green' : 'red' }}>{relay.status ? 'On' : 'Off'}</Typography>
+    <Typography sx={{ flex: 2, color: '#555' }}>{`Relay ${relay.relay_id}`}</Typography>
+    <Typography sx={{ flex: 1, color: relay.state ? 'green' : 'red', fontWeight: 'bold' }}>
+      {relay.state ? 'On' : 'Off'}
+    </Typography>
     <Switch
-      checked={relay.status}
-      onChange={() => onToggle(relay.id)}
+      checked={relay.state}
+      onChange={() => onToggle(relay.relay_id)}
       sx={{ marginLeft: 'auto' }}
     />
-    <IconButton onClick={() => onDelete(relay.id)} sx={{ marginLeft: '16px' }}>
+    <IconButton onClick={() => onDelete(relay.relay_id)} sx={{ marginLeft: '16px' }}>
       <DeleteIcon color="error" />
     </IconButton>
   </Box>
@@ -60,78 +55,43 @@ const RelayGrid = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editRelay, setEditRelay] = useState(null);
 
-  const loadRelays = () => {
-    const savedRelays = localStorage.getItem('relays');
-    if (savedRelays) {
-      setRelays(JSON.parse(savedRelays));
-    }
-  };
-
-  const saveRelays = (newRelays) => {
-    localStorage.setItem('relays', JSON.stringify(newRelays));
+  const loadData = () => {
+    const storedRelayJSON = localStorage.getItem('relays');
+    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+    setRelays(storedRelayData);
   };
 
   useEffect(() => {
-    loadRelays();
-
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      fetchRelayGet(accessToken);
-
-      const intervalId = setInterval(() => {
-        fetchRelayGet(accessToken);
-      }, 5000);
-
-      return () => clearInterval(intervalId);
-    }
+    loadData();
   }, []);
 
-  useEffect(() => {
-    saveRelays(relays);
-  }, [relays]);
-
-  const fetchRelayGet = async (token) => {
+  const fetchRelayAdd = async (relay_id, relay_name, state) => {
     try {
-      const response = await fetch('http://localhost:8080/relay', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-      const result = await response.json();
-      if (response.ok) {
-        setRelays(result.relays);
-      } else {
-        console.error('Error:', result.message);
-      }
-    } catch (error) {
-      console.error('Error fetching status:', error);
-    }
-  }
-
-  const fetchRelayAdd = async (token, relay_id, relay_name, state) => {
-    try {
+      const finalRelayName = relay_name || `Relay ${relay_id}`;
       const response = await fetch('http://localhost:8080/relay/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, relay_name, state }),
+        body: JSON.stringify({ relay_id, relay_name: finalRelayName, state }),
       });
       const result = await response.json();
       if (response.ok) {
-        fetchRelayGet(token);
+        const storedRelayJSON = localStorage.getItem('relays');
+        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+        storedRelayData.push({ relay_id, relay_name: finalRelayName, state });
+        localStorage.setItem('relays', JSON.stringify(storedRelayData));
+        loadData();
       } else {
         console.error('Error:', result.message);
       }
     } catch (error) {
       console.error('Error adding relay:', error);
     }
-  }
+  };
 
-  const fetchRelaySet = async (token, relay_id, relay_name, new_relay_id) => {
+  const fetchRelaySet = async (relay_id, relay_name, new_relay_id) => {
     try {
       const response = await fetch('http://localhost:8080/relay/set', {
         method: 'PATCH',
@@ -143,16 +103,32 @@ const RelayGrid = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        fetchRelayGet(token);
+        const storedRelayJSON = localStorage.getItem('relays');
+        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+
+        const updatedRelays = storedRelayData.map((relay) => {
+          if (relay.relay_id === relay_id) {
+            return {
+              ...relay,
+              relay_name: relay_name || relay.relay_name,
+              relay_id: new_relay_id || relay.relay_id,
+            };
+          }
+          return relay;
+        });
+        localStorage.setItem('relays', JSON.stringify(updatedRelays));
+        setRelays(updatedRelays);
+        loadData();
       } else {
-        console.error('Error:', result.message);
+        alert(result.error);
+        console.error('Error:', result.error);
       }
     } catch (error) {
       console.error('Error setting relay:', error);
     }
-  }
+  };
 
-  const fetchRelayDelete = async (token, relay_id) => {
+  const fetchRelayDelete = async (relay_id) => {
     try {
       const response = await fetch('http://localhost:8080/relay/delete', {
         method: 'DELETE',
@@ -164,16 +140,20 @@ const RelayGrid = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        fetchRelayGet(token);
+        const storedRelayJSON = localStorage.getItem('relays');
+        let storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+        storedRelayData = storedRelayData.filter(relay => relay.relay_id !== relay_id);
+        localStorage.setItem('relays', JSON.stringify(storedRelayData));
+        loadData();
       } else {
         console.error('Error:', result.message);
       }
     } catch (error) {
       console.error('Error deleting relay:', error);
     }
-  }
+  };
 
-  const fetchStatusSet = async (token, relay_id, state) => {
+  const fetchStatusSet = async (relay_id, state) => {
     try {
       const response = await fetch('http://localhost:8080/relay/set-status', {
         method: 'PATCH',
@@ -185,23 +165,28 @@ const RelayGrid = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        fetchRelayGet(token);
+        const storedRelayJSON = localStorage.getItem('relays');
+        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+        const updatedRelays = storedRelayData.map((relay) =>
+          relay.relay_id === relay_id ? { ...relay, state } : relay
+        );
+        localStorage.setItem('relays', JSON.stringify(updatedRelays));
+        setRelays(updatedRelays);
+        loadData();
       } else {
         console.error('Error:', result.message);
       }
     } catch (error) {
       console.error('Error setting status:', error);
     }
-  }
+  };
 
   const handleToggle = (id) => {
-    setRelays(relays.map((relay) =>
-      relay.id === id ? { ...relay, status: !relay.status } : relay
-    ));
-
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      fetchStatusSet(accessToken, id, !relays.find(relay => relay.id === id).status);
+    const relay = relays.find(relay => relay.relay_id === id);
+    if (relay) {
+      fetchStatusSet(id, !relay.state);
+    } else {
+      console.error('Relay not found:', id);
     }
   };
 
@@ -210,85 +195,65 @@ const RelayGrid = () => {
   };
 
   const handleSaveCard = () => {
-    if (relays.some(relay => relay.name === newCard.name)) {
-      alert('Relay with this name already exists.');
+    if (!newCard.relayId) {
+      alert('Relay ID is required.');
       return;
     }
-
-    const newId = newCard.relayId ? Number(newCard.relayId) : (relays.length ? Math.max(...relays.map(relay => relay.id)) + 1 : 1);
-    setRelays([...relays, { id: newId, name: newCard.name, status: false }].sort((a, b) => a.id - b.id));
-
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      fetchRelayAdd(accessToken, newId, newCard.name, false);
-    }
-
+    fetchRelayAdd(newCard.relayId, newCard.name, false);
     setNewCard({ name: '', relayId: '' });
     setDialogOpen(false);
   };
 
   const handleEditRelay = (id) => {
-    const relayToEdit = relays.find(relay => relay.id === id);
+    const relayToEdit = relays.find(relay => relay.relay_id === id);
     setEditRelay(relayToEdit);
     setEditDialogOpen(true);
   };
 
   const handleSaveEdit = () => {
-    setRelays(relays.map(relay =>
-      relay.id === editRelay.id ? { ...relay, name: editRelay.name } : relay
-    ).sort((a, b) => a.id - b.id));
-
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      fetchRelaySet(accessToken, editRelay.id, editRelay.name);
+    if (editRelay) {
+      fetchRelaySet(editRelay.relay_id, editRelay.name, editRelay.new_relay_id);
+      setEditRelay(null);
+      setEditDialogOpen(false);
     }
-
-    setEditRelay(null);
-    setEditDialogOpen(false);
   };
 
   const handleDelete = (id) => {
-    setRelays(relays.filter(relay => relay.id !== id).sort((a, b) => a.id - b.id));
-
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      fetchRelayDelete(accessToken, id);
-    }
+    fetchRelayDelete(id);
   };
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '16px', alignItems: 'center' }}>
       {relays.map((relay) => (
         <RelayCard
-          key={relay.id}
+          key={relay.relay_id}
           relay={relay}
           onToggle={handleToggle}
           onEdit={handleEditRelay}
           onDelete={handleDelete}
         />
       ))}
-
-      <Tooltip title="Add Relay" aria-label="add">
-        <Button
-          variant="contained"
+      <Tooltip title="Add Relay">
+        <IconButton
           color="primary"
           onClick={handleAddCard}
           sx={{
             position: 'fixed',
             bottom: '16px',
             right: '16px',
-            borderRadius: '50%',
-            minWidth: '56px',
-            minHeight: '56px',
-            padding: 0
+            backgroundColor: '#3f51b5',
+            color: '#fff',
+            '&:hover': {
+              backgroundColor: '#303f9f',
+            },
           }}
         >
           <AddIcon />
-        </Button>
+        </IconButton>
       </Tooltip>
 
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Add Relay</DialogTitle>
+        <DialogTitle>Add New Relay</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -296,48 +261,56 @@ const RelayGrid = () => {
             label="Relay Name"
             type="text"
             fullWidth
+            variant="outlined"
             value={newCard.name}
             onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
           />
           <TextField
             margin="dense"
             label="Relay ID"
-            type="number"
+            type="text"
             fullWidth
+            variant="outlined"
             value={newCard.relayId}
             onChange={(e) => setNewCard({ ...newCard, relayId: e.target.value })}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSaveCard} color="primary">
-            Save
-          </Button>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveCard}>Save</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
         <DialogTitle>Edit Relay</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Relay Name"
-            type="text"
-            fullWidth
-            value={editRelay?.name || ''}
-            onChange={(e) => setEditRelay({ ...editRelay, name: e.target.value })}
-          />
+          {editRelay && (
+            <>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Relay Name"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={editRelay.name}
+                onChange={(e) => setEditRelay({ ...editRelay, name: e.target.value })}
+              />
+              <TextField
+                margin="dense"
+                label="New Relay ID (optional)"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={editRelay.new_relay_id || ''}
+                onChange={(e) => setEditRelay({ ...editRelay, new_relay_id: e.target.value })}
+              />
+            </>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSaveEdit} color="primary">
-            Save
-          </Button>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleSaveEdit}>Save</Button>
         </DialogActions>
       </Dialog>
     </Box>

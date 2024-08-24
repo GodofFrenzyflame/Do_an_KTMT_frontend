@@ -9,13 +9,43 @@ import AuthenticatedLayout from './components/ui/sidebar/Sidebarlayout';
 import { Box } from '@mui/material';
 import Relay from './components/ui/Relayboard/Relay';
 import Setting from './components/ui/Settingboard/Settingboard';
-import Forget from './components/auth/Forget'; // Import trang Forget
+import Forget from './components/auth/Forget';
 
 
 function App() {
-  
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+
+  const refreshAccessToken = async (state) => {
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    try {
+      const response = await fetch('http://localhost:8080/refresh-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        const { accessToken } = result;
+        localStorage.setItem('accessToken', accessToken);
+        if (state === 'connect') await fetchConnectMqtt(accessToken);
+        else if (state === 'disconnect') await fetchDisconnectMqtt(accessToken);
+      } else {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('Error during access token refresh:', error);
+    }
+  };
 
   const fetchConnectMqtt = async (token) => {
     console.log('Connecting to MQTT...');
@@ -40,6 +70,7 @@ function App() {
       console.error('Error connecting to MQTT:', error);
     }
   };
+
   const fetchDisconnectMqtt = async (token) => {
     try {
       const response = await fetch('http://localhost:8080/mqtt/disconnect', {
@@ -74,9 +105,7 @@ function App() {
       const result = await response.json();
       if (response.ok) {
         fetchDisconnectMqtt(token);
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        localStorage.clear();
         setIsLoggedIn(false);
         console.log('Logged out successfully');
       } else {
@@ -90,33 +119,88 @@ function App() {
     }
   }
 
-  const refreshAccessToken = async (state) => {
-    const refreshToken = localStorage.getItem('refreshToken');
-
+  const fetchRelayGet = async (token) => {
     try {
-      const response = await fetch('http://localhost:8080/refresh-token', {
-        method: 'POST',
+      const response = await fetch('http://localhost:8080/relay/get', {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
+          'Authorization': `Bearer ${token}`,
+        }
       });
 
       const result = await response.json();
-
       if (response.ok) {
-        const { accessToken } = result;
-        localStorage.setItem('accessToken', accessToken);
-        if (state === 'connect') await fetchConnectMqtt(accessToken);
-        else if (state === 'disconnect') await fetchDisconnectMqtt(accessToken);
+        const relayToStore = result.map(relay => ({
+          relay_id: relay.relay_id,
+          relay_name: relay.relay_name,
+          state: relay.state
+        }));
+
+        const relayJSON = JSON.stringify(relayToStore);
+        localStorage.setItem('relays', relayJSON);
       } else {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        setIsLoggedIn(false);
+        console.error('Error:', result.message);
       }
     } catch (error) {
-      console.error('Error during access token refresh:', error);
+      console.error('Error fetching status:', error);
+    }
+  }
+
+  const fetchRelayGetHome = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/relay/get-home', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        const relayToStore = result.map(relay => ({
+          relay_id: relay.relay_id,
+          relay_name: relay.relay_name,
+          state: relay.state
+        }));
+
+        const relayJSON = JSON.stringify(relayToStore);
+        localStorage.setItem('relays_home', relayJSON);
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching status:', error);
+    }
+  }
+
+  const fetchProfileData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/profile', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        localStorage.setItem('username', result.data.username);
+        localStorage.setItem('fullname', result.data.fullname);
+        localStorage.setItem('email', result.data.email);
+        localStorage.setItem('phone_number', result.data.phone_number);
+        localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
+        localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
+        if (result.data.avatar) {
+          const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
+          localStorage.setItem('avatar', avatarSrc);
+        }
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
     }
   };
 
@@ -125,8 +209,11 @@ function App() {
     if (storedLoggedInStatus === 'true') {
       setIsLoggedIn(true);
       fetchConnectMqtt(localStorage.getItem('accessToken'));
+      fetchRelayGet(localStorage.getItem('accessToken'));
+      fetchRelayGetHome(localStorage.getItem('accessToken'));
+      fetchProfileData(localStorage.getItem('accessToken'));
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const handleLogin = (status) => {
     setIsLoggedIn(status);

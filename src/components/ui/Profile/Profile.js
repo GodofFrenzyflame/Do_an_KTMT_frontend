@@ -3,55 +3,41 @@ import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
 import PasswordDialog from './PasswordDialog';
 import { InputAdornment } from '@mui/material';
 
+const token = localStorage.getItem('accessToken');
+
 const Profile = () => {
   const [username, setUsername] = useState('');
   const [fullname, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone_number, setPhone] = useState('');
-  
+
   const [aioUser, setAioUser] = useState('');
   const [aioKey, setAioPassword] = useState('');
   const [avatar, setAvatar] = useState('');
   const [originalAvatar, setOriginalAvatar] = useState('');
   const [isEditable, setIsEditable] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false); 
+  const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
 
-  const fetchProfileData = async (token) => {
-    try {
-      const response = await fetch('http://localhost:8080/profile', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-      if (response.ok) {
-        setUsername(result.data.username);
-        setFullName(result.data.fullname);
-        setEmail(result.data.email);
-        setPhone(result.data.phone_number);
-        setAioUser(result.data.AIO_USERNAME);
-        setAioPassword(result.data.AIO_KEY);
-        if (result.data.avatar) {
-          const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
-          setAvatar(avatarSrc);
-          setOriginalAvatar(avatarSrc); // Save original avatar
-        }
-        else {
-          setAvatar('');
-          setOriginalAvatar(''); // No avatar
-        }
-      } else {
-        console.error('Error:', result.message);
-      }
-    } catch (error) {
-      console.error('Error fetching profile data:', error);
+  const loadData = () => {
+    setUsername(localStorage.getItem('username'));
+    setFullName(localStorage.getItem('fullname'));
+    setEmail(localStorage.getItem('email'));
+    setPhone(localStorage.getItem('phone_number'));
+    setAioUser(localStorage.getItem('AIO_USERNAME'));
+    setAioPassword(localStorage.getItem('AIO_KEY'));
+    if (localStorage.getItem('avatar')) {
+      setAvatar(localStorage.getItem('avatar'));
+      setOriginalAvatar(localStorage.getItem('avatar'));
     }
+    else {
+      setAvatar('');
+      setOriginalAvatar(''); // No avatar
+    }
+
   };
 
-  const fetchProfileEdit = async (token) => {
+  const fetchProfileEdit = async () => {
     try {
       const formData = new FormData();
       formData.append('username', username);
@@ -71,14 +57,24 @@ const Profile = () => {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        body: formData, // Use FormData instead of JSON.stringify
+        body: formData,
       });
 
       const result = await response.json();
       if (response.ok) {
         alert('Profile saved!');
         setIsEditable(false);
-        fetchProfileData(token);
+        localStorage.setItem('username', result.data.username);
+        localStorage.setItem('fullname', result.data.fullname);
+        localStorage.setItem('email', result.data.email);
+        localStorage.setItem('phone_number', result.data.phone_number);
+        localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
+        localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
+        if (result.data.avatar) {
+          const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
+          localStorage.setItem('avatar', avatarSrc);
+        }
+        loadData();
       } else {
         console.error('Error:', result.message);
       }
@@ -88,11 +84,11 @@ const Profile = () => {
   };
 
   const handleSave = () => {
-    fetchProfileEdit(localStorage.getItem('accessToken'));
+    fetchProfileEdit();
   };
 
   const handleCancel = () => {
-    fetchProfileData(localStorage.getItem('accessToken'));
+    loadData();
     setIsEditable(false);
     setAvatar(originalAvatar); // Reset to original avatar
   };
@@ -115,8 +111,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    fetchProfileData(accessToken);
+    loadData();
   }, []);
 
   const obfuscatePhone = (phone_number) => {
@@ -293,7 +288,7 @@ const Profile = () => {
           setIsPasswordDialogOpen(false);
           if (isPasswordConfirmed) {
             // Refresh profile data if the password was confirmed
-            fetchProfileData(localStorage.getItem('accessToken'));
+            loadData();
           }
         }}
         onConfirm={(confirmed) => {
