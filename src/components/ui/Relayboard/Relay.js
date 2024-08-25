@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
-  Typography, IconButton, Switch, Tooltip
+  Typography, IconButton, Switch, Tooltip, Checkbox
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 const token = localStorage.getItem('accessToken');
 
-const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
+const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome }) => (
   <Box
     sx={{
       border: '1px solid #ddd',
@@ -29,6 +29,12 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete }) => (
       },
     }}
   >
+    <Checkbox
+      checked={relay.relay_home}
+      onChange={() => oncheckHome(relay.relay_id)}  // Đảm bảo onHomeToggle là một hàm
+      sx={{ marginRight: '16px' }}
+    />
+
     <Typography sx={{ flex: 2, fontWeight: 'bold', fontSize: '1.2rem' }}>{relay.relay_name}</Typography>
     <IconButton onClick={() => onEdit(relay.relay_id)} sx={{ marginRight: '16px' }}>
       <EditIcon color="primary" />
@@ -181,6 +187,45 @@ const RelayGrid = () => {
     }
   };
 
+  const fetchRelayHomeSet = async (relay_id, relay_home) => {
+    try {
+      const response = await fetch('http://localhost:8080/relay/set-home', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ relay_id, relay_home }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        const storedRelayJSON = localStorage.getItem('relays');
+        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+        const updatedRelays = storedRelayData.map((relay) =>
+          relay.relay_id === relay_id ? { ...relay, relay_home } : relay
+        );
+        localStorage.setItem('relays', JSON.stringify(updatedRelays));
+        setRelays(updatedRelays);
+        loadData();
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error setting relay home:', error);
+    }
+  };
+  
+  const handleCheckHome = (id) => {
+    const relay = relays.find(relay => relay.relay_id === id);
+    if (relay) {
+      fetchRelayHomeSet(id, !relay.relay_home);
+    } else {
+      console.error('Relay not found:', id);
+    }
+  };
+  
+  
+  
   const handleToggle = (id) => {
     const relay = relays.find(relay => relay.relay_id === id);
     if (relay) {
@@ -231,6 +276,7 @@ const RelayGrid = () => {
           onToggle={handleToggle}
           onEdit={handleEditRelay}
           onDelete={handleDelete}
+          oncheckHome={handleCheckHome}
         />
       ))}
       <Tooltip title="Add Relay">
