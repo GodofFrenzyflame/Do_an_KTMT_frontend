@@ -167,6 +167,7 @@ function App() {
 
         const relayJSON = JSON.stringify(relayToStore);
         localStorage.setItem('relays_home', relayJSON);
+        console.log('Relay home:', localStorage.getItem('relays_home'));
       } else {
         console.error('Error:', result.message);
       }
@@ -212,6 +213,10 @@ function App() {
       fetchRelayGet(localStorage.getItem('accessToken'));
       fetchRelayGetHome(localStorage.getItem('accessToken'));
       fetchProfileData(localStorage.getItem('accessToken'));
+      const intervalId = setInterval(() => {
+        fetchRelayGetHome(localStorage.getItem('accessToken'));
+      }, 1000);
+      return () => clearInterval(intervalId);
     }
   }, [isLoggedIn]);
 

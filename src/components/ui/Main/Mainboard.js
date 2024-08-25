@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
 import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart component
@@ -10,10 +10,32 @@ import { useTranslation } from 'react-i18next';
 const Home = () => {
   const { settings } = useContext(AppContext);
   const { t } = useTranslation();
+  const [relaysHome, setRelaysHome] = useState([]);
 
   const getBackgroundColor = () => settings.color === 'dark' ? '#000f1f' : '#ffffff';
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
+
+  const gridItemWidths = {
+    1: 12,
+    2: 6,
+    3: 4,
+    4: 3,
+  };
+
+  const loadData = () => {
+    const data = JSON.parse(localStorage.getItem('relays_home')) || [];
+    setRelaysHome(data);
+  };
+
+  useEffect(() => {
+    loadData();
+    const intervalId = setInterval(() => {
+      loadData();
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
 
   return (
     <Container maxWidth="xxxl" sx={{ backgroundColor: getBackgroundColor() }}>
@@ -21,12 +43,20 @@ const Home = () => {
         {t('Home')}
       </Typography>
 
-      <Grid container spacing={2} sx={{ mb: '1%' }}>
-        {[1, 2, 3, 4].map((relay) => (
-          <Grid item xs={12} sm={6} md={3} key={relay}>
-            <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', bgcolor: getBoxBackgroundColor(), color: getWordColor() }}>
-              <Typography variant="h6">Relay {relay}</Typography>
-              <Typography variant="body1">Status: OFF</Typography>
+      <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%' }}>
+        {relaysHome.map((relay) => (
+          <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>
+            <Paper
+              elevation={3}
+              sx={{
+                p: '2%',
+                textAlign: 'center',
+                bgcolor: getBoxBackgroundColor(relay.state),
+                color: getWordColor(),
+              }}
+            >
+              <Typography variant="h6">{relay.relay_name}</Typography>
+              <Typography variant="body1">Status: {relay.state ? 'ON' : 'OFF'}</Typography>
             </Paper>
           </Grid>
         ))}
@@ -51,7 +81,7 @@ const Home = () => {
           </Paper>
         </Grid>
       </Grid>
-      
+
       <Paper elevation={3} sx={{ p: '2%', textAlign: 'left', bgcolor: getBoxBackgroundColor(), color: getWordColor(), mt: '1%' }}>
         <Typography variant="h6" sx={{ mb: '1%' }}>Temperature & Humidity</Typography>
         <DualAxisChart /> {/* Replace History with DualAxisChart */}
