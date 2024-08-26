@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Box } from '@mui/material';
+
+
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
-import Home from './components/ui/Main/Mainboard';
-import Profile from './components/ui/Profile/Profile';
-import History from './components/ui/historyboard/History';
-import AuthenticatedLayout from './components/ui/sidebar/Sidebarlayout';
-import { Box } from '@mui/material';
-import Relay from './components/ui/Relayboard/Relay';
-import Setting from './components/ui/Settingboard/Settingboard';
 import Forget from './components/auth/Forget';
+
+import Home from './components/ui/Home/home';
+import Profile from './components/ui/Profile/profile';
+import History from './components/ui/History/history';
+import AuthenticatedLayout from './components/ui/sidebar/sidebarlayout';
+import Relay from './components/ui/Relay/relay';
+import Setting from './components/ui/Setting/setting';
+
 
 
 function App() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
-
+  const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
   const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
 
@@ -31,7 +35,7 @@ function App() {
 
       const result = await response.json();
 
-      if (response.ok) {
+      if (response.ok) {  
         const { accessToken } = result;
         localStorage.setItem('accessToken', accessToken);
         if (state === 'connect') await fetchConnectMqtt(accessToken);
@@ -233,14 +237,29 @@ function App() {
     setSidebarOpen((prev) => !prev);
   };
 
+  const handleMouseMove = (e) => {
+    const { clientX: x, clientY: y } = e;
+    setBackgroundPosition({ x, y });
+  };
+
+  const gradientStyle = {
+    background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #ff7f50, #1e90ff)`,
+    border: 'none',
+    boxShadow: 'none', 
+  };
+
   return (
-    <Router>
-      <Routes>
+    <Box onMouseMove={handleMouseMove}
+    sx={{
+      ...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
+    }}>
+    <Router >
+      <Routes >
         <Route
           path="/"
           element={
             isLoggedIn ? <Navigate to="/home" /> :
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <Login onLogin={handleLogin} />
               </Box>
           }
@@ -248,7 +267,7 @@ function App() {
         <Route
           path="/signup"
           element={
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100&' }}>
               <Signup />
             </Box>
           }
@@ -326,6 +345,7 @@ function App() {
         />
       </Routes>
     </Router>
+    </Box>
   );
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import  AppContext  from '../../../AppContext'; // Import context
+import  AppContext  from './language/AppContext'; // Import context
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);

@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
-import TemperatureChart from '../Charts/TemperatureChart';
-import HumidityChart from '../Charts/HumidityChart';
 import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart component
-import Map from '../Map/Map';
+import Map from '../Map/map';
 import { Box, Typography, Grid, Paper } from '@mui/material';
-import AppContext from '../../../AppContext';
+import AppContext from '../Setting/language/AppContext';
 import { useTranslation } from 'react-i18next';
+import TemperatureGauge from '../Charts/TemperatureGauge';
+import HumidityGauge from '../Charts/HumidityGauge';
 
 const Home = () => {
   const { settings } = useContext(AppContext);
   const { t } = useTranslation();
   const [relaysHome, setRelaysHome] = useState([]);
-
   
+
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
 
@@ -36,9 +36,10 @@ const Home = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  
 
   return (
-    <Box>
+    <Box >
       <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
         {t('Home')}
       </Typography>
@@ -65,13 +66,13 @@ const Home = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
           <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
-            <TemperatureChart />
+            <TemperatureGauge />
           </Paper>
         </Grid>
 
         <Grid item xs={12} sm={4}>
           <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
-            <HumidityChart />
+            <HumidityGauge />
           </Paper>
         </Grid>
 

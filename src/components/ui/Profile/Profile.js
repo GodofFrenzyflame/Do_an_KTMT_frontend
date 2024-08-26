@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
-import PasswordDialog from './PasswordDialog';
+import PasswordDialog from './changePass';
 import { InputAdornment } from '@mui/material';
 
 const token = localStorage.getItem('accessToken');

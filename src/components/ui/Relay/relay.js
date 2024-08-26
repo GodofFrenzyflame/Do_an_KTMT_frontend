@@ -291,7 +291,7 @@ const RelayGrid = () => {
   };
   
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '16px', alignItems: 'center' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' ,overflow: 'hidden'}}>
       {relays.map((relay) => (
         <RelayCard
           key={relay.relay_id}

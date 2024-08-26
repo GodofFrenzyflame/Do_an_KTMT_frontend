@@ -2,16 +2,16 @@ import React, { useEffect, useState, useContext } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Box, Typography } from '@mui/material';
-import AppContext from '../../../AppContext';
+import AppContext from '../Setting/language/AppContext';
 
-const TemperatureGauge = () => {
+const HumidityGauge = () => {
   const { settings } = useContext(AppContext);
-  const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
-  const [temperature, setTemperature] = useState(null);
+  const getWordColor = () => (settings.color === 'dark' ? '#fff' : '#000');
+  const [humidity, setHumidity] = useState(null);
 
-  const fetchTemperaturData = async (token) => {
+  const fetchHumidityData = async (token) => {
     try {
-      const response = await fetch('http://localhost:8080/sensor/temp', {
+      const response = await fetch('http://localhost:8080/sensor/humi', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -20,20 +20,20 @@ const TemperatureGauge = () => {
       });
       const result = await response.json();
       if (response.ok) {
-        setTemperature(result.data);
+        setHumidity(result.data);
       } else {
         console.error('Error:', result.message);
       }
     } catch (error) {
-      console.error('Error fetching temperature data:', error);
+      console.error('Error fetching humidity data:', error);
     }
   };
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
-    fetchTemperaturData(accessToken);
+    fetchHumidityData(accessToken);
     const intervalId = setInterval(() => {
-      fetchTemperaturData(accessToken);
+      fetchHumidityData(accessToken);
     }, 5000);
     return () => clearInterval(intervalId);
   }, []);
@@ -51,11 +51,11 @@ const TemperatureGauge = () => {
       }}
     >
       <CircularProgressbar
-        value={temperature === null ? 0 : temperature}
-        text={`${temperature === null ? 0 : temperature}°C`}
+        value={humidity === null ? 0 : humidity}
+        text={`${humidity === null ? 0 : humidity}%`}
         styles={buildStyles({
           textColor: getWordColor(),
-          pathColor: temperature < 15 ? '#00BFFF' : temperature < 80 ? '#FFD700' : '#FF4500',
+          pathColor: humidity < 40 ? '#FF0000' : humidity < 70 ? '#FFFF00' : '#00FF00',
           trailColor: '#eee',
         })}
         style={{
@@ -70,10 +70,10 @@ const TemperatureGauge = () => {
           color: getWordColor(),
         }}
       >
-        🌡️ Temperature
+        💧Humidity
       </Typography>
     </Box>
   );
 };
 
-export default TemperatureGauge;
+export default HumidityGauge;

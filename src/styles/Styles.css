@@ -1,5 +1,6 @@
 /* Ensure the overall layout behaves correctly */
 body {
+    margin: 0;
     font-family: 'Roboto', sans-serif;
   }
   
