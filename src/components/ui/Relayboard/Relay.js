@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
-  Typography, IconButton, Switch, Checkbox
+  Typography, IconButton, Switch, Checkbox, Tooltip
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
 
 const token = localStorage.getItem('accessToken');
 
-const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome }) => (
+const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome, showCheckboxes , showDeleteIcons}) => (
   <Box
     sx={{
       border: '1px solid #ddd',
@@ -32,12 +32,13 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome }) => (
       },
     }}
   >
-    <Checkbox
-      checked={relay.relay_home}
-      onChange={() => oncheckHome(relay.relay_id)}
-      sx={{ marginRight: '16px' }}
-    />
-
+    {showCheckboxes && (
+      <Checkbox
+        checked={relay.relay_home}
+        onChange={() => oncheckHome(relay.relay_id)}
+        sx={{ marginRight: '16px' }}
+      />
+    )}
     <Typography sx={{ flex: 2, fontWeight: 'bold', fontSize: '1.2rem' }}>{relay.relay_name}</Typography>
     <IconButton onClick={() => onEdit(relay.relay_id)} sx={{ marginRight: '16px' }}>
       <EditIcon color="primary" />
@@ -51,9 +52,11 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome }) => (
       onChange={() => onToggle(relay.relay_id)}
       sx={{ marginLeft: 'auto' }}
     />
+    {showDeleteIcons && ( // Show delete icon only when showDeleteIcons is true
     <IconButton onClick={() => onDelete(relay.relay_id)} sx={{ marginLeft: '16px' }}>
       <DeleteIcon color="error" />
     </IconButton>
+)}
   </Box>
 );
 
@@ -64,12 +67,15 @@ const RelayGrid = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editRelay, setEditRelay] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showCheckboxes, setShowCheckboxes] = useState(false); // State để quản lý hiển thị của checkbox
+  const [showDeleteIcons, setShowDeleteIcons] = useState(false);
+
+
 
   const loadData = () => {
     const storedRelayJSON = localStorage.getItem('relays');
     const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
     setRelays(storedRelayData);
-    console.log(storedRelayData)
   };
 
   useEffect(() => {
@@ -219,7 +225,7 @@ const RelayGrid = () => {
       console.error('Error setting relay home:', error);
     }
   };
-  
+
   const handleCheckHome = (id) => {
     const relay = relays.find(relay => relay.relay_id === id);
     if (relay) {
@@ -228,7 +234,7 @@ const RelayGrid = () => {
       console.error('Relay not found:', id);
     }
   };
-  
+
   const handleToggle = (id) => {
     const relay = relays.find(relay => relay.relay_id === id);
     if (relay) {
@@ -272,17 +278,20 @@ const RelayGrid = () => {
   };
 
   const handleAddToHome = () => {
-    alert('Add to Home action');
+    setShowCheckboxes(!showCheckboxes); // Toggle hiển thị của checkbox
     setMenuOpen(false);
   };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-
+  const handleDeleteMode = () => {
+    setShowDeleteIcons((prev) => !prev); // Toggle the state
+    setMenuOpen(false); // Optionally close the menu if required
+  };
+  
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', padding: '16px', alignItems: 'center' }}>
-      
       {relays.map((relay) => (
         <RelayCard
           key={relay.relay_id}
@@ -291,71 +300,99 @@ const RelayGrid = () => {
           onEdit={handleEditRelay}
           onDelete={handleDelete}
           oncheckHome={handleCheckHome}
+          showCheckboxes={showCheckboxes} // Truyền state showCheckboxes vào RelayCard
+          showDeleteIcons={showDeleteIcons} // Pass this prop here
         />
       ))}
 
-      {/* Floating Action Button */}
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: '16px',
-          right: '16px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        {menuOpen && (
-          <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <IconButton
-              onClick={handleAddCard}
-              sx={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                backgroundColor: '#3f51b5',
-                color: '#fff',
-                mb: 1,
-                '&:hover': { backgroundColor: '#303f9f' },
-              }}
-            >
-              <AddCircleOutlineIcon />
-            </IconButton>
-            <IconButton
-              onClick={handleAddToHome}
-              sx={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                backgroundColor: '#3f51b5',
-                color: '#fff',
-                '&:hover': { backgroundColor: '#303f9f' },
-              }}
-            >
-              <HomeIcon />
-            </IconButton>
-          </Box>
-        )}
-
-        <IconButton
-          color="primary"
-          onClick={toggleMenu}
+        <Box
           sx={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '50%',
-            backgroundColor: '#4800ff',
-            color: '#000',
-            '&:hover': { backgroundColor: '#030d99' },
-            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-            transition: 'transform 0.2s ease-in-out',
-            transform: menuOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+            position: 'fixed',
+            bottom: '16px',
+            right: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}
         >
-          {menuOpen ? <CloseIcon /> : <AddIcon />}
-        </IconButton>
-      </Box>
+          {menuOpen && (
+            <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              {/* Nút Add New Card */}
+              <Tooltip title="Add new card" placement="left">
+                <IconButton
+                  onClick={handleAddCard}
+                  sx={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    backgroundColor: '#4caf50', // Xanh lá cây
+                    color: '#fff',
+                    mb: 1,
+                    '&:hover': { backgroundColor: '#388e3c' }, // Xanh lá cây đậm hơn
+                  }}
+                >
+                  <AddCircleOutlineIcon />
+                </IconButton>
+              </Tooltip>
 
+              {/* Nút Add to Home */}
+              <Tooltip title="Add to Home" placement="left">
+                <IconButton
+                  onClick={handleAddToHome}
+                  sx={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    backgroundColor: '#2196f3', // Xanh dương
+                    color: '#fff',
+                    mb: 1,
+                    '&:hover': { backgroundColor: '#1976d2' }, // Xanh dương đậm hơn
+                  }}
+                >
+                  <HomeIcon />
+                </IconButton>
+              </Tooltip>
+
+              {/* Nút Delete */}
+              <Tooltip title="Delete card" placement="left">
+                <IconButton
+                  onClick={handleDeleteMode}
+                  sx={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    backgroundColor: '#f76ae7', 
+                    color: '#fff',
+                    '&:hover': { backgroundColor: '#a30091' }, 
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          )}
+
+          {/* Nút Menu */}
+          <IconButton
+            color="primary"
+            onClick={toggleMenu}
+            sx={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              backgroundColor: menuOpen ? '#f44336' : '#4800ff', 
+              color: '#fff',
+              '&:hover': { backgroundColor: menuOpen ? '#f44336' : '#4800ff' },
+              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+              transition: 'transform 0.2s ease-in-out',
+              transform: menuOpen ? 'rotate(89deg)' : 'rotate(0deg)',
+            }}
+          >
+            {menuOpen ? <CloseIcon /> : <AddIcon />}
+          </IconButton>
+        </Box>
+
+      
       {/* Dialog thêm mới Relay */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Add New Relay</DialogTitle>

@@ -3,7 +3,7 @@ import TemperatureChart from '../Charts/TemperatureChart';
 import HumidityChart from '../Charts/HumidityChart';
 import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart component
 import Map from '../Map/Map';
-import { Container, Typography, Grid, Paper } from '@mui/material';
+import { Box, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../../../AppContext';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,7 @@ const Home = () => {
   const { t } = useTranslation();
   const [relaysHome, setRelaysHome] = useState([]);
 
-  const getBackgroundColor = () => settings.color === 'dark' ? '#000f1f' : '#ffffff';
+  
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
 
@@ -38,7 +38,7 @@ const Home = () => {
 
 
   return (
-    <Container maxWidth="xxxl" sx={{ backgroundColor: getBackgroundColor() }}>
+    <Box>
       <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
         {t('Home')}
       </Typography>
@@ -86,7 +86,7 @@ const Home = () => {
         <Typography variant="h6" sx={{ mb: '1%' }}>Temperature & Humidity</Typography>
         <DualAxisChart /> {/* Replace History with DualAxisChart */}
       </Paper>
-    </Container>
+    </Box>
   );
 };
 
