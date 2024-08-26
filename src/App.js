@@ -7,12 +7,12 @@ import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
 import Forget from './components/auth/Forget';
 
-import Home from './components/ui/Home/home';
-import Profile from './components/ui/Profile/profile';
-import History from './components/ui/History/history';
-import AuthenticatedLayout from './components/ui/sidebar/sidebarlayout';
-import Relay from './components/ui/Relay/relay';
-import Setting from './components/ui/Setting/setting';
+import Home from './components/ui/Home/Home';
+import Profile from './components/ui/Profile/Profile';
+import History from './components/ui/History/History';
+import AuthenticatedLayout from './components/ui/Sidebar/Sidebarlayout';
+import Relay from './components/ui/Relay/Relay';
+import Setting from './components/ui/Setting/Setting';
 
 
 

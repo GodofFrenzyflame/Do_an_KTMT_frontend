@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton } from '@mui/material';
-import Sidebar from './sidebar';
-import Clock from '../Clock/clock'; // Import Clock component
+import Sidebar from './Sidebar';
+import Clock from '../Clock/Clock'; // Import Clock component
 
 const AuthenticatedLayout = ({ onLogout, children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);

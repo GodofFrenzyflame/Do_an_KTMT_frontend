@@ -13,14 +13,15 @@ const Settings = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: '500px', mx: 'auto' }}> {/* Giới hạn chiều rộng của Box */}
-      <Typography variant="h4" gutterBottom>Settings</Typography>
+      <Typography variant="h4" gutterBottom></Typography>
       <Box sx={{ mt: 2 }}>
-        <FormControl fullWidth variant="outlined" sx={{ mb: 1, maxWidth: '300px' }}>
+        <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
           <InputLabel>Color</InputLabel>
           <Select
             value={color}
             onChange={(e) => setColor(e.target.value)}
             label="Color"
+            
           >
             <MenuItem value="light">Light</MenuItem>
             <MenuItem value="dark">Dark</MenuItem>

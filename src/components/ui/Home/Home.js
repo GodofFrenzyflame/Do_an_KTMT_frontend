@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart component
-import Map from '../Map/map';
+import Map from '../Map/Map';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
 import { useTranslation } from 'react-i18next';

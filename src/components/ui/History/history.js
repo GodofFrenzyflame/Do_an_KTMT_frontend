@@ -36,9 +36,7 @@ const History = () => {
   return (
     <Box sx={{ p: 3, ml: '1.5cm', height: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       {/* Page title */}
-      <Typography variant="h3" gutterBottom sx={{ mb: 3 }}>
-        History
-      </Typography>
+      <Typography variant="h3" gutterBottom sx={{ mb: 3 }}></Typography>
 
       {/* Time input form */}
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, mb: 3 }}>
