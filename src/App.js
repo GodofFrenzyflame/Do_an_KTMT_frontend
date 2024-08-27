@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 
@@ -14,10 +14,10 @@ import AuthenticatedLayout from './components/ui/Sidebar/Sidebarlayout';
 import Relay from './components/ui/Relay/Relay';
 import Setting from './components/ui/Setting/Setting';
 
-
+import AppContext from './components/ui/Setting/language/AppContext';
 
 function App() {
-
+  const { settings } = useContext(AppContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
@@ -242,16 +242,21 @@ function App() {
     setBackgroundPosition({ x, y });
   };
 
-  const gradientStyle = {
-    background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #ff7f50, #1e90ff)`,
-    border: 'none',
-    boxShadow: 'none', 
-  };
+  // const gradientStyle = {
+  //   // background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px,  #6e6b6b, #061f00)`,
+  //   background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`,
+  //   border: 'none',
+  //   boxShadow: 'none', 
+  // };
+  const getBackgroundColor = (active) => settings.color === 'dark' 
+  ? `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #093001, #211205)` 
+  : `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`;
 
   return (
     <Box onMouseMove={handleMouseMove}
     sx={{
-      ...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
+      background: getBackgroundColor(),
+      //...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
     }}>
     <Router >
       <Routes >

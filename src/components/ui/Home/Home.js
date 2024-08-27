@@ -14,7 +14,7 @@ const Home = () => {
   
 
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
-  const getBoxBackgroundColor = () => settings.color === 'dark' ? '#214770' : '#e6e6e6';
+  const getBoxBackgroundColor = () => settings.color === 'dark' ? '#212121' : '#caccca';
 
   const gridItemWidths = {
     1: 12,
@@ -84,7 +84,7 @@ const Home = () => {
       </Grid>
 
       <Paper elevation={3} sx={{ p: '2%', textAlign: 'left', bgcolor: getBoxBackgroundColor(), color: getWordColor(), mt: '1%' }}>
-        <Typography variant="h6" sx={{ mb: '1%' }}>Temperature & Humidity</Typography>
+        <Typography variant="h6">Temperature & Humidity</Typography>
         <DualAxisChart /> {/* Replace History with DualAxisChart */}
       </Paper>
     </Box>

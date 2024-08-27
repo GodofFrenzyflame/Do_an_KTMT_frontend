@@ -68,23 +68,23 @@ const DualAxisChart = () => {
 
   return (
     <div>
-      <div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1%', marginRight:'5%',marginTop:'1%'}}>
         <button onClick={() => handleTimeChange(7)}>7 Days</button>
         <button onClick={() => handleTimeChange(30)}>30 Days</button>
         <button onClick={() => handleTimeChange(90)}>90 Days</button>
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={displayData}>
-          <CartesianGrid strokeDasharray="3 3" />
+        <CartesianGrid stroke="#000000" strokeDasharray="1 3" />
           <XAxis dataKey="time" />
           <YAxis 
-            yAxisId="left" 
+            yAxisId="left"
             orientation="left" 
             stroke="#ff0000" 
             domain={temperatureDomain}
             label={{ 
               value: '°C', 
-              angle: -90, 
+              angle: -90,   
               position: 'insideLeft', 
               style: { 
                 textAnchor: 'middle', 
