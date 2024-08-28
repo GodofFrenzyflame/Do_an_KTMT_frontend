@@ -242,14 +242,8 @@ function App() {
     setBackgroundPosition({ x, y });
   };
 
-  // const gradientStyle = {
-  //   // background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px,  #6e6b6b, #061f00)`,
-  //   background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`,
-  //   border: 'none',
-  //   boxShadow: 'none', 
-  // };
   const getBackgroundColor = (active) => settings.color === 'dark' 
-  ? `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #093001, #211205)` 
+  ? `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #0c5c0e, #1e3963)` 
   : `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`;
 
   return (

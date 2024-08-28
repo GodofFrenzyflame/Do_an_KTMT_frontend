@@ -34,7 +34,7 @@ const TemperatureGauge = () => {
     fetchTemperaturData(accessToken);
     const intervalId = setInterval(() => {
       fetchTemperaturData(accessToken);
-    }, 5000);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, []);
 

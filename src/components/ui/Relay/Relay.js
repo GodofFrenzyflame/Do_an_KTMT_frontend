@@ -5,10 +5,12 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import AddIcon from '@mui/icons-material/Add';
+import AppIcon from '@mui/icons-material/Apps';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'; // Biểu tượng cho Add New Relay
 import HomeIcon from '@mui/icons-material/Home'; // Biểu tượng cho Add to Home
 import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
+import './TwinToggle.css'
+
 
 const token = localStorage.getItem('accessToken');
 
@@ -289,9 +291,66 @@ const RelayGrid = () => {
     setShowDeleteIcons((prev) => !prev); // Toggle the state
     setMenuOpen(false); // Optionally close the menu if required
   };
+ 
   
+  const [position, setPosition] = useState('center');
+  const [color, setColor] = useState('center');
+  const [animating, setAnimating] = useState(false);
+  
+
+  const handleClick = (event) => {
+      if (animating) return; // Không cho phép nhấp khi đang hoạt động
+
+      setAnimating(true);
+
+      const toggleWidth = event.currentTarget.offsetWidth;
+      const clickX = event.clientX - event.currentTarget.getBoundingClientRect().left;
+
+      if (clickX < toggleWidth / 3) {
+          setPosition('right');
+          setColor('right');
+      } else if (clickX > (toggleWidth * 2) / 3) {
+          setPosition('left');
+          setColor('left');
+      } else {
+          setPosition('center');
+          setColor('center');
+      }
+      setTimeout(() => {
+          setPosition('center');
+          setColor('center');
+          setAnimating(false);
+      }, 400); 
+  };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' ,overflow: 'hidden'}}>
+    <Box sx={{  width: '100%' , marginTop: '10%'}}>
+
+        {showCheckboxes && (
+              <div className="twin-toggle-container">
+              <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
+                <div className="twin-toggle-knob"></div>
+                    <div className="twin-toggle-labels">
+                      <span>Cancel</span>
+                      <span>Accept</span>
+                </div>
+              </div>
+          </div>
+        )}
+
+        {showDeleteIcons  && (
+              <div className="twin-toggle-container">
+              <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
+                <div className="twin-toggle-knob"></div>
+                    <div className="twin-toggle-labels">
+                      <span>Cancel</span>
+                      <span>Delete</span>
+                </div>
+              </div>
+          </div>
+        )}
+
+        
+
       {relays.map((relay) => (
         <RelayCard
           key={relay.relay_id}
@@ -337,6 +396,8 @@ const RelayGrid = () => {
 
               {/* Nút Add to Home */}
               <Tooltip title="Add to Home" placement="left">
+
+                
                 <IconButton
                   onClick={handleAddToHome}
                   sx={{
@@ -388,7 +449,7 @@ const RelayGrid = () => {
               transform: menuOpen ? 'rotate(89deg)' : 'rotate(0deg)',
             }}
           >
-            {menuOpen ? <CloseIcon /> : <AddIcon />}
+            {menuOpen ? <CloseIcon /> : <AppIcon />}
           </IconButton>
         </Box>
 

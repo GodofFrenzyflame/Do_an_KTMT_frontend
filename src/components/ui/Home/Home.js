@@ -3,16 +3,14 @@ import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart com
 import Map from '../Map/Map';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
-import { useTranslation } from 'react-i18next';
 import TemperatureGauge from '../Charts/TemperatureGauge';
 import HumidityGauge from '../Charts/HumidityGauge';
 
 const Home = () => {
-  const { settings } = useContext(AppContext);
-  const { t } = useTranslation();
+  
   const [relaysHome, setRelaysHome] = useState([]);
   
-
+  const { settings } = useContext(AppContext);
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#212121' : '#caccca';
 
@@ -40,10 +38,6 @@ const Home = () => {
 
   return (
     <Box >
-      <Typography variant="h4" gutterBottom sx={{ mb: '1%', color: getWordColor() }}>
-        {t('Home')}
-      </Typography>
-
       <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%' }}>
         {relaysHome.map((relay) => (
           <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>

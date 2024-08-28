@@ -1,9 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , useContext } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+import AppContext from '../Setting/language/AppContext';
 
 const DualAxisChart = () => {
   const [data, setData] = useState(null);
   const [time, setTime] = useState(7);
+
+  const { settings } = useContext(AppContext);
+  const getWordColor = () => settings.color === 'dark' ? '#ffffff' : '#000000';
+
+
 
   const fetchTemperatureHumidityData = async (token) => {
     try {
@@ -50,7 +57,7 @@ const DualAxisChart = () => {
     fetchTemperatureHumidityData(accessToken);
     const intervalId = setInterval(() => {
       fetchTemperatureHumidityData(accessToken);
-    }, 5000);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, [time]);
 
@@ -75,7 +82,7 @@ const DualAxisChart = () => {
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={displayData}>
-        <CartesianGrid stroke="#000000" strokeDasharray="1 3" />
+        <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
           <XAxis dataKey="time" />
           <YAxis 
             yAxisId="left"
@@ -84,8 +91,9 @@ const DualAxisChart = () => {
             domain={temperatureDomain}
             label={{ 
               value: '°C', 
-              angle: -90,   
+              angle: 0,   
               position: 'insideLeft', 
+              marginTop: '10%',
               style: { 
                 textAnchor: 'middle', 
                 fill: '#ff0000', 
@@ -102,7 +110,7 @@ const DualAxisChart = () => {
             domain={humidityDomain}
             label={{ 
               value: '%', 
-              angle: 90, 
+              angle: 0, 
               position: 'insideRight', 
               style: { 
                 textAnchor: 'middle', 

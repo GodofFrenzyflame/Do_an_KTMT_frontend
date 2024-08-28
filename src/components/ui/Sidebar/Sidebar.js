@@ -63,7 +63,7 @@ export default function Sidebar({ onLogout, isOpen }) {
               bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
             },
           }}>
-            🏠{t('Home')}
+            {t('Home')}
           </Button>
         </Link>
         <Link to="/history" style={{ textDecoration: 'none' }}>
@@ -83,7 +83,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            🧾{t('History')}
+            {t('History')}
           </Button>
         </Link>
         <Link to="/relay" style={{ textDecoration: 'none' }}>
@@ -103,7 +103,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            🔘 {t('Relay')}
+              {t('Relay')}
           </Button>
         </Link>
         <Link to="/profile" style={{ textDecoration: 'none' }}>
@@ -123,7 +123,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            📑{t('Profile')}
+            {t('Profile')}
           </Button>
         </Link>
         <Link to="/setting" style={{ textDecoration: 'none' }}>
@@ -143,7 +143,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-            📐{t('Settings')}
+            {t('Settings')}
           </Button>
         </Link>
       </Box>

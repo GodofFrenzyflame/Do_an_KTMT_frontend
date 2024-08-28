@@ -34,7 +34,7 @@ const HumidityGauge = () => {
     fetchHumidityData(accessToken);
     const intervalId = setInterval(() => {
       fetchHumidityData(accessToken);
-    }, 5000);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, []);
 

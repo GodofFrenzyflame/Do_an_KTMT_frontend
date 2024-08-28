@@ -38,7 +38,7 @@ const MapCenterUpdater = ({ position }) => {
 const apikey = process.env.REACT_APP_IPINFO_API_KEY;
 
 const Map = () => {
-  const [position, setPosition] = useState(null);
+  const [position, setPosition] = useState([10.772768634927345, 106.65924413319098]); //null
   const [destination, setDestination] = useState([10.772768634927345, 106.65924413319098]);
   const [googleMapsUrl, setGoogleMapsUrl] = useState(null);
 
