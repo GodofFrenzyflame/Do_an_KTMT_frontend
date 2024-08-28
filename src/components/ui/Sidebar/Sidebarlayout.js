@@ -1,48 +1,45 @@
+// src/components/AuthenticatedLayout.js
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton } from '@mui/material';
 import Sidebar from './Sidebar';
 import Clock from '../Clock/Clock'; // Import Clock component
-// import MiniSidebar from './MiniSidebar'
+import NotificationBell from '../Notification/NotificationBell'; // Import NotificationBell component
+import MiniSidebar from './MiniSidebar';
 
 const AuthenticatedLayout = ({ onLogout, children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMiniSidebarOpen, setIsMiniSidebarOpen] = useState(true);
-
 
   useEffect(() => {
+    // Load sidebar state from localStorage when component mounts
     const savedState = localStorage.getItem('sidebarOpen');
     if (savedState !== null) {
       setIsSidebarOpen(JSON.parse(savedState));
-      setIsMiniSidebarOpen(JSON.parse(savedState));
     }
   }, []);
 
   useEffect(() => {
+    // Save sidebar state to localStorage when it changes
     localStorage.setItem('sidebarOpen', JSON.stringify(isSidebarOpen));
   }, [isSidebarOpen]);
-
-  useEffect(() => {
-    localStorage.setItem('sidebarOpen', JSON.stringify(isMiniSidebarOpen));
-  }, [isMiniSidebarOpen]);
-
 
   const toggleSidebar = () => {
     setIsSidebarOpen(prevState => !prevState);
   };
 
-
   const sidebarWidth = isSidebarOpen ? '18%' : '0%';
-  
+
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
       <Sidebar 
         isOpen={isSidebarOpen} 
         onLogout={onLogout}
       />
-      
-      <Clock /> 
-
-
+      <MiniSidebar 
+        isOpen={!isSidebarOpen} 
+        onLogout={onLogout}
+      />
+      <Clock />
+      <NotificationBell /> {/* Add NotificationBell component here */}
       <Box 
         sx={{ 
           flexGrow: 1, 
@@ -60,7 +57,7 @@ const AuthenticatedLayout = ({ onLogout, children }) => {
         sx={{ 
           position: 'fixed', 
           top: '0%', 
-          left: isSidebarOpen ? '17%' : '3%',
+          left: isSidebarOpen ? '17%' : '1%',
           zIndex: 1300, // Ensure button is on top
           transition: 'left 0s ease',
           fontSize: '2.5rem',

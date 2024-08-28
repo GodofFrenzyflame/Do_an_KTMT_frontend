@@ -10,6 +10,7 @@ const Profile = () => {
   const [fullname, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone_number, setPhone] = useState('');
+  const [webServerIp, setWebServerIp] = useState(''); // Thêm state cho Web Server IP
 
   const [aioUser, setAioUser] = useState('');
   const [aioKey, setAioPassword] = useState('');
@@ -24,17 +25,16 @@ const Profile = () => {
     setFullName(localStorage.getItem('fullname'));
     setEmail(localStorage.getItem('email'));
     setPhone(localStorage.getItem('phone_number'));
+    setWebServerIp(localStorage.getItem('webServerIp') || ''); // Tải giá trị Web Server IP
     setAioUser(localStorage.getItem('AIO_USERNAME'));
     setAioPassword(localStorage.getItem('AIO_KEY'));
     if (localStorage.getItem('avatar')) {
       setAvatar(localStorage.getItem('avatar'));
       setOriginalAvatar(localStorage.getItem('avatar'));
-    }
-    else {
+    } else {
       setAvatar('');
       setOriginalAvatar(''); // No avatar
     }
-
   };
 
   const fetchProfileEdit = async () => {
@@ -46,6 +46,8 @@ const Profile = () => {
       formData.append('phone_number', phone_number);
       formData.append('AIO_USERNAME', aioUser);
       formData.append('AIO_KEY', aioKey);
+      
+      formData.append('webServerIp', webServerIp); // Thêm Web Server IP vào formData
 
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput && fileInput.files[0]) {
@@ -68,6 +70,9 @@ const Profile = () => {
         localStorage.setItem('fullname', result.data.fullname);
         localStorage.setItem('email', result.data.email);
         localStorage.setItem('phone_number', result.data.phone_number);
+
+        localStorage.setItem('webServerIp', result.data.webServerIp); // Lưu Web Server IP
+
         localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
         localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
         if (result.data.avatar) {
@@ -90,7 +95,7 @@ const Profile = () => {
   const handleCancel = () => {
     loadData();
     setIsEditable(false);
-    setAvatar(originalAvatar); // Reset to original avatar
+    setAvatar(originalAvatar); 
   };
 
   const handleAvatarChange = (event) => {
@@ -116,7 +121,7 @@ const Profile = () => {
 
   const obfuscatePhone = (phone_number) => {
     if (!phone_number) return '';
-    const digits = phone_number.replace(/\D/g, ''); // Remove non-digit characters
+    const digits = phone_number.replace(/\D/g, ''); 
     return `${digits.slice(0, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
   };
 
@@ -152,7 +157,7 @@ const Profile = () => {
                 readOnly: !isEditable,
               }}
               InputLabelProps={{
-                shrink: true, // Always keep the label on top
+                shrink: true, 
               }}
             />
           </Grid>
@@ -166,7 +171,7 @@ const Profile = () => {
                 readOnly: !isEditable,
               }}
               InputLabelProps={{
-                shrink: true, // Always keep the label on top
+                shrink: true, 
               }}
             />
           </Grid>
@@ -180,7 +185,7 @@ const Profile = () => {
                 readOnly: !isEditable,
               }}
               InputLabelProps={{
-                shrink: true, // Always keep the label on top
+                shrink: true, 
               }}
             />
           </Grid>
@@ -197,6 +202,22 @@ const Profile = () => {
               }}
             />
           </Grid>
+              {/*Webserver  */}
+          <Grid item xs={12}>
+            <TextField
+              label="Web Server IP" // Thêm trường nhập Web Server IP
+              value={webServerIp}
+              onChange={(e) => setWebServerIp(e.target.value)}
+              fullWidth
+              InputProps={{
+                readOnly: !isEditable,
+              }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
+              }}
+            />
+          </Grid>
+
           <Grid item xs={12}>
             <TextField
               label="Password"
@@ -239,7 +260,7 @@ const Profile = () => {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="AIO key"
+              label="AIO Key"
               value={aioKey}
               onChange={(e) => setAioPassword(e.target.value)}
               fullWidth

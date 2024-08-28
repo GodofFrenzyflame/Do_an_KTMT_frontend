@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Avatar } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
 import '../../../Styles/Styles.css';
 import { useTranslation } from 'react-i18next';
@@ -10,12 +10,31 @@ export default function Sidebar({ onLogout, isOpen }) {
   const { t } = useTranslation();
   const location = useLocation();
   const sidebarWidth = isOpen ? '19%' : '0%';
+  const visibility = isOpen ? 'visible' : 'hidden';
+
+  const [avatar, setAvatar] = useState('');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    // Lấy thông tin từ localStorage
+    const savedAvatar = localStorage.getItem('avatar');
+    const savedUsername = localStorage.getItem('username');
+    const savedEmail = localStorage.getItem('email');
+
+    setAvatar(savedAvatar || '');
+    setUsername(savedUsername || 'User');
+    setEmail(savedEmail || 'user@example.com');
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
-  const getBackgroundColor = (active) => settings.color === 'dark' ? (active ? '#4361ee' : '#414a4c') : (active ? '#0013ff' : '#d6d6d6');
-  const getButtonColor = () => settings.color === 'dark' ? '#fff' : '#000';
-  const getSidebarBackgroundColor = () => settings.color === 'dark' ? '#333' : '#e6e3e3';
+  const getBackgroundColor = (active) => 
+    settings.color === 'dark' ? (active ? '#4361ee' : '#414a4c') : (active ? '#0013ff' : '#d6d6d6');
+
+  const getButtonColor = () => (settings.color === 'dark' ? '#fff' : '#000');
+
+  const getSidebarBackgroundColor = () => (settings.color === 'dark' ? '#333' : '#e6e3e3');
 
   return (
     <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{
@@ -28,24 +47,25 @@ export default function Sidebar({ onLogout, isOpen }) {
       top: 10,
       left: 10,
       borderRadius: '12px',
-      zIndex: 1200 // Ensure it is above other content
-      
+      zIndex: 1200, // Ensure it is above other content
+      visibility: visibility, // Điều chỉnh hiển thị khi ẩn sidebar
+      overflow: 'hidden', // Ẩn nội dung tràn ra ngoài
+      transition: 'visibility 0.3s, width 0.3s' // Hiệu ứng chuyển tiếp cho việc ẩn/hiện
     }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: '20%', mt: '5%' }}>
-        <img 
-          src="/static/Bku.ico" 
-          alt="" 
-          style={{ 
-            maxWidth: '15%',
-            height: 'auto',
-            borderRadius: '0%',
-            marginRight: '0%'
-          }} 
-        />
-        <Typography variant="h6" sx={{ color: getButtonColor(), fontSize: '1.2vw' }}>
-          Dashboard IoT
-        </Typography>
+      {/* Box chứa Avatar và thông tin người dùng */}
+      <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', mb: '20%', mt: '5%', visibility: visibility }}>
+        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2 }} />
+        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="subtitle1" sx={{ color: getButtonColor() }}>
+            {username}
+          </Typography>
+          <Typography variant="body2" sx={{ color: getButtonColor() }}>
+            {email}
+          </Typography>
+        </Box>
       </Box>
+      
+      {/* Các nút điều hướng */}
       <Box sx={{ width: '100%', flexGrow: 1 }}>
         <Link to="/home" style={{ textDecoration: 'none' }}>
           <Button variant="contained" fullWidth sx={{
@@ -147,6 +167,8 @@ export default function Sidebar({ onLogout, isOpen }) {
           </Button>
         </Link>
       </Box>
+      
+      {/* Nút đăng xuất */}
       <Button variant="contained" fullWidth sx={{
         bgcolor: '#f44336',
         color: '#fff',

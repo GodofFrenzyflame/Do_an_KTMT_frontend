@@ -1,4 +1,4 @@
-// src/components/ui/Clock.js
+// src/components/Clock.js
 import React, { useState, useEffect } from 'react';
 import { Box, Typography } from '@mui/material';
 
@@ -33,15 +33,15 @@ const Clock = () => {
       sx={{
         position: 'absolute',
         top: '10px',
-        right: '50px',
+        right: '60px', // Adjusted to make space for the notification bell
         padding: '5px 15px',
-        backgroundColor: '#ffffff', // Nền trắng
-        color: '#000', // Chữ màu đen
+        color: '#000', // Black text
         borderRadius: '5px',
-        zIndex: 1100, // Đảm bảo nằm trên các phần tử khác
+        zIndex: 1100,
         display: 'flex',
         alignItems: 'center',
-        gap: '10px'
+        gap: '10px',
+        backgroundColor: 'transparent', // No background
       }}
     >
       <Typography variant="h6">{formatDate(time)}</Typography>
