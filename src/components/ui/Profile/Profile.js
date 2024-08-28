@@ -203,20 +203,7 @@ const Profile = () => {
             />
           </Grid>
               {/*Webserver  */}
-          <Grid item xs={12}>
-            <TextField
-              label="Web Server IP" // Thêm trường nhập Web Server IP
-              value={webServerIp}
-              onChange={(e) => setWebServerIp(e.target.value)}
-              fullWidth
-              InputProps={{
-                readOnly: !isEditable,
-              }}
-              InputLabelProps={{
-                shrink: true, // Always keep the label on top
-              }}
-            />
-          </Grid>
+          
 
           <Grid item xs={12}>
             <TextField
@@ -263,6 +250,20 @@ const Profile = () => {
               label="AIO Key"
               value={aioKey}
               onChange={(e) => setAioPassword(e.target.value)}
+              fullWidth
+              InputProps={{
+                readOnly: !isEditable,
+              }}
+              InputLabelProps={{
+                shrink: true, // Always keep the label on top
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              label="Web Server IP" // Thêm trường nhập Web Server IP
+              value={webServerIp}
+              onChange={(e) => setWebServerIp(e.target.value)}
               fullWidth
               InputProps={{
                 readOnly: !isEditable,

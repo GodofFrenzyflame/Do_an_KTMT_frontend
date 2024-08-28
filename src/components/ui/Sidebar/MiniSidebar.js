@@ -32,127 +32,149 @@ export default function MiniSidebar({ onLogout, isOpen }) {
 
   return (
     <Box
-      className={`minisidebar ${isOpen ? '' : 'minisidebar-closed'}`}
+      className={`minisidebar ${isOpen ? 'minisidebar-open' : 'minisidebar-closed'}`}
       sx={{
-        display: isOpen ? 'flex' : 'none', // Chỉ hiện khi isOpen là true
+        display: 'flex',
         flexDirection: 'column',
-        height: '30%',
-        width: '3%', // Đặt chiều rộng của MiniSidebar là 3%
+        height: '350px', // Đặt chiều cao của sidebar để nó chiếm toàn bộ chiều cao màn hình
+        width: '60px', // Đặt chiều rộng phù hợp với kích thước của các nút
         backgroundColor: getSidebarBackgroundColor(),
         position: 'fixed',
-        top: '6%',
-        left: 10, // Điều chỉnh để sát cạnh trái màn hình
+        top: '50px',
+        left: '10px',
         borderRadius: '12px 12px 12px 12px', // Làm tròn góc phải
         zIndex: 1200, // Đảm bảo nó nằm trên các thành phần khác
-        padding: '0.5%', // Thêm khoảng trống nhỏ bên trong
+        padding: '10px', // Thêm khoảng trống bên trong
         boxSizing: 'border-box', // Đảm bảo padding không ảnh hưởng đến chiều rộng thực tế
-        alignItems: 'center', // Canh giữa các nút icon theo chiều ngang
+        alignItems: 'center',
       }}
     >
-      {/* Điều chỉnh kích cỡ avatar sao cho đồng nhất với icon */}
+      {/* Avatar */}
       <Avatar src={avatar} sx={{ width: 40, height: 40, mb: 2 }} />
 
-      {/* Icon cho Home */}
-      <Link to="/home" style={{ textDecoration: 'none' }}>
-        <IconButton
-          sx={{
-            bgcolor: getBackgroundColor(isActive('/home')),
-            color: getButtonColor(),
-            marginBottom: '10%', // Khoảng cách giữa các nút
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            fontSize: '1.5rem', // Kích thước icon
-          }}
-        >
-          <HomeIcon />
-        </IconButton>
-      </Link>
+      {/* Các nút điều hướng */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        <Link to="/home" style={{ textDecoration: 'none' }}>
+          <IconButton
+            sx={{
+              bgcolor: getBackgroundColor(isActive('/home')),
+              color: getButtonColor(),
+              marginBottom: '10%',
+              '&:hover': {
+                bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              },
+              fontSize: '1.5rem',
+              width: '100%',
+              height: '40px',
+              justifyContent: 'center',
+              zIndex: 1201, // Đảm bảo nút nằm trên cùng một lớp với sidebar
+            }}
+          >
+            <HomeIcon />
+          </IconButton>
+        </Link>
 
-      {/* Icon cho History */}
-      <Link to="/history" style={{ textDecoration: 'none' }}>
-        <IconButton
+        <Link to="/history" style={{ textDecoration: 'none' }}>
+          <IconButton
+            sx={{
+              bgcolor: getBackgroundColor(isActive('/history')),
+              color: getButtonColor(),
+              marginBottom: '10%',
+              '&:hover': {
+                bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              },
+              fontSize: '1.5rem',
+              width: '100%',
+              height: '40px',
+              justifyContent: 'center',
+              zIndex: 1201,
+            }}
+          >
+            <HistoryIcon />
+          </IconButton>
+        </Link>
+
+        <Link to="/relay" style={{ textDecoration: 'none' }}>
+          <IconButton
+            sx={{
+              bgcolor: getBackgroundColor(isActive('/relay')),
+              color: getButtonColor(),
+              marginBottom: '10%',
+              '&:hover': {
+                bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              },
+              fontSize: '1.5rem',
+              width: '100%',
+              height: '40px',
+              justifyContent: 'center',
+              zIndex: 1201,
+            }}
+          >
+            <RelayIcon />
+          </IconButton>
+        </Link>
+
+        <Link to="/profile" style={{ textDecoration: 'none' }}>
+          <IconButton
+            sx={{
+              bgcolor: getBackgroundColor(isActive('/profile')),
+              color: getButtonColor(),
+              marginBottom: '10%',
+              '&:hover': {
+                bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              },
+              fontSize: '1.5rem',
+              width: '100%',
+              height: '40px',
+              justifyContent: 'center',
+              zIndex: 1201,
+            }}
+          >
+            <ProfileIcon />
+          </IconButton>
+        </Link>
+
+        <Link to="/setting" style={{ textDecoration: 'none' }}>
+          <IconButton
+            sx={{
+              bgcolor: getBackgroundColor(isActive('/setting')),
+              color: getButtonColor(),
+              marginBottom: '10%',
+              '&:hover': {
+                bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              },
+              fontSize: '1.5rem',
+              width: '100%',
+              height: '40px',
+              justifyContent: 'center',
+              zIndex: 1201,
+            }}
+          >
+            <SettingsIcon />
+          </IconButton>
+        </Link>
+
+        {/* Logout Button */}
+        {/* <IconButton
           sx={{
-            bgcolor: getBackgroundColor(isActive('/history')),
-            color: getButtonColor(),
+            bgcolor: '#f44336',
+            color: '#fff',
             marginBottom: '10%',
             '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              bgcolor: '#c62828',
             },
+            mt: 'auto',
+            width: '100%',
+            height: '40px',
+            justifyContent: 'center',
             fontSize: '1.5rem',
+            zIndex: 1201,
           }}
+          onClick={onLogout}
         >
-          <HistoryIcon />
-        </IconButton>
-      </Link>
-
-      {/* Icon cho Relay */}
-      <Link to="/relay" style={{ textDecoration: 'none' }}>
-        <IconButton
-          sx={{
-            bgcolor: getBackgroundColor(isActive('/relay')),
-            color: getButtonColor(),
-            marginBottom: '10%',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            fontSize: '1.5rem',
-          }}
-        >
-          <RelayIcon />
-        </IconButton>
-      </Link>
-
-      {/* Icon cho Profile */}
-      <Link to="/profile" style={{ textDecoration: 'none' }}>
-        <IconButton
-          sx={{
-            bgcolor: getBackgroundColor(isActive('/profile')),
-            color: getButtonColor(),
-            marginBottom: '10%',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            fontSize: '1.5rem',
-          }}
-        >
-          <ProfileIcon />
-        </IconButton>
-      </Link>
-
-      {/* Icon cho Settings */}
-      <Link to="/setting" style={{ textDecoration: 'none' }}>
-        <IconButton
-          sx={{
-            bgcolor: getBackgroundColor(isActive('/setting')),
-            color: getButtonColor(),
-            marginBottom: '10%',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            fontSize: '1.5rem',
-          }}
-        >
-          <SettingsIcon />
-        </IconButton>
-      </Link>
-
-      {/* Icon cho Logout */}
-      {/* <IconButton
-        sx={{
-          bgcolor: '#f44336',
-          color: '#fff',
-          marginBottom: '10%',
-          '&:hover': {
-            bgcolor: '#c62828',
-          },
-          mt: 'auto',
-          fontSize: '1.5rem', // Kích thước icon
-        }}
-        onClick={onLogout}
-      >
-        <LogoutIcon /> */}
-      {/* </IconButton> */}
+          <LogoutIcon />
+        </IconButton> */}
+      </Box>
     </Box>
   );
 }

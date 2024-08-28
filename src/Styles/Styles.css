@@ -24,4 +24,17 @@ body {
     height: 100%;
     position: relative;
   }
+  .minisidebar {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+  
+  .minisidebar-open {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .minisidebar-closed {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
   
