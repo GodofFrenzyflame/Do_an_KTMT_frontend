@@ -456,7 +456,14 @@ const RelayGrid = () => {
 
       
       {/* Dialog thêm mới Relay */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} sx={{ 
+          '& .MuiDialog-paper': { 
+            width: '400px', 
+            maxWidth: '90%', 
+            minHeight: 'auto',
+            
+          } 
+        }}>
         <DialogTitle>Add New Relay</DialogTitle>
         <DialogContent>
           <TextField

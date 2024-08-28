@@ -37,7 +37,7 @@ const Home = () => {
   
 
   return (
-    <Box>
+    <Box sx={{paddingLeft:'2%'}}>
       <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%'}}>
         {relaysHome.map((relay) => (
           <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>
