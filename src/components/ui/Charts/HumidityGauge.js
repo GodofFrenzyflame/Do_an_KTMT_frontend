@@ -55,7 +55,7 @@ const HumidityGauge = () => {
         text={`${humidity === null ? 0 : humidity}%`}
         styles={buildStyles({
           textColor: getWordColor(),
-          pathColor: humidity < 40 ? '#FF0000' : humidity < 70 ? '#FFFF00' : '#00FF00',
+          pathColor: humidity < 30 ? '#00b7ff' : humidity < 70 ? '#00b7ff' : humidity < 80 ? '#ffee00' : '#ffee00',
           trailColor: '#eee',
         })}
         style={{
