@@ -84,7 +84,7 @@ export default function Login({ onLogin }) {
   };
 
   const gradientStyle = {
-    background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #ff7f50, #1e90ff)`,
+    background: `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px,  #299121, #1e90ff)`,
   };
 
   return (

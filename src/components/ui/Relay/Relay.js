@@ -307,11 +307,12 @@ const RelayGrid = () => {
       const clickX = event.clientX - event.currentTarget.getBoundingClientRect().left;
 
       if (clickX < toggleWidth / 3) {
-          setPosition('right');
-          setColor('right');
-      } else if (clickX > (toggleWidth * 2) / 3) {
+          
           setPosition('left');
           setColor('left');
+      } else if (clickX > (toggleWidth * 2) / 3) {
+        setPosition('right');
+        setColor('right');
       } else {
           setPosition('center');
           setColor('center');
@@ -323,7 +324,7 @@ const RelayGrid = () => {
       }, 400); 
   };
   return (
-    <Box sx={{  width: '100%' , marginTop: '10%'}}>
+    <Box sx={{  display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' ,overflow: 'hidden'}}>
 
         {showCheckboxes && (
               <div className="twin-toggle-container">
