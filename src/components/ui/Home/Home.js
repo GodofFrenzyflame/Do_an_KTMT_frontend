@@ -7,9 +7,9 @@ import TemperatureGauge from '../Charts/TemperatureGauge';
 import HumidityGauge from '../Charts/HumidityGauge';
 
 const Home = () => {
-  
+
   const [relaysHome, setRelaysHome] = useState([]);
-  
+
   const { settings } = useContext(AppContext);
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const getBoxBackgroundColor = () => settings.color === 'dark' ? '#212121' : '#caccca';
@@ -34,11 +34,11 @@ const Home = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  
+
 
   return (
-    <Box sx={{paddingLeft:'2%'}}>
-      <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%'}}>
+    <Box sx={{ paddingLeft: '2%' }}>
+      <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%' }}>
         {relaysHome.map((relay) => (
           <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>
             <Paper

@@ -79,7 +79,7 @@ const Profile = () => {
         }
         loadData();
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);

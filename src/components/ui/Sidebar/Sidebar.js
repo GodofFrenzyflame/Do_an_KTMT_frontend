@@ -1,15 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import { Box, Button, Typography, Avatar } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
 import AppContext from '../Setting/language/AppContext';
 import '../../../Styles/Styles.css';
 import { useTranslation } from 'react-i18next';
+import { SidebarData } from './Sidebardata';
 
 export default function Sidebar({ onLogout, isOpen }) {
   const { settings } = useContext(AppContext);
   const { t } = useTranslation();
   const location = useLocation();
-  const sidebarWidth = isOpen ? '19%' : '0%';
+  const navigate = useNavigate(); // Initialize useNavigate
+  const sidebarWidth = isOpen ? '19%' : '0';
   const visibility = isOpen ? 'visible' : 'hidden';
 
   const [avatar, setAvatar] = useState('');
@@ -24,7 +26,7 @@ export default function Sidebar({ onLogout, isOpen }) {
     setAvatar(savedAvatar || '');
     setUsername(savedUsername || 'User');
     setEmail(savedEmail || 'user@example.com');
-  }
+  };
 
   useEffect(() => {
     loadData();
@@ -44,152 +46,90 @@ export default function Sidebar({ onLogout, isOpen }) {
   const getSidebarBackgroundColor = () => (settings.color === 'dark' ? '#333' : '#e6e3e3');
 
   return (
-    <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{
-      width: sidebarWidth,
-      display: 'flex',
-      flexDirection: 'column',
-      height: '97vh',
-      backgroundColor: getSidebarBackgroundColor(),
-      position: 'fixed',
-      top: 10,
-      left: 10,
-      borderRadius: '12px',
-      zIndex: 1200, // Ensure it is above other content
-      visibility: visibility, // Điều chỉnh hiển thị khi ẩn sidebar
-      overflow: 'hidden', // Ẩn nội dung tràn ra ngoài
-      transition: 'visibility 0.3s, width 0.3s' // Hiệu ứng chuyển tiếp cho việc ẩn/hiện
-    }}>
+    <Box
+      className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`}
+      sx={{
+        width: sidebarWidth,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '97vh',
+        backgroundColor: getSidebarBackgroundColor(),
+        position: 'fixed',
+        top: 10,
+        left: 10,
+        borderRadius: '12px',
+        zIndex: 1200,
+        visibility: visibility,
+        overflow: 'hidden',
+        transition: 'visibility 0.3s, width 0.3s',
+      }}
+    >
       {/* Box chứa Avatar và thông tin người dùng */}
-      <Box sx={{ display: 'flex', alignItems: 'center', padding: '10px', mb: '20%', mt: '5%', visibility: visibility }}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          padding: '10px',
+          mb: '20%',
+          mt: '5%',
+          visibility: visibility,
+        }}
+      >
         <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2 }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ color: getButtonColor() }}>
             {username}
           </Typography>
-          <Typography variant="body2" sx={{ color: getButtonColor() }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: '#000',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '180px',
+            }}
+          >
             {email}
           </Typography>
         </Box>
       </Box>
 
-      {/* Các nút điều hướng */}
-      <Box sx={{ width: '100%', flexGrow: 1 }}>
-        <Link to="/home" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" fullWidth sx={{
-            bgcolor: getBackgroundColor(isActive('/home')),
-            color: getButtonColor(),
-            padding: '4% 8%',
-            fontSize: '1.2vw',
-            height: '7%',
-            width: '90%',
-            marginLeft: '5%',
-            borderRadius: '8px',
-            justifyContent: 'flex-start',
-            textAlign: 'left',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-          }}>
-            {t('Home')}
-          </Button>
-        </Link>
-        <Link to="/history" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" fullWidth sx={{
-            bgcolor: getBackgroundColor(isActive('/history')),
-            color: getButtonColor(),
-            padding: '4% 8%',
-            fontSize: '1.2vw',
-            height: '7%',
-            width: '90%',
-            marginLeft: '5%',
-            borderRadius: '8px',
-            justifyContent: 'flex-start',
-            textAlign: 'left',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            mt: '2%'
-          }}>
-            {t('History')}
-          </Button>
-        </Link>
-        <Link to="/relay" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" fullWidth sx={{
-            bgcolor: getBackgroundColor(isActive('/relay')),
-            color: getButtonColor(),
-            padding: '4% 8%',
-            fontSize: '1.2vw',
-            height: '7%',
-            width: '90%',
-            marginLeft: '5%',
-            borderRadius: '8px',
-            justifyContent: 'flex-start',
-            textAlign: 'left',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            mt: '2%'
-          }}>
-            {t('Relay')}
-          </Button>
-        </Link>
-        <Link to="/profile" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" fullWidth sx={{
-            bgcolor: getBackgroundColor(isActive('/profile')),
-            color: getButtonColor(),
-            padding: '4% 8%',
-            fontSize: '1.2vw',
-            height: '7%',
-            width: '90%',
-            marginLeft: '5%',
-            borderRadius: '8px',
-            justifyContent: 'flex-start',
-            textAlign: 'left',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            mt: '2%'
-          }}>
-            {t('Profile')}
-          </Button>
-        </Link>
-        <Link to="/setting" style={{ textDecoration: 'none' }}>
-          <Button variant="contained" fullWidth sx={{
-            bgcolor: getBackgroundColor(isActive('/setting')),
-            color: getButtonColor(),
-            padding: '4% 8%',
-            fontSize: '1.2vw',
-            height: '7%',
-            width: '90%',
-            marginLeft: '5%',
-            borderRadius: '8px',
-            justifyContent: 'flex-start',
-            textAlign: 'left',
-            '&:hover': {
-              bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
-            },
-            mt: '2%'
-          }}>
-            {t('Settings')}
-          </Button>
-        </Link>
-      </Box>
+      {/* Sidebar Menu Items */}
+      <ul className="sidebar-menu">
+        {SidebarData.map((val, index) => (
+          <li
+            key={index}
+            className={`row ${isActive(val.link) ? 'active' : ''}`}
+            onClick={() => navigate(val.link)}
+          >
+            <div className="icon">{val.icon}</div> {/* Placeholder for the icon */}
+            <div className="sidebar-title">{val.title}</div>
+          </li>
+        ))}
+      </ul>
 
-      {/* Nút đăng xuất */}
-      <Button variant="contained" fullWidth sx={{
-        bgcolor: '#f44336',
-        color: '#fff',
-        padding: '4% 8%',
-        fontSize: '1.2vw',
-        height: '7%',
-        width: '90%',
-        marginLeft: '5%',
-        borderRadius: '8px',
-        '&:hover': {
-          bgcolor: '#c62828',
-        },
-        mt: 'auto'
-      }} onClick={onLogout}>
+
+      {/* Logout Button */}
+      <Button
+        variant="contained"
+        fullWidth
+        sx={{
+          bgcolor: '#f44336',
+          color: '#fff',
+          padding: '4% 8%',
+          fontSize: '1vw',
+          height: '4%',
+          width: '90%',
+          marginLeft: '5%',
+          borderRadius: '8px',
+          '&:hover': {
+            bgcolor: '#c62828',
+          },
+          mt: 'auto',
+        }}
+        onClick={onLogout}
+      >
         {t('Log out')}
       </Button>
       <Box sx={{ height: '2%' }} />

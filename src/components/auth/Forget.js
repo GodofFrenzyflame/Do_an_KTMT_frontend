@@ -24,13 +24,14 @@ export default function Forget({ open, onClose }) {
       });
       const result = await response.json();
       if (response.ok) {
+        setError('');
         setStep('verify');
         setSuccess('Instructions for resetting your password have been sent.');
       } else {
-        setError(result.message || 'Failed to request password reset');
+        setError(result.error);
       }
     } catch (error) {
-      setError('Failed to connect to the server');
+      setError(error);
     }
   };
 
@@ -45,13 +46,14 @@ export default function Forget({ open, onClose }) {
       });
       const result = await response.json();
       if (response.ok) {
+        setError('');
         setSuccess('Verification successful.');
         setStep('resetPassword');
       } else {
-        setError(result.message || 'Failed to verify code');
+        setError(result.error);
       }
     } catch (error) {
-      setError('Failed to connect to the server');
+      setError(error);
     }
   };
 
@@ -70,17 +72,17 @@ export default function Forget({ open, onClose }) {
       });
       const result = await response.json();
       if (response.ok) {
+        setError('');
         setSuccess('Password reset successful. Redirecting to login...');
         setTimeout(() => {
-          onClose(); // Đóng dialog
-          // Redirect to login page
+          onClose();
           window.location.href = '/';
         }, 2000);
       } else {
-        setError(result.message || 'Failed to reset password');
+        setError(result.error);
       }
     } catch (error) {
-      setError('Failed to connect to the server');
+      setError(error);
     }
   };
 

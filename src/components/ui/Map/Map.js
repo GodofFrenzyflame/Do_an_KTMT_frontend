@@ -23,7 +23,7 @@ const destinationIcon = new L.Icon({
 });
 
 // Component để cập nhật trung tâm bản đồ
-const MapCenterUpdater = ({ position }) => {  
+const MapCenterUpdater = ({ position }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -35,12 +35,13 @@ const MapCenterUpdater = ({ position }) => {
   return null;
 };
 
-const apikey = process.env.REACT_APP_IPINFO_API_KEY;
-
 const Map = () => {
   const [position, setPosition] = useState([10.772768634927345, 106.65924413319098]); //null
   const [destination, setDestination] = useState([10.772768634927345, 106.65924413319098]);
-  const [googleMapsUrl, setGoogleMapsUrl] = useState(null);
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(position.join(','))}&destination=${encodeURIComponent(destination.join(','))}`);
+
+  const apikey = process.env.REACT_APP_IPINFO_API_KEY;
+  const token = localStorage.getItem('accessToken');
 
   const handleButtonClick = () => {
     if (googleMapsUrl) {
@@ -50,7 +51,7 @@ const Map = () => {
     }
   };
 
-  const fetchLocationData = async (token) => {
+  const fetchLocationData = async () => {
     try {
       const response = await fetch('http://localhost:8080/sensor/location', {
         method: 'GET',
@@ -68,44 +69,53 @@ const Map = () => {
           setGoogleMapsUrl(newGoogleMapsUrl);
         }
       } else {
-        console.error('Error:', result.message);
+        console.error('Error:', result.error);
       }
     } catch (error) {
       console.error('Error fetching location data:', error);
     }
   };
+
   const fetchUserLocation = async () => {
     try {
       const response = await fetch(`https://ipinfo.io/json?token=${apikey}`);
       const data = await response.json();
       if (response.ok) {
-        const [latitude, longitude] = data.loc.split(',');
-        const newPosition = [latitude, longitude];
-        setPosition(newPosition);
+        console.log('IP Info Data:', data);
+        if (data.loc) {
+          const [latitude, longitude] = data.loc.split(',');
+          const newPosition = [parseFloat(latitude), parseFloat(longitude)];
+          if (newPosition.length === 2) {
+            setPosition(newPosition);
+          } else {
+            throw new Error('Invalid location data format');
+          }
+        } else {
+          throw new Error('Location data not found');
+        }
       } else {
         throw new Error(data.error || 'Unable to fetch location');
       }
     } catch (error) {
       console.error('Error fetching IP location:', error);
-      throw error;
     }
   };
 
-  const fetchData = async (accessToken) => {
+
+  const fetchData = async () => {
     try {
-      await fetchUserLocation();
-      await fetchLocationData(accessToken);
+      fetchUserLocation();
+      fetchLocationData();
     } catch (error) {
       console.error('Error updating location:', error);
     }
   };
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    fetchData(accessToken);
+    fetchData();
     const intervalId = setInterval(() => {
-      fetchData(accessToken);
-    }, 1000);
+      fetchData();
+    }, 2000);
     return () => clearInterval(intervalId);
   }, [position]);
 
@@ -147,7 +157,7 @@ const Map = () => {
           color: '#fff',
           border: 'none',
           padding: '10px 20px',
-          borderRadius: '17px',
+          borderRadius: '5px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
           cursor: 'pointer',
           zIndex: 1000

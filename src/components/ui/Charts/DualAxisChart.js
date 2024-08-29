@@ -1,4 +1,4 @@
-import React, { useEffect, useState , useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 import AppContext from '../Setting/language/AppContext';
@@ -6,13 +6,14 @@ import AppContext from '../Setting/language/AppContext';
 const DualAxisChart = () => {
   const [data, setData] = useState(null);
   const [time, setTime] = useState(7);
-
   const { settings } = useContext(AppContext);
   const getWordColor = () => settings.color === 'dark' ? '#ffffff' : '#000000';
 
+  const token = localStorage.getItem('accessToken');
 
 
-  const fetchTemperatureHumidityData = async (token) => {
+
+  const fetchTemperatureHumidityData = async () => {
     try {
       const [tempResponse, humiResponse] = await Promise.all([
         fetch('http://localhost:8080/log/temp', {
@@ -42,10 +43,9 @@ const DualAxisChart = () => {
           temperature: tempEntry.value,
           humidity: humiResult[index]?.value || 0,
         }));
-
         setData(combinedData);
       } else {
-        console.error('Error:', tempResult.message || humiResult.message);
+        console.error(tempResult.error || humiResult.error);
       }
     } catch (error) {
       console.error('Error fetching temperature and humidity data:', error);
@@ -53,11 +53,10 @@ const DualAxisChart = () => {
   };
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    fetchTemperatureHumidityData(accessToken);
+    fetchTemperatureHumidityData();
     const intervalId = setInterval(() => {
-      fetchTemperatureHumidityData(accessToken);
-    }, 1000);
+      fetchTemperatureHumidityData();
+    }, 1500);
     return () => clearInterval(intervalId);
   }, [time]);
 
@@ -75,48 +74,48 @@ const DualAxisChart = () => {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1%', marginRight:'5%',marginTop:'1%'}}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1%', marginRight: '5%', marginTop: '1%' }}>
         <button onClick={() => handleTimeChange(7)}>7 Days</button>
         <button onClick={() => handleTimeChange(30)}>30 Days</button>
         <button onClick={() => handleTimeChange(90)}>90 Days</button>
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={displayData}>
-        <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
+          <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
           <XAxis dataKey="time" />
-          <YAxis 
+          <YAxis
             yAxisId="left"
-            orientation="left" 
-            stroke="#ff0000" 
+            orientation="left"
+            stroke="#ff0000"
             domain={temperatureDomain}
-            label={{ 
-              value: '°C', 
-              angle: 0,   
-              position: 'insideLeft', 
+            label={{
+              value: '°C',
+              angle: 0,
+              position: 'insideLeft',
               marginTop: '10%',
-              style: { 
-                textAnchor: 'middle', 
-                fill: '#ff0000', 
-                fontSize: 14, 
-                fontWeight: 'bold' 
+              style: {
+                textAnchor: 'middle',
+                fill: '#ff0000',
+                fontSize: 14,
+                fontWeight: 'bold'
               },
               offset: 15
             }}
           />
-          <YAxis 
-            yAxisId="right" 
-            orientation="right" 
-            stroke="#0000ff" 
+          <YAxis
+            yAxisId="right"
+            orientation="right"
+            stroke="#0000ff"
             domain={humidityDomain}
-            label={{ 
-              value: '%', 
-              angle: 0, 
-              position: 'insideRight', 
-              style: { 
-                textAnchor: 'middle', 
-                fill: '#0000ff', 
-                fontSize: 14, 
-                fontWeight: 'bold' 
+            label={{
+              value: '%',
+              angle: 0,
+              position: 'insideRight',
+              style: {
+                textAnchor: 'middle',
+                fill: '#0000ff',
+                fontSize: 14,
+                fontWeight: 'bold'
               },
               offset: 15
             }}

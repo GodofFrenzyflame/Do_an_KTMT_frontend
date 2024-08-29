@@ -22,7 +22,7 @@ const HumidityGauge = () => {
       if (response.ok) {
         setHumidity(result.data);
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching humidity data:', error);
@@ -55,7 +55,7 @@ const HumidityGauge = () => {
         text={`${humidity === null ? 0 : humidity}%`}
         styles={buildStyles({
           textColor: getWordColor(),
-          pathColor: humidity < 30 ? '#00b7ff' : humidity < 70 ? '#00b7ff' : humidity < 80 ? '#ffee00' : '#ffee00',
+          pathColor: humidity < 40 ? '#FF0000' : humidity < 70 ? '#FFFF00' : '#00FF00',
           trailColor: '#eee',
         })}
         style={{

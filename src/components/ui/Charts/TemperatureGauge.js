@@ -22,7 +22,7 @@ const TemperatureGauge = () => {
       if (response.ok) {
         setTemperature(result.data);
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching temperature data:', error);
@@ -55,7 +55,7 @@ const TemperatureGauge = () => {
         text={`${temperature === null ? 0 : temperature}°C`}
         styles={buildStyles({
           textColor: getWordColor(),
-          pathColor: temperature < 10 ? '#00c3ff' :temperature < 40 ? '#00ff0d' : temperature <65 ? '#FFD700' : '#FF4500',
+          pathColor: temperature < 15 ? '#00BFFF' : temperature < 80 ? '#FFD700' : '#FF4500',
           trailColor: '#eee',
         })}
         style={{

@@ -4,37 +4,30 @@ import AppContext from './language/AppContext'; // Import context
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);
-  const [mode, setMode] = useState(settings.mode);
+  const [mode, setMode] = useState(settings.mode || 'light');
   const [language, setLanguage] = useState(settings.language);
   const [connect, setConnect] = useState(settings.connect || 'MQTT');
 
   const token = localStorage.getItem('accessToken');
-
 
   const loadData = async () => {
     const storedMode = localStorage.getItem('mode');
     const storedLanguage = localStorage.getItem('language');
     const storedConnect = localStorage.getItem('connect');
 
-    console.log('Stored mode:', storedMode);
-    console.log('Stored language:', storedLanguage);
-    console.log('Stored connect:', storedConnect);
-
     if (storedMode) setMode(storedMode);
     if (storedLanguage) setLanguage(storedLanguage);
-    if (storedConnect) setConnect(storedConnect);
+    storedConnect === 'MQTT' ? setConnect('MQTT') : setConnect('Webserver');
   }
 
 
   useEffect(() => {
     loadData();
-  }
-    , []);
+  }, []);
 
-  const fetchConnect = async () => {
+  const fetchConnect = async (connect) => {
     console.log('Connecting ...');
     try {
-      const connect = localStorage.getItem('connect');
       const response = await fetch('http://localhost:8080/connect', {
         method: 'POST',
         headers: {
@@ -43,52 +36,20 @@ const Settings = () => {
         },
         body: JSON.stringify({ connect }),
       });
-      const result = await response.json();
       if (response.ok) {
-        console.log('Connected  successfully');
+        console.log('Connected successfully');
+        localStorage.setItem('connect', connect);
       } else {
-        console.error('Error:', result.message);
+        alert('Please go to profile to update your webserver IP');
       }
     } catch (error) {
-      console.error('Error connecting to MQTT:', error);
+      alert('Please go to profile to check your webserver IP');
     }
   };
 
-  const fetchSettings = async () => {
-    try {
-      const response = await fetch('http://localhost:8080/setting/set', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ mode, language, connect }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        console.log('Settings saved successfully');
-      }
-      else {
-        console.error('Error:', result.message);
-      }
-    }
-    catch (error) {
-      console.error('Error fetching settings:', error);
-    }
-  }
-
-
   const handleSave = () => {
     setSettings({ mode, language, connect });
-    fetchSettings();
-    if (connect === 'MQTT') {
-      localStorage.setItem('connect', 'MQTT');
-      fetchConnect();
-    }
-    else {
-      localStorage.setItem('connect', 'WSV');
-      fetchConnect();
-    }
+    fetchConnect(connect === 'MQTT' ? 'MQTT' : 'WSV');
   };
 
   return (

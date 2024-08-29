@@ -90,8 +90,10 @@ const RelayGrid = () => {
     const storedRelayJSON = localStorage.getItem('relays');
     const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
     setRelays(storedRelayData);
-
     let relaysHome = JSON.parse(localStorage.getItem('relays_home'));
+    if (localStorage.getItem('relays_home_add')) {
+      localStorage.removeItem('relays_home_add');
+    }
     if (relaysHome) {
       let updatedRelaysHome = relaysHome.map(relay => {
         relay.relay_home = true;
@@ -237,6 +239,10 @@ const RelayGrid = () => {
         body: JSON.stringify({ relay_id, relay_home }),
       });
       const result = await response.json();
+      if (response.ok) {
+      } else {
+        console.error('Error:', result.message);
+      }
     } catch (error) {
       console.error('Error setting relay home:', error);
     }
@@ -413,32 +419,17 @@ const RelayGrid = () => {
         </div>
       )}
 
-        {showDeleteIcons && (
-                <div>
-                  <IconButton
-                    onClick={handleCancel}
-                    sx={{
-                      position: 'absolute', // Thêm position để z-index có hiệu lực
-                      zIndex: 2, // Đặt layer cao hơn cho IconButton
-                      top: '94px',
-                      right: '437px',
-                      height: '25px',
-                      backgroundColor: '#f44336',
-                      color:'#ffffff',
-                      '&:hover': {
-                        backgroundColor: '#d32f2f',
-                      },
-                      borderRadius: '8px',
-                      boxShadow: 2,
-                      transition: 'background-color 0.3s ease',
-                      fontSize: '16px',
-                    }}
-                    
-                  >
-                    Cancel
-                  </IconButton>
-                </div>
-              )}
+      {showDeleteIcons && (
+        <div className="twin-toggle-container">
+          <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
+            <div className="twin-toggle-knob"></div>
+            <div className="twin-toggle-labels">
+              <span>Cancel</span>
+              <span>Delete</span>
+            </div>
+          </div>
+        </div>
+      )}
 
 
 

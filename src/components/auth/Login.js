@@ -13,15 +13,17 @@ export default function Login({ onLogin }) {
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
-  const fetchConnectMqtt = async (token) => {
+  const fetchConnect = async (token) => {
     console.log('Connecting to MQTT...');
+    const connect = 'MQTT';
     try {
-      const response = await fetch('http://localhost:8080/mqtt/connect', {
-        method: 'GET',
+      const response = await fetch('http://localhost:8080/connect', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify({ connect }),
       });
       const result = await response.json();
       if (response.ok) {
@@ -36,8 +38,11 @@ export default function Login({ onLogin }) {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
     try {
+      if (!emailOrusername || !password) {
+        setError('Username and password are required.');
+        return;
+      }
       const response = await fetch('http://localhost:8080/login', {
         method: 'POST',
         headers: {
@@ -49,19 +54,19 @@ export default function Login({ onLogin }) {
       const result = await response.json();
 
       if (response.ok) {
+        setError('');
         const { accessToken, refreshToken } = result;
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('isLoggedIn', 'true');
-        fetchConnectMqtt(accessToken);
+        localStorage.setItem('connect', 'MQTT');
+        fetchConnect(accessToken);
         onLogin(true);
         navigate('/home');
       } else {
-        console.error('Error:', result.message);
-        setError(result.message || 'Failed to create account');
+        setError(result.error);
       }
     } catch (error) {
-      console.error('Error:', error);
       setError('Failed to connect to the server');
     }
   };
@@ -107,7 +112,7 @@ export default function Login({ onLogin }) {
         sx={{
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
           padding: 4,
-          borderRadius: '17px',
+          borderRadius: 2,
           boxShadow: 3,
           width: '100%',
           maxWidth: '400px',

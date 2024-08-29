@@ -19,7 +19,7 @@ import AppContext from './components/ui/Setting/language/AppContext';
 function App() {
   const { settings } = useContext(AppContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
   const refreshAccessToken = async (state) => {
@@ -38,7 +38,7 @@ function App() {
       if (response.ok) {
         const { accessToken } = result;
         localStorage.setItem('accessToken', accessToken);
-        if (state === 'connect') await fetchConnect(accessToken);
+        if (state === 'connect') await fetchConnect(accessToken, localStorage.getItem('connect'));
         else if (state === 'disconnect') await fetchDisconnect(accessToken);
       } else {
         localStorage.removeItem('isLoggedIn');
@@ -51,11 +51,8 @@ function App() {
     }
   };
 
-  const fetchConnect = async (token) => {
-    console.log('Connecting ...');
-    console.log('Connect', localStorage.getItem('connect'))
+  const fetchConnect = async (token, connect) => {
     try {
-      const connect = localStorage.getItem('connect');
       const response = await fetch('http://localhost:8080/connect', {
         method: 'POST',
         headers: {
@@ -66,10 +63,9 @@ function App() {
       });
       const result = await response.json();
       if (response.ok) {
-        console.log('Connected  successfully');
-        localStorage.setItem('connected', 'true');
+        localStorage.setItem('connect', connect);
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
         if (response.status === 403) {
           await refreshAccessToken('connect');
         }
@@ -91,7 +87,7 @@ function App() {
       const result = await response.json();
       if (response.ok) {
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
         if (response.status === 403) {
           await refreshAccessToken('disconnect');
         }
@@ -113,11 +109,12 @@ function App() {
       const result = await response.json();
       if (response.ok) {
         fetchDisconnect(token);
-        localStorage.clear();
         setIsLoggedIn(false);
+        localStorage.clear();
+        setSidebarOpen(false);
         console.log('Logged out successfully');
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
         if (response.status === 403) {
           await refreshAccessToken('disconnect');
         }
@@ -148,7 +145,7 @@ function App() {
         const relayJSON = JSON.stringify(relayToStore);
         localStorage.setItem('relays', relayJSON);
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching status:', error);
@@ -170,12 +167,13 @@ function App() {
         const relayToStore = result.map(relay => ({
           relay_id: relay.relay_id,
           relay_name: relay.relay_name,
-          state: relay.state
+          state: relay.state,
+          relay_home: true,
         }));
         const relayJSON = JSON.stringify(relayToStore);
         localStorage.setItem('relays_home', relayJSON);
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching status:', error);
@@ -205,48 +203,12 @@ function App() {
           localStorage.setItem('avatar', avatarSrc);
         }
       } else {
-        console.error('Error:', result.message);
+        console.error(result.error);
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
     }
   };
-
-  const fetchSettingData = async (token) => {
-    try {
-      const response = await fetch('http://localhost:8080/setting/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-      if (response.ok) {
-        const settings = result.setting[0];
-        localStorage.setItem('mode', settings.mode);
-        localStorage.setItem('language', settings.language);
-        localStorage.setItem('connect', settings.connect);
-        localStorage.setItem('connected', 'false');
-        fetchConnect(token);
-      }
-      else {
-        console.error('Error:', result.message);
-      }
-    }
-    catch (error) {
-      console.error('Error fetching setting data:', error);
-    }
-  };
-
-
-  useEffect(() => {
-    if (performance.navigation.type === 1) {
-      console.log('Page reloaded');
-      localStorage.setItem('connected', 'false');
-    }
-  }
-    , []);
 
   useEffect(() => {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
@@ -256,15 +218,10 @@ function App() {
       fetchRelayGet(accessToken);
       fetchRelayGetHome(accessToken);
       fetchProfileData(accessToken);
-      fetchSettingData(accessToken);
-
+      fetchConnect(accessToken, localStorage.getItem('connect'));
       const intervalId = setInterval(() => {
         fetchRelayGetHome(accessToken);
-        // if (localStorage.getItem('connected') !== 'true') {
-        //   fetchConnect(accessToken);
-        // }
       }, 1000);
-
       return () => clearInterval(intervalId);
     }
   }, [isLoggedIn]);
@@ -287,7 +244,7 @@ function App() {
     setBackgroundPosition({ x, y });
   };
 
-  const getBackgroundColor = (active) => settings.color === 'dark'
+  const getBackgroundColor = (active) => settings.mode === 'dark'
     ? `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #0c5c0e, #1e3963)`
     : `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`;
 
