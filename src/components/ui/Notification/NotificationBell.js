@@ -46,7 +46,6 @@ const NotificationBell = () => {
           bgcolor: 'background.paper',
           border: '1px solid',
           borderColor: 'divider',
-          borderRadius: '4px',
           p: 2,
           maxWidth: '200px',
         }}

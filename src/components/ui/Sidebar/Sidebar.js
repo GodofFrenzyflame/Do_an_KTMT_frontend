@@ -16,8 +16,7 @@ export default function Sidebar({ onLogout, isOpen }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
 
-  useEffect(() => {
-    // Lấy thông tin từ localStorage
+  const loadData = async () => {
     const savedAvatar = localStorage.getItem('avatar');
     const savedUsername = localStorage.getItem('username');
     const savedEmail = localStorage.getItem('email');
@@ -25,11 +24,19 @@ export default function Sidebar({ onLogout, isOpen }) {
     setAvatar(savedAvatar || '');
     setUsername(savedUsername || 'User');
     setEmail(savedEmail || 'user@example.com');
+  }
+
+  useEffect(() => {
+    loadData();
+    const intervalId = setInterval(() => {
+      loadData();
+    }, 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const isActive = (path) => location.pathname === path;
 
-  const getBackgroundColor = (active) => 
+  const getBackgroundColor = (active) =>
     settings.color === 'dark' ? (active ? '#4361ee' : '#414a4c') : (active ? '#0013ff' : '#d6d6d6');
 
   const getButtonColor = () => (settings.color === 'dark' ? '#fff' : '#000');
@@ -38,9 +45,9 @@ export default function Sidebar({ onLogout, isOpen }) {
 
   return (
     <Box className={`sidebar ${!isOpen ? 'sidebar-closed' : ''}`} sx={{
-      width: sidebarWidth, 
-      display: 'flex', 
-      flexDirection: 'column', 
+      width: sidebarWidth,
+      display: 'flex',
+      flexDirection: 'column',
       height: '97vh',
       backgroundColor: getSidebarBackgroundColor(),
       position: 'fixed',
@@ -64,7 +71,7 @@ export default function Sidebar({ onLogout, isOpen }) {
           </Typography>
         </Box>
       </Box>
-      
+
       {/* Các nút điều hướng */}
       <Box sx={{ width: '100%', flexGrow: 1 }}>
         <Link to="/home" style={{ textDecoration: 'none' }}>
@@ -123,7 +130,7 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             mt: '2%'
           }}>
-              {t('Relay')}
+            {t('Relay')}
           </Button>
         </Link>
         <Link to="/profile" style={{ textDecoration: 'none' }}>
@@ -167,7 +174,7 @@ export default function Sidebar({ onLogout, isOpen }) {
           </Button>
         </Link>
       </Box>
-      
+
       {/* Nút đăng xuất */}
       <Button variant="contained" fullWidth sx={{
         bgcolor: '#f44336',

@@ -107,7 +107,7 @@ export default function Login({ onLogin }) {
         sx={{
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
           padding: 4,
-          borderRadius: 2,
+          borderRadius: '17px',
           boxShadow: 3,
           width: '100%',
           maxWidth: '400px',

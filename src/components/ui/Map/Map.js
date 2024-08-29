@@ -147,7 +147,7 @@ const Map = () => {
           color: '#fff',
           border: 'none',
           padding: '10px 20px',
-          borderRadius: '5px',
+          borderRadius: '17px',
           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
           cursor: 'pointer',
           zIndex: 1000

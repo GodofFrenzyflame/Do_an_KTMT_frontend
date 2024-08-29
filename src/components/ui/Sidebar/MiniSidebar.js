@@ -6,7 +6,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import RelayIcon from '@mui/icons-material/Power';
 import ProfileIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
-// import LogoutIcon from '@mui/icons-material/Logout';
+import LogoutIcon from '@mui/icons-material/Logout';
 import AppContext from '../Setting/language/AppContext';
 import '../../../Styles/Styles.css';
 
@@ -155,7 +155,7 @@ export default function MiniSidebar({ onLogout, isOpen }) {
         </Link>
 
         {/* Logout Button */}
-        {/* <IconButton
+        <IconButton
           sx={{
             bgcolor: '#f44336',
             color: '#fff',
@@ -173,7 +173,7 @@ export default function MiniSidebar({ onLogout, isOpen }) {
           onClick={onLogout}
         >
           <LogoutIcon />
-        </IconButton> */}
+        </IconButton>
       </Box>
     </Box>
   );

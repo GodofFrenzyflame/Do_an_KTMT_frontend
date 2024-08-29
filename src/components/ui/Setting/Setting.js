@@ -1,15 +1,94 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AppContext from './language/AppContext'; // Import context
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);
-  const [color, setColor] = useState(settings.color);
+  const [mode, setMode] = useState(settings.mode);
   const [language, setLanguage] = useState(settings.language);
-  const [webserver, setWebserver] = useState(settings.webserver || 'MQTT'); // Thêm trạng thái cho webserver
+  const [connect, setConnect] = useState(settings.connect || 'MQTT');
+
+  const token = localStorage.getItem('accessToken');
+
+
+  const loadData = async () => {
+    const storedMode = localStorage.getItem('mode');
+    const storedLanguage = localStorage.getItem('language');
+    const storedConnect = localStorage.getItem('connect');
+
+    console.log('Stored mode:', storedMode);
+    console.log('Stored language:', storedLanguage);
+    console.log('Stored connect:', storedConnect);
+
+    if (storedMode) setMode(storedMode);
+    if (storedLanguage) setLanguage(storedLanguage);
+    if (storedConnect) setConnect(storedConnect);
+  }
+
+
+  useEffect(() => {
+    loadData();
+  }
+    , []);
+
+  const fetchConnect = async () => {
+    console.log('Connecting ...');
+    try {
+      const connect = localStorage.getItem('connect');
+      const response = await fetch('http://localhost:8080/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ connect }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Connected  successfully');
+      } else {
+        console.error('Error:', result.message);
+      }
+    } catch (error) {
+      console.error('Error connecting to MQTT:', error);
+    }
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/setting/set', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ mode, language, connect }),
+      });
+      const result = await response.json();
+      if (response.ok) {
+        console.log('Settings saved successfully');
+      }
+      else {
+        console.error('Error:', result.message);
+      }
+    }
+    catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+  }
+
 
   const handleSave = () => {
-    setSettings({ color, language, webserver }); // Cập nhật trạng thái bao gồm webserver
+    setSettings({ mode, language, connect });
+    fetchSettings();
+    if (connect === 'MQTT') {
+      localStorage.setItem('connect', 'MQTT');
+      fetchConnect();
+    }
+    else {
+      localStorage.setItem('connect', 'WSV');
+      fetchConnect();
+    }
   };
 
   return (
@@ -17,11 +96,11 @@ const Settings = () => {
       <Typography variant="h4" gutterBottom>Settings</Typography>
       <Box sx={{ mt: 2 }}>
         <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
-          <InputLabel>Color</InputLabel>
+          <InputLabel>Mode</InputLabel>
           <Select
-            value={color}
-            onChange={(e) => setColor(e.target.value)}
-            label="Color"
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+            label="Mode"
           >
             <MenuItem value="light">Light</MenuItem>
             <MenuItem value="dark">Dark</MenuItem>
@@ -39,17 +118,17 @@ const Settings = () => {
           </Select>
         </FormControl>
         <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
-          <InputLabel>Webserver</InputLabel>
+          <InputLabel>Connect</InputLabel>
           <Select
-            value={webserver}
-            onChange={(e) => setWebserver(e.target.value)}
-            label="Webserver"
+            value={connect}
+            onChange={(e) => setConnect(e.target.value)}
+            label="Connect"
           >
             <MenuItem value="MQTT">MQTT</MenuItem>
             <MenuItem value="Webserver">Webserver</MenuItem>
           </Select>
         </FormControl>
-        <Box sx={{ mt: 2, textAlign: 'center' }}> 
+        <Box sx={{ mt: 2, textAlign: 'center' }}>
           <Button
             variant="contained"
             color="primary"

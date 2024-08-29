@@ -91,7 +91,7 @@ const History = () => {
         overflowY: 'auto', width: '75%', mx: 'auto', mt: 3, border: '2px solid #ccc',
         bgcolor: getBoxBackgroundColor(),
         color: getWordColor(),
-        borderRadius: '16px',
+        borderRadius: '17px',
       }}>
         <List>
           {filteredHistory.map((record, index) => (

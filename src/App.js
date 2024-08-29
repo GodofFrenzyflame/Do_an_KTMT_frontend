@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext} from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 
@@ -21,9 +21,9 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+
   const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
-
     try {
       const response = await fetch('http://localhost:8080/refresh-token', {
         method: 'POST',
@@ -35,11 +35,11 @@ function App() {
 
       const result = await response.json();
 
-      if (response.ok) {  
+      if (response.ok) {
         const { accessToken } = result;
         localStorage.setItem('accessToken', accessToken);
-        if (state === 'connect') await fetchConnectMqtt(accessToken);
-        else if (state === 'disconnect') await fetchDisconnectMqtt(accessToken);
+        if (state === 'connect') await fetchConnect(accessToken);
+        else if (state === 'disconnect') await fetchDisconnect(accessToken);
       } else {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('accessToken');
@@ -51,19 +51,23 @@ function App() {
     }
   };
 
-  const fetchConnectMqtt = async (token) => {
-    console.log('Connecting to MQTT...');
+  const fetchConnect = async (token) => {
+    console.log('Connecting ...');
+    console.log('Connect', localStorage.getItem('connect'))
     try {
-      const response = await fetch('http://localhost:8080/mqtt/connect', {
-        method: 'GET',
+      const connect = localStorage.getItem('connect');
+      const response = await fetch('http://localhost:8080/connect', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify({ connect }),
       });
       const result = await response.json();
       if (response.ok) {
-        console.log('Connected to MQTT successfully');
+        console.log('Connected  successfully');
+        localStorage.setItem('connected', 'true');
       } else {
         console.error('Error:', result.message);
         if (response.status === 403) {
@@ -75,9 +79,9 @@ function App() {
     }
   };
 
-  const fetchDisconnectMqtt = async (token) => {
+  const fetchDisconnect = async (token) => {
     try {
-      const response = await fetch('http://localhost:8080/mqtt/disconnect', {
+      const response = await fetch('http://localhost:8080/connect/disconnect', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +112,7 @@ function App() {
       });
       const result = await response.json();
       if (response.ok) {
-        fetchDisconnectMqtt(token);
+        fetchDisconnect(token);
         localStorage.clear();
         setIsLoggedIn(false);
         console.log('Logged out successfully');
@@ -168,10 +172,8 @@ function App() {
           relay_name: relay.relay_name,
           state: relay.state
         }));
-
         const relayJSON = JSON.stringify(relayToStore);
         localStorage.setItem('relays_home', relayJSON);
-        console.log('Relay home:', localStorage.getItem('relays_home'));
       } else {
         console.error('Error:', result.message);
       }
@@ -197,6 +199,7 @@ function App() {
         localStorage.setItem('phone_number', result.data.phone_number);
         localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
         localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
+        localStorage.setItem('webServerIp', result.data.webServerIp);
         if (result.data.avatar) {
           const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
           localStorage.setItem('avatar', avatarSrc);
@@ -209,17 +212,59 @@ function App() {
     }
   };
 
+  const fetchSettingData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/setting/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        const settings = result.setting[0];
+        localStorage.setItem('mode', settings.mode);
+        localStorage.setItem('language', settings.language);
+        localStorage.setItem('connect', settings.connect);
+        localStorage.setItem('connected', 'false');
+        fetchConnect(token);
+      }
+      else {
+        console.error('Error:', result.message);
+      }
+    }
+    catch (error) {
+      console.error('Error fetching setting data:', error);
+    }
+  };
+
+
+  useEffect(() => {
+    if (performance.navigation.type === 1) {
+      console.log('Page reloaded');
+      localStorage.setItem('connected', 'false');
+    }
+  }
+    , []);
+
   useEffect(() => {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
     if (storedLoggedInStatus === 'true') {
+      const accessToken = localStorage.getItem('accessToken');
       setIsLoggedIn(true);
-      fetchConnectMqtt(localStorage.getItem('accessToken'));
-      fetchRelayGet(localStorage.getItem('accessToken'));
-      fetchRelayGetHome(localStorage.getItem('accessToken'));
-      fetchProfileData(localStorage.getItem('accessToken'));
+      fetchRelayGet(accessToken);
+      fetchRelayGetHome(accessToken);
+      fetchProfileData(accessToken);
+      fetchSettingData(accessToken);
+
       const intervalId = setInterval(() => {
-        fetchRelayGetHome(localStorage.getItem('accessToken'));
+        fetchRelayGetHome(accessToken);
+        // if (localStorage.getItem('connected') !== 'true') {
+        //   fetchConnect(accessToken);
+        // }
       }, 1000);
+
       return () => clearInterval(intervalId);
     }
   }, [isLoggedIn]);
@@ -242,108 +287,108 @@ function App() {
     setBackgroundPosition({ x, y });
   };
 
-  const getBackgroundColor = (active) => settings.color === 'dark' 
-  ? `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #0c5c0e, #1e3963)` 
-  : `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`;
+  const getBackgroundColor = (active) => settings.color === 'dark'
+    ? `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #0c5c0e, #1e3963)`
+    : `radial-gradient(circle at ${backgroundPosition.x}px ${backgroundPosition.y}px, #299121, #1e90ff)`;
 
   return (
     <Box onMouseMove={handleMouseMove}
-    sx={{
-      background: getBackgroundColor(),
-      //...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
-    }}>
-    <Router >
-      <Routes >
-        <Route
-          path="/"
-          element={
-            isLoggedIn ? <Navigate to="/home" /> :
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <Login onLogin={handleLogin} />
+      sx={{
+        background: getBackgroundColor(),
+        //...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
+      }}>
+      <Router >
+        <Routes >
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? <Navigate to="/home" /> :
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                  <Login onLogin={handleLogin} />
+                </Box>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100&' }}>
+                <Signup />
               </Box>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100&' }}>
-              <Signup />
-            </Box>
-          }
-        />
-        <Route
-          path="/home"
-          element={
-            isLoggedIn ?
-              <AuthenticatedLayout
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-                onLogout={handleLogout}
-              >
-                <Home />
-              </AuthenticatedLayout>
-              : <Navigate to="/" />
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            isLoggedIn ?
-              <AuthenticatedLayout
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-                onLogout={handleLogout}
-              >
-                <Profile />
-              </AuthenticatedLayout>
-              : <Navigate to="/" />
-          }
-        />
-        <Route
-          path="/history"
-          element={
-            isLoggedIn ?
-              <AuthenticatedLayout
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-                onLogout={handleLogout}
-              >
-                <History />
-              </AuthenticatedLayout>
-              : <Navigate to="/" />
-          }
-        />
-        <Route
-          path="/relay"
-          element={
-            isLoggedIn ?
-              <AuthenticatedLayout
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-                onLogout={handleLogout}
-              >
-                <Relay />
-              </AuthenticatedLayout>
-              : <Navigate to="/" />
-          }
-        />
-        <Route path="/forget" element={<Forget />} />
-        <Route
-          path="/setting"
-          element={
-            isLoggedIn ?
-              <AuthenticatedLayout
-                isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-                onLogout={handleLogout}
-              >
-                <Setting />
-              </AuthenticatedLayout>
-              : <Navigate to="/" />
-          }
-        />
-      </Routes>
-    </Router>
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <Home />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <Profile />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <History />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />
+          <Route
+            path="/relay"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <Relay />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />
+          <Route path="/forget" element={<Forget />} />
+          <Route
+            path="/setting"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <Setting />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />
+        </Routes>
+      </Router>
     </Box>
   );
 }

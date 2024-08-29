@@ -36,7 +36,6 @@ const Clock = () => {
         right: '60px', // Adjusted to make space for the notification bell
         padding: '5px 15px',
         color: '#000', // Black text
-        borderRadius: '5px',
         zIndex: 1100,
         display: 'flex',
         alignItems: 'center',

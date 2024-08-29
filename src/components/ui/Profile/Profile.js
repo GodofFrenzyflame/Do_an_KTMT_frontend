@@ -10,7 +10,7 @@ const Profile = () => {
   const [fullname, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone_number, setPhone] = useState('');
-  const [webServerIp, setWebServerIp] = useState(''); // Thêm state cho Web Server IP
+  const [webServerIp, setWebServerIp] = useState('');
 
   const [aioUser, setAioUser] = useState('');
   const [aioKey, setAioPassword] = useState('');
@@ -25,7 +25,7 @@ const Profile = () => {
     setFullName(localStorage.getItem('fullname'));
     setEmail(localStorage.getItem('email'));
     setPhone(localStorage.getItem('phone_number'));
-    setWebServerIp(localStorage.getItem('webServerIp') || ''); // Tải giá trị Web Server IP
+    setWebServerIp(localStorage.getItem('webServerIp') || '');
     setAioUser(localStorage.getItem('AIO_USERNAME'));
     setAioPassword(localStorage.getItem('AIO_KEY'));
     if (localStorage.getItem('avatar')) {
@@ -46,8 +46,7 @@ const Profile = () => {
       formData.append('phone_number', phone_number);
       formData.append('AIO_USERNAME', aioUser);
       formData.append('AIO_KEY', aioKey);
-      
-      formData.append('webServerIp', webServerIp); // Thêm Web Server IP vào formData
+      formData.append('webServerIp', webServerIp);
 
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput && fileInput.files[0]) {
@@ -63,6 +62,7 @@ const Profile = () => {
       });
 
       const result = await response.json();
+      console.log(result.data);
       if (response.ok) {
         alert('Profile saved!');
         setIsEditable(false);
@@ -70,11 +70,9 @@ const Profile = () => {
         localStorage.setItem('fullname', result.data.fullname);
         localStorage.setItem('email', result.data.email);
         localStorage.setItem('phone_number', result.data.phone_number);
-
-        localStorage.setItem('webServerIp', result.data.webServerIp); // Lưu Web Server IP
-
         localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
         localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
+        localStorage.setItem('webServerIp', result.data.webServerIp);
         if (result.data.avatar) {
           const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
           localStorage.setItem('avatar', avatarSrc);
@@ -95,7 +93,7 @@ const Profile = () => {
   const handleCancel = () => {
     loadData();
     setIsEditable(false);
-    setAvatar(originalAvatar); 
+    setAvatar(originalAvatar);
   };
 
   const handleAvatarChange = (event) => {
@@ -121,7 +119,7 @@ const Profile = () => {
 
   const obfuscatePhone = (phone_number) => {
     if (!phone_number) return '';
-    const digits = phone_number.replace(/\D/g, ''); 
+    const digits = phone_number.replace(/\D/g, '');
     return `${digits.slice(0, 4)}-${digits.slice(4, 7)}-${digits.slice(7)}`;
   };
 
@@ -132,8 +130,8 @@ const Profile = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto' }}>
-      <Paper sx={{ p: 3 }}>
+    <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto', }}>
+      <Paper sx={{ p: 3, borderRadius: '17px' }}>
         {/* Avatar Section */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Avatar src={avatar} sx={{ width: 100, height: 100, mr: 2 }} />
@@ -157,7 +155,7 @@ const Profile = () => {
                 readOnly: !isEditable,
               }}
               InputLabelProps={{
-                shrink: true, 
+                shrink: true,
               }}
             />
           </Grid>
@@ -171,7 +169,7 @@ const Profile = () => {
                 readOnly: !isEditable,
               }}
               InputLabelProps={{
-                shrink: true, 
+                shrink: true,
               }}
             />
           </Grid>
@@ -185,7 +183,7 @@ const Profile = () => {
                 readOnly: !isEditable,
               }}
               InputLabelProps={{
-                shrink: true, 
+                shrink: true,
               }}
             />
           </Grid>
@@ -202,8 +200,8 @@ const Profile = () => {
               }}
             />
           </Grid>
-              {/*Webserver  */}
-          
+          {/*Webserver  */}
+
 
           <Grid item xs={12}>
             <TextField

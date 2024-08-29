@@ -11,14 +11,21 @@ import HomeIcon from '@mui/icons-material/Home'; // Biểu tượng cho Add to H
 import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
 import './TwinToggle.css'
 
-
 const token = localStorage.getItem('accessToken');
 
-const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome, showCheckboxes , showDeleteIcons}) => (
+const RelayCard = ({
+  relay,
+  onToggle,
+  onEdit,
+  onDelete,
+  oncheckHome,
+  showCheckboxes,
+  showDeleteIcons
+}) => (
   <Box
     sx={{
       border: '1px solid #ddd',
-      borderRadius: '12px',
+      borderRadius: '17px',
       padding: '16px',
       display: 'flex',
       alignItems: 'center',
@@ -37,7 +44,7 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome, showCheckbo
     {showCheckboxes && (
       <Checkbox
         checked={relay.relay_home}
-        onChange={() => oncheckHome(relay.relay_id)}
+        onChange={(e) => oncheckHome(relay.relay_id, e.target.checked)}
         sx={{ marginRight: '16px' }}
       />
     )}
@@ -54,11 +61,11 @@ const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome, showCheckbo
       onChange={() => onToggle(relay.relay_id)}
       sx={{ marginLeft: 'auto' }}
     />
-    {showDeleteIcons && ( // Show delete icon only when showDeleteIcons is true
-    <IconButton onClick={() => onDelete(relay.relay_id)} sx={{ marginLeft: '16px' }}>
-      <DeleteIcon color="error" />
-    </IconButton>
-)}
+    {showDeleteIcons && (
+      <IconButton onClick={() => onDelete(relay.relay_id)} sx={{ marginLeft: '16px' }}>
+        <DeleteIcon color="error" />
+      </IconButton>
+    )}
   </Box>
 );
 
@@ -72,12 +79,28 @@ const RelayGrid = () => {
   const [showCheckboxes, setShowCheckboxes] = useState(false); // State để quản lý hiển thị của checkbox
   const [showDeleteIcons, setShowDeleteIcons] = useState(false);
 
+  const handleKeyDown = (e, saveFunction) => {
+    if (e.key === 'Enter') {
+      saveFunction();
+    }
+  };
 
 
   const loadData = () => {
     const storedRelayJSON = localStorage.getItem('relays');
     const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
     setRelays(storedRelayData);
+
+    let relaysHome = JSON.parse(localStorage.getItem('relays_home'));
+    if (relaysHome) {
+      let updatedRelaysHome = relaysHome.map(relay => {
+        relay.relay_home = true;
+        return relay;
+      });
+      localStorage.setItem('relays_home_add', JSON.stringify(updatedRelaysHome));
+    } else {
+      console.log('No relays_home data found in localStorage');
+    }
   };
 
   useEffect(() => {
@@ -138,6 +161,8 @@ const RelayGrid = () => {
         localStorage.setItem('relays', JSON.stringify(updatedRelays));
         setRelays(updatedRelays);
         loadData();
+        setEditRelay(null);
+        setEditDialogOpen(false);
       } else {
         alert(result.error);
         console.error('Error:', result.error);
@@ -173,6 +198,7 @@ const RelayGrid = () => {
   };
 
   const fetchStatusSet = async (relay_id, state) => {
+    const connect = localStorage.getItem('connect');
     try {
       const response = await fetch('http://localhost:8080/relay/set-status', {
         method: 'PATCH',
@@ -180,7 +206,7 @@ const RelayGrid = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, state }),
+        body: JSON.stringify({ relay_id, state, connect }),
       });
       const result = await response.json();
       if (response.ok) {
@@ -200,7 +226,7 @@ const RelayGrid = () => {
     }
   };
 
-  const fetchRelayHomeSet = async (relay_id, relay_home) => {
+  const fetchRelayHomeSet = async (relay_id, relay_home, relay_name, state) => {
     try {
       const response = await fetch('http://localhost:8080/relay/set-home', {
         method: 'PATCH',
@@ -211,31 +237,45 @@ const RelayGrid = () => {
         body: JSON.stringify({ relay_id, relay_home }),
       });
       const result = await response.json();
-      if (response.ok) {
-        const storedRelayJSON = localStorage.getItem('relays');
-        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-        const updatedRelays = storedRelayData.map((relay) =>
-          relay.relay_id === relay_id ? { ...relay, relay_home } : relay
-        );
-        localStorage.setItem('relays', JSON.stringify(updatedRelays));
-        setRelays(updatedRelays);
-        loadData();
-      } else {
-        console.error('Error:', result.message);
-      }
     } catch (error) {
       console.error('Error setting relay home:', error);
     }
   };
 
-  const handleCheckHome = (id) => {
-    const relay = relays.find(relay => relay.relay_id === id);
+  const handleCheckHome = (id, checked) => {
+    const relay = relays.find((relay) => relay.relay_id === id);
+    const storedRelayJSON = localStorage.getItem('relays_home_add');
+    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+
     if (relay) {
-      fetchRelayHomeSet(id, !relay.relay_home);
+      const existingRelay = storedRelayData.find((storedRelay) => storedRelay.relay_id === id);
+
+      if (checked) {
+        if (existingRelay) {
+          existingRelay.relay_home = true;
+        } else {
+          storedRelayData.push({
+            relay_id: relay.relay_id,
+            relay_name: relay.relay_name,
+            state: relay.state,
+            relay_home: true,
+          });
+        }
+      } else {
+        if (existingRelay) {
+          existingRelay.relay_home = false;
+        }
+      }
+      const updatedRelays = relays.map((relay) =>
+        relay.relay_id === id ? { ...relay, relay_home: checked } : relay
+      );
+      localStorage.setItem('relays_home_add', JSON.stringify(storedRelayData));
+      setRelays(updatedRelays);
     } else {
       console.error('Relay not found:', id);
     }
   };
+
 
   const handleToggle = (id) => {
     const relay = relays.find(relay => relay.relay_id === id);
@@ -270,8 +310,6 @@ const RelayGrid = () => {
   const handleSaveEdit = () => {
     if (editRelay) {
       fetchRelaySet(editRelay.relay_id, editRelay.name, editRelay.new_relay_id);
-      setEditRelay(null);
-      setEditDialogOpen(false);
     }
   };
 
@@ -280,77 +318,129 @@ const RelayGrid = () => {
   };
 
   const handleAddToHome = () => {
-    setShowCheckboxes(!showCheckboxes); // Toggle hiển thị của checkbox
+    const storedRelayJSON = localStorage.getItem('relays_home_add');
+    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+    const updatedRelays = relays.map((relay) => {
+      const isRelayInHome = storedRelayData.some(
+        (storedRelay) => storedRelay.relay_id === relay.relay_id && storedRelay.relay_home === true
+      );
+      return { ...relay, relay_home: isRelayInHome };
+    });
+    setRelays(updatedRelays);
+    setShowCheckboxes(true);
+    setShowDeleteIcons(false);
+    setMenuOpen(false);
+  };
+
+  const handleDeleteMode = () => {
+    setShowCheckboxes(false);
+    setShowDeleteIcons(true);
     setMenuOpen(false);
   };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-  const handleDeleteMode = () => {
-    setShowDeleteIcons((prev) => !prev); // Toggle the state
-    setMenuOpen(false); // Optionally close the menu if required
-  };
- 
-  
+
+  const handleAccpet = async () => {
+    const storedRelayJSON = localStorage.getItem('relays_home_add');
+    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+    const relayHomeCount = storedRelayData.filter(relay => relay.relay_home === true).length;
+    if (relayHomeCount > 4) {
+      alert('You cannot add more than 4 relays to home.');
+      return;
+    }
+    try {
+      await Promise.all(storedRelayData.map(relay =>
+        fetchRelayHomeSet(relay.relay_id, relay.relay_home, relay.relay_name, relay.state)
+      ));
+      const filteredRelays = storedRelayData.filter(relay => relay.relay_home === true);
+      localStorage.setItem('relays_home', JSON.stringify(filteredRelays));
+      handleCancel();
+    } catch (error) {
+      console.error('Error in handleAccept:', error);
+    }
+  }
+
+  const handleCancel = async () => {
+    loadData();
+    setShowCheckboxes(false);
+    setShowDeleteIcons(false);
+    setMenuOpen(false);
+  }
+
   const [position, setPosition] = useState('center');
   const [color, setColor] = useState('center');
   const [animating, setAnimating] = useState(false);
-  
 
   const handleClick = (event) => {
-      if (animating) return; // Không cho phép nhấp khi đang hoạt động
+    if (animating) return; // Không cho phép nhấp khi đang hoạt động
 
-      setAnimating(true);
+    setAnimating(true);
 
-      const toggleWidth = event.currentTarget.offsetWidth;
-      const clickX = event.clientX - event.currentTarget.getBoundingClientRect().left;
+    const toggleWidth = event.currentTarget.offsetWidth;
+    const clickX = event.clientX - event.currentTarget.getBoundingClientRect().left;
 
-      if (clickX < toggleWidth / 3) {
-          
-          setPosition('left');
-          setColor('left');
-      } else if (clickX > (toggleWidth * 2) / 3) {
-        setPosition('right');
-        setColor('right');
-      } else {
-          setPosition('center');
-          setColor('center');
-      }
-      setTimeout(() => {
-          setPosition('center');
-          setColor('center');
-          setAnimating(false);
-      }, 400); 
+    if (clickX < toggleWidth / 3) {
+      setPosition('left');
+      setColor('left');
+      handleCancel();
+    } else if (clickX > (toggleWidth * 2) / 3) {
+      setPosition('right');
+      setColor('right');
+      handleAccpet();
+    } else {
+      setPosition('center');
+      setColor('center');
+    }
+    setTimeout(() => {
+      setPosition('center');
+      setColor('center');
+      setAnimating(false);
+    }, 400);
   };
   return (
-    <Box sx={{  display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center' ,overflow: 'hidden'}}>
-
-        {showCheckboxes && (
-              <div className="twin-toggle-container">
-              <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
-                <div className="twin-toggle-knob"></div>
-                    <div className="twin-toggle-labels">
-                      <span>Cancel</span>
-                      <span>Accept</span>
-                </div>
-              </div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden' }}>
+      {showCheckboxes && (
+        <div className="twin-toggle-container">
+          <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
+            <div className="twin-toggle-knob"></div>
+            <div className="twin-toggle-labels">
+              <span>Cancel</span>
+              <span>Accept</span>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {showDeleteIcons  && (
-              <div className="twin-toggle-container">
-              <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
-                <div className="twin-toggle-knob"></div>
-                    <div className="twin-toggle-labels">
-                      <span>Cancel</span>
-                      <span>Delete</span>
+        {showDeleteIcons && (
+                <div>
+                  <IconButton
+                    onClick={handleCancel}
+                    sx={{
+                      position: 'absolute', // Thêm position để z-index có hiệu lực
+                      zIndex: 2, // Đặt layer cao hơn cho IconButton
+                      top: '94px',
+                      right: '437px',
+                      height: '25px',
+                      backgroundColor: '#f44336',
+                      color:'#ffffff',
+                      '&:hover': {
+                        backgroundColor: '#d32f2f',
+                      },
+                      borderRadius: '8px',
+                      boxShadow: 2,
+                      transition: 'background-color 0.3s ease',
+                      fontSize: '16px',
+                    }}
+                    
+                  >
+                    Cancel
+                  </IconButton>
                 </div>
-              </div>
-          </div>
-        )}
+              )}
 
-        
+
 
       {relays.map((relay) => (
         <RelayCard
@@ -365,105 +455,102 @@ const RelayGrid = () => {
         />
       ))}
 
-        <Box
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '16px',
+          right: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        {menuOpen && (
+          <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Nút Add New Card */}
+            <Tooltip title="Add new card" placement="left">
+              <IconButton
+                onClick={handleAddCard}
+                sx={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  backgroundColor: '#4caf50', // Xanh lá cây
+                  color: '#fff',
+                  mb: 1,
+                  '&:hover': { backgroundColor: '#388e3c' }, // Xanh lá cây đậm hơn
+                }}
+              >
+                <AddCircleOutlineIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Nút Add to Home */}
+            <Tooltip title="Add to Home" placement="left">
+              <IconButton
+                onClick={handleAddToHome}
+                sx={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  backgroundColor: '#2196f3', // Xanh dương
+                  color: '#fff',
+                  mb: 1,
+                  '&:hover': { backgroundColor: '#1976d2' }, // Xanh dương đậm hơn
+                }}
+              >
+                <HomeIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Nút Delete */}
+            <Tooltip title="Delete card" placement="left">
+              <IconButton
+                onClick={handleDeleteMode}
+                sx={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  backgroundColor: '#f76ae7',
+                  color: '#fff',
+                  '&:hover': { backgroundColor: '#a30091' },
+                }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
+
+        {/* Nút Menu */}
+        <IconButton
+          color="primary"
+          onClick={toggleMenu}
           sx={{
-            position: 'fixed',
-            bottom: '16px',
-            right: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            backgroundColor: menuOpen ? '#f44336' : '#4800ff',
+            color: '#fff',
+            '&:hover': { backgroundColor: menuOpen ? '#f44336' : '#4800ff' },
+            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+            transition: 'transform 0.2s ease-in-out',
+            transform: menuOpen ? 'rotate(89deg)' : 'rotate(0deg)',
           }}
         >
-          {menuOpen && (
-            <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              {/* Nút Add New Card */}
-              <Tooltip title="Add new card" placement="left">
-                <IconButton
-                  onClick={handleAddCard}
-                  sx={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    backgroundColor: '#4caf50', // Xanh lá cây
-                    color: '#fff',
-                    mb: 1,
-                    '&:hover': { backgroundColor: '#388e3c' }, // Xanh lá cây đậm hơn
-                  }}
-                >
-                  <AddCircleOutlineIcon />
-                </IconButton>
-              </Tooltip>
+          {menuOpen ? <CloseIcon /> : <AppIcon />}
+        </IconButton>
+      </Box>
 
-              {/* Nút Add to Home */}
-              <Tooltip title="Add to Home" placement="left">
 
-                
-                <IconButton
-                  onClick={handleAddToHome}
-                  sx={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    backgroundColor: '#2196f3', // Xanh dương
-                    color: '#fff',
-                    mb: 1,
-                    '&:hover': { backgroundColor: '#1976d2' }, // Xanh dương đậm hơn
-                  }}
-                >
-                  <HomeIcon />
-                </IconButton>
-              </Tooltip>
-
-              {/* Nút Delete */}
-              <Tooltip title="Delete card" placement="left">
-                <IconButton
-                  onClick={handleDeleteMode}
-                  sx={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '50%',
-                    backgroundColor: '#f76ae7', 
-                    color: '#fff',
-                    '&:hover': { backgroundColor: '#a30091' }, 
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          )}
-
-          {/* Nút Menu */}
-          <IconButton
-            color="primary"
-            onClick={toggleMenu}
-            sx={{
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              backgroundColor: menuOpen ? '#f44336' : '#4800ff', 
-              color: '#fff',
-              '&:hover': { backgroundColor: menuOpen ? '#f44336' : '#4800ff' },
-              boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-              transition: 'transform 0.2s ease-in-out',
-              transform: menuOpen ? 'rotate(89deg)' : 'rotate(0deg)',
-            }}
-          >
-            {menuOpen ? <CloseIcon /> : <AppIcon />}
-          </IconButton>
-        </Box>
-
-      
       {/* Dialog thêm mới Relay */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} sx={{ 
-          '& .MuiDialog-paper': { 
-            width: '400px', 
-            maxWidth: '90%', 
-            minHeight: 'auto',
-            
-          } 
-        }}>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: '17px',
+          },
+        }}
+      >
         <DialogTitle>Add New Relay</DialogTitle>
         <DialogContent>
           <TextField
@@ -484,6 +571,7 @@ const RelayGrid = () => {
             variant="outlined"
             value={newCard.relayId}
             onChange={(e) => setNewCard({ ...newCard, relayId: e.target.value })}
+            onKeyDown={(e) => handleKeyDown(e, handleSaveCard)}
           />
         </DialogContent>
         <DialogActions>
@@ -493,9 +581,15 @@ const RelayGrid = () => {
       </Dialog>
 
       {/* Dialog chỉnh sửa Relay */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}>
+      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: '17px',
+          },
+        }}
+      >
         <DialogTitle>Edit Relay</DialogTitle>
-        <DialogContent>
+        <DialogContent >
           {editRelay && (
             <>
               <TextField
@@ -507,6 +601,7 @@ const RelayGrid = () => {
                 variant="outlined"
                 value={editRelay.name}
                 onChange={(e) => setEditRelay({ ...editRelay, name: e.target.value })}
+                onKeyDown={(e) => handleKeyDown(e, handleSaveEdit)}
               />
               <TextField
                 margin="dense"
@@ -516,6 +611,7 @@ const RelayGrid = () => {
                 variant="outlined"
                 value={editRelay.new_relay_id || ''}
                 onChange={(e) => setEditRelay({ ...editRelay, new_relay_id: e.target.value })}
+                onKeyDown={(e) => handleKeyDown(e, handleSaveEdit)}
               />
             </>
           )}
