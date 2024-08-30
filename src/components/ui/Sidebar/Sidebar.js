@@ -5,6 +5,9 @@ import AppContext from '../Setting/language/AppContext';
 import '../../../Styles/Styles.css';
 import { useTranslation } from 'react-i18next';
 import { SidebarData } from './Sidebardata';
+import './Sidebar.css';
+
+
 
 export default function Sidebar({ onLogout, isOpen }) {
   const { settings } = useContext(AppContext);
@@ -58,21 +61,46 @@ export default function Sidebar({ onLogout, isOpen }) {
         visibility: visibility,
         overflow: 'hidden',
         transition: 'visibility 0.3s, width 0.3s',
-        background: `linear-gradient(to bottom, rgb(144, 238, 144) 0%, rgb(144, 238, 144) 10%, ${getSidebarBackgroundColor()} 17%, ${getSidebarBackgroundColor()} 100%)`,
+        background: `linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.6) 5%, 
+                    rgba(255, 255, 255, 0.6) 20%, 
+                    ${getSidebarBackgroundColor()} 20%, 
+                    ${getSidebarBackgroundColor()} 100%)`,
       }}
     >
+      {/* Pseudo-element for blurred background image */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '22%', // Adjust this to control the height of the blurred section
+          backgroundImage: `url(${avatar})`,
+          backgroundSize: 'cover', // 'cover' ensures the image covers the entire area while maintaining its aspect ratio
+          backgroundPosition: 'center', // Centers the image in the blurred section
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(4px)', // Blur effect only on the background image
+          zIndex: -1, // Ensure the blur effect is behind all content
+          borderTopLeftRadius: '12px',
+          borderTopRightRadius: '12px',
+        }}
+      />
+
       {/* Box chứa Avatar và thông tin người dùng */}
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           padding: '10px',
-          mb: '5%',
-          mt: '7%',
+          mb: '20%',
+          mt: '20%',
           visibility: visibility,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
-        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2, ml: 4, mb: 4 }} />
+        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2, ml: 4, mb: 1 }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ color: getButtonColor() }}>
             {username}
@@ -85,7 +113,7 @@ export default function Sidebar({ onLogout, isOpen }) {
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               maxWidth: '180px',
-              mb: 4,
+              mb: 1,
             }}
           >
             {email}
@@ -94,7 +122,7 @@ export default function Sidebar({ onLogout, isOpen }) {
       </Box>
 
       {/* Divider line */}
-      <Divider sx={{ width: '90%', margin: '0 auto', mb: 2, backgroundColor: '#bdbdbd' }} />
+      <Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1  }} />
 
       {/* Bottom Section for Sidebar Menu Items */}
       <Box
@@ -105,6 +133,9 @@ export default function Sidebar({ onLogout, isOpen }) {
           alignItems: 'center',
           width: '100%',
           mt: 'auto',
+          position: 'relative',
+          zIndex: 1,
+          backgroundColor: getSidebarBackgroundColor(), 
         }}
       >
         {SidebarData.map((val, index) => (
@@ -113,20 +144,33 @@ export default function Sidebar({ onLogout, isOpen }) {
             onClick={() => navigate(val.link)}
             sx={{
               width: '90%',
-              display: 'flex',
-              justifyContent: 'flex-start',
-              padding: '12px 0',
-              mb: 1,
-              borderRadius: '8px',
-              backgroundColor: getSidebarBackgroundColor(),
-              cursor: 'pointer',
-              transition: 'border 0.3s',
-              border: isActive(val.link) ? '2px solid #9e9e9e' : '2px solid transparent',
-              marginLeft: '1px',
-              boxSizing: 'border-box',
-              '&:hover': {
-                borderColor: '#9e9e9e',
-              },
+    display: 'flex',
+    justifyContent: 'flex-start',
+    padding: '12px 0',
+    mb: 1,
+    borderRadius: '8px', // Bo góc cho viền
+    backgroundColor: getSidebarBackgroundColor(), // Cùng màu với nền của sidebar
+    cursor: 'pointer',
+    transition: 'border 0.3s',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderImageSlice: 1,
+    borderImageSource: isActive(val.link)
+      ? 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)'
+      : 'none', // Hiệu ứng cầu vồng khi được chọn
+    animation: isActive(val.link)
+      ? 'rainbowBorder 1s infinite linear'
+      : 'none', // Chuyển động cầu vồng liên tục khi được chọn
+    borderColor: isActive(val.link)
+      ? 'transparent'
+      : getSidebarBackgroundColor(), // Cùng màu với sidebar khi không được chọn
+    '&:hover': {
+      borderColor: isActive(val.link)
+        ? 'transparent'
+        : '#9e9e9e', // Màu xám đơn sắc khi hover
+    },
+    marginLeft: '1px',
+    boxSizing: 'border-box',
             }}
           >
             <Box sx={{ color: getButtonColor(), fontSize: '1.5em', mr: 2, marginLeft: '17%' }}>

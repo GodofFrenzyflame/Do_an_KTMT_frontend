@@ -4,7 +4,7 @@ import App from './App';
 import './Styles/Styles.css';
 import { AppProvider } from '../src/components/ui/Setting/language/AppContext.jsx'; // Import AppProvider
 import '../src/components/ui/Setting/language/i18n.jsx';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 

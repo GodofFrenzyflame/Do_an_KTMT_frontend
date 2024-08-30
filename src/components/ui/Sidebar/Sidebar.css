@@ -1,0 +1,12 @@
+@keyframes rainbowBorder {
+    0% {
+      border-image-source: linear-gradient(90deg, rgb(248, 247, 247), rgb(129, 116, 91), yellow, green, blue, indigo, rgb(223, 10, 223));
+    }
+    50% {
+      border-image-source: linear-gradient(270deg, violet, indigo, blue, rgb(62, 250, 62), rgb(136, 136, 87), orange, red);
+    }
+    100% {
+      border-image-source: linear-gradient(450deg, red, orange, yellow, rgb(96, 37, 192), rgb(211, 245, 61), rgb(3, 255, 108), rgb(252, 251, 252));
+    }
+  }
+  
