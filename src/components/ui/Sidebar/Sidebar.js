@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Button, Typography, Avatar } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Box, Button, Typography, Avatar, Divider } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom'; 
 import AppContext from '../Setting/language/AppContext';
 import '../../../Styles/Styles.css';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ export default function Sidebar({ onLogout, isOpen }) {
   const { settings } = useContext(AppContext);
   const { t } = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
   const sidebarWidth = isOpen ? '19%' : '0';
   const visibility = isOpen ? 'visible' : 'hidden';
 
@@ -38,9 +38,6 @@ export default function Sidebar({ onLogout, isOpen }) {
 
   const isActive = (path) => location.pathname === path;
 
-  const getBackgroundColor = (active) =>
-    settings.color === 'dark' ? (active ? '#4361ee' : '#414a4c') : (active ? '#0013ff' : '#d6d6d6');
-
   const getButtonColor = () => (settings.color === 'dark' ? '#fff' : '#000');
 
   const getSidebarBackgroundColor = () => (settings.color === 'dark' ? '#333' : '#e6e3e3');
@@ -53,7 +50,6 @@ export default function Sidebar({ onLogout, isOpen }) {
         display: 'flex',
         flexDirection: 'column',
         height: '97vh',
-        backgroundColor: getSidebarBackgroundColor(),
         position: 'fixed',
         top: 10,
         left: 10,
@@ -62,6 +58,7 @@ export default function Sidebar({ onLogout, isOpen }) {
         visibility: visibility,
         overflow: 'hidden',
         transition: 'visibility 0.3s, width 0.3s',
+        background: `linear-gradient(to bottom, rgb(144, 238, 144) 0%, rgb(144, 238, 144) 10%, ${getSidebarBackgroundColor()} 17%, ${getSidebarBackgroundColor()} 100%)`,
       }}
     >
       {/* Box chứa Avatar và thông tin người dùng */}
@@ -70,12 +67,12 @@ export default function Sidebar({ onLogout, isOpen }) {
           display: 'flex',
           alignItems: 'center',
           padding: '10px',
-          mb: '20%',
-          mt: '5%',
+          mb: '5%',
+          mt: '7%',
           visibility: visibility,
         }}
       >
-        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2 }} />
+        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2, ml: 4, mb: 4 }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ color: getButtonColor() }}>
             {username}
@@ -88,6 +85,7 @@ export default function Sidebar({ onLogout, isOpen }) {
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               maxWidth: '180px',
+              mb: 4,
             }}
           >
             {email}
@@ -95,20 +93,62 @@ export default function Sidebar({ onLogout, isOpen }) {
         </Box>
       </Box>
 
-      {/* Sidebar Menu Items */}
-      <ul className="sidebar-menu">
-        {SidebarData.map((val, index) => (
-          <li
-            key={index}
-            className={`row ${isActive(val.link) ? 'active' : ''}`}
-            onClick={() => navigate(val.link)}
-          >
-            <div className="icon">{val.icon}</div> {/* Placeholder for the icon */}
-            <div className="sidebar-title">{val.title}</div>
-          </li>
-        ))}
-      </ul>
+      {/* Divider line */}
+      <Divider sx={{ width: '90%', margin: '0 auto', mb: 2, backgroundColor: '#bdbdbd' }} />
 
+      {/* Bottom Section for Sidebar Menu Items */}
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          mt: 'auto',
+        }}
+      >
+        {SidebarData.map((val, index) => (
+          <Box
+            key={index}
+            onClick={() => navigate(val.link)}
+            sx={{
+              width: '90%',
+              display: 'flex',
+              justifyContent: 'flex-start',
+              padding: '12px 0',
+              mb: 1,
+              borderRadius: '8px',
+              backgroundColor: getSidebarBackgroundColor(),
+              cursor: 'pointer',
+              transition: 'border 0.3s',
+              border: isActive(val.link) ? '2px solid #9e9e9e' : '2px solid transparent',
+              marginLeft: '1px',
+              boxSizing: 'border-box',
+              '&:hover': {
+                borderColor: '#9e9e9e',
+              },
+            }}
+          >
+            <Box sx={{ color: getButtonColor(), fontSize: '1.5em', mr: 2, marginLeft: '17%' }}>
+              {val.icon}
+            </Box>
+            <Typography
+              variant="body1"
+              sx={{
+                color: getButtonColor(),
+                fontWeight: isActive(val.link) ? 'bold' : 'normal',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textAlign: 'left',
+                marginLeft: '10%',
+              }}
+            >
+              {val.title}
+            </Typography>
+          </Box>
+        ))}
+      </Box>
 
       {/* Logout Button */}
       <Button

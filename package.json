@@ -17,8 +17,11 @@
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.26.0",
     "react-scripts": "^5.0.1",
+    "react-toastify": "^10.0.5",
     "react-use": "^17.5.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "sweetalert2": "^11.12.4",
+    "toastify-js": "^1.12.0"
   },
   "scripts": {
     "start": "react-scripts start",

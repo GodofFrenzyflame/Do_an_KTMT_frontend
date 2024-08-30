@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AppContext from './language/AppContext'; // Import context
+import { toast } from 'react-toastify';
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);
@@ -36,14 +37,15 @@ const Settings = () => {
         },
         body: JSON.stringify({ connect }),
       });
+      const result = await response.json();
       if (response.ok) {
-        console.log('Connected successfully');
         localStorage.setItem('connect', connect);
+        toast.success(`Connected to ${connect} successfully`);
       } else {
-        alert('Please go to profile to update your webserver IP');
+        toast.error(result.error);
       }
     } catch (error) {
-      alert('Please go to profile to check your webserver IP');
+      toast.error(error);
     }
   };
 

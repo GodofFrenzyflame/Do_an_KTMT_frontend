@@ -2,8 +2,35 @@ import React, { useEffect, useState } from 'react';
 import { Box, TextField, Button, Avatar, Grid, Paper } from '@mui/material';
 import PasswordDialog from './ChangePass';
 import { InputAdornment } from '@mui/material';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 
 const token = localStorage.getItem('accessToken');
+
+// const showToast = (message, type) => {
+//   Toastify({
+//     text: message,
+//     duration: 4000,
+//     close: true,
+//     gravity: "top",
+//     position: "center",
+//     backgroundColor: type === 'success'
+//       ? 'linear-gradient(to right, #28a745, #218838)'
+//       : 'linear-gradient(to right, #dc3545, #c82333)',
+//     stopOnFocus: true,
+//     className: type,
+//     onClick: () => { }
+//   }).showToast();
+// };
+
+const showAlert = (message, type) => {
+  Swal.fire({
+    icon: type,
+    title: type === 'error' ? 'Oops...' : 'Success',
+    text: message,
+    confirmButtonText: 'OK',
+  });
+};
 
 const Profile = () => {
   const [username, setUsername] = useState('');
@@ -25,7 +52,7 @@ const Profile = () => {
     setFullName(localStorage.getItem('fullname'));
     setEmail(localStorage.getItem('email'));
     setPhone(localStorage.getItem('phone_number'));
-    setWebServerIp(localStorage.getItem('webServerIp') || '');
+    setWebServerIp(localStorage.getItem('webServerIp'));
     setAioUser(localStorage.getItem('AIO_USERNAME'));
     setAioPassword(localStorage.getItem('AIO_KEY'));
     if (localStorage.getItem('avatar')) {
@@ -33,53 +60,57 @@ const Profile = () => {
       setOriginalAvatar(localStorage.getItem('avatar'));
     } else {
       setAvatar('');
-      setOriginalAvatar(''); // No avatar
+      setOriginalAvatar('');
     }
   };
 
   const fetchProfileEdit = async () => {
+    if (!username) {
+      showAlert('Username is required', 'error');
+      return;
+    }
+    if (!aioUser || !aioKey) {
+      showAlert('AIO Username and AIO Key are required', 'error');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('fullname', fullname);
+    formData.append('email', email);
+    formData.append('phone_number', phone_number);
+    formData.append('AIO_USERNAME', aioUser);
+    formData.append('AIO_KEY', aioKey);
+    formData.append('webServerIp', webServerIp);
+    const fileInput = document.querySelector('input[type="file"]');
+    if (fileInput && fileInput.files[0]) {
+      formData.append('avatar', fileInput.files[0]);
+    }
     try {
-      const formData = new FormData();
-      formData.append('username', username);
-      formData.append('fullname', fullname);
-      formData.append('email', email);
-      formData.append('phone_number', phone_number);
-      formData.append('AIO_USERNAME', aioUser);
-      formData.append('AIO_KEY', aioKey);
-      formData.append('webServerIp', webServerIp);
-
-      const fileInput = document.querySelector('input[type="file"]');
-      if (fileInput && fileInput.files[0]) {
-        formData.append('avatar', fileInput.files[0]);
-      }
-
       const response = await fetch('http://localhost:8080/profile/edit', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        body: formData,
+        body: formData
       });
-
       const result = await response.json();
-      console.log(result.data);
       if (response.ok) {
-        alert('Profile saved!');
         setIsEditable(false);
-        localStorage.setItem('username', result.data.username);
-        localStorage.setItem('fullname', result.data.fullname);
-        localStorage.setItem('email', result.data.email);
-        localStorage.setItem('phone_number', result.data.phone_number);
-        localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
-        localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
-        localStorage.setItem('webServerIp', result.data.webServerIp);
+        localStorage.setItem('username', result.data.username || '');
+        localStorage.setItem('fullname', result.data.fullname || '');
+        localStorage.setItem('email', result.data.email || '');
+        localStorage.setItem('phone_number', result.data.phone_number || '');
+        localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME || '');
+        localStorage.setItem('AIO_KEY', result.data.AIO_KEY || '');
+        localStorage.setItem('webServerIp', result.data.webServerIp || '');
         if (result.data.avatar) {
           const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
           localStorage.setItem('avatar', avatarSrc);
         }
+        toast.success('Profile saved!');
         loadData();
       } else {
-        console.error(result.error);
+        console.error('Error saving profile:', result.error);
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
@@ -148,7 +179,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Username"
-              value={username}
+              value={username || ''}
               onChange={(e) => setUsername(e.target.value)}
               fullWidth
               InputProps={{
@@ -162,7 +193,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Full Name"
-              value={fullname}
+              value={fullname || ''}
               onChange={(e) => setFullName(e.target.value)}
               fullWidth
               InputProps={{
@@ -232,7 +263,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="AIO User"
-              value={aioUser}
+              value={aioUser || ''}
               onChange={(e) => setAioUser(e.target.value)}
               fullWidth
               InputProps={{
@@ -246,7 +277,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="AIO Key"
-              value={aioKey}
+              value={aioKey || ''}
               onChange={(e) => setAioPassword(e.target.value)}
               fullWidth
               InputProps={{
@@ -260,7 +291,7 @@ const Profile = () => {
           <Grid item xs={12}>
             <TextField
               label="Web Server IP" // Thêm trường nhập Web Server IP
-              value={webServerIp}
+              value={webServerIp || ''}
               onChange={(e) => setWebServerIp(e.target.value)}
               fullWidth
               InputProps={{

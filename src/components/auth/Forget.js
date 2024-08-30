@@ -62,6 +62,7 @@ export default function Forget({ open, onClose }) {
       setError('Passwords do not match');
       return;
     }
+    emailOrusername = emailOrusername.toLowerCase();
     try {
       const response = await fetch('http://localhost:8080/forgot-password', {
         method: 'PATCH',

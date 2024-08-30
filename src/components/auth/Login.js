@@ -13,29 +13,6 @@ export default function Login({ onLogin }) {
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
 
-  const fetchConnect = async (token) => {
-    console.log('Connecting to MQTT...');
-    const connect = 'MQTT';
-    try {
-      const response = await fetch('http://localhost:8080/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ connect }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        console.log('Connected to MQTT successfully');
-      } else {
-        console.error('Error:', result.message);
-      }
-    } catch (error) {
-      console.error('Error connecting to MQTT:', error);
-    }
-  };
-
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -43,12 +20,13 @@ export default function Login({ onLogin }) {
         setError('Username and password are required.');
         return;
       }
+      let convert = emailOrusername.toLowerCase();
       const response = await fetch('http://localhost:8080/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ emailOrusername, password }),
+        body: JSON.stringify({ emailOrusername: convert, password }),
       });
 
       const result = await response.json();
@@ -60,7 +38,7 @@ export default function Login({ onLogin }) {
         localStorage.setItem('refreshToken', refreshToken);
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('connect', 'MQTT');
-        fetchConnect(accessToken);
+        localStorage.setItem('connected', 'false');
         onLogin(true);
         navigate('/home');
       } else {

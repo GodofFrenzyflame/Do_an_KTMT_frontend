@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Paper, List, ListItem } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
+import { toast } from 'react-toastify';
 
 const History = () => {
   const [startDate, setStartDate] = useState('');
@@ -42,11 +43,12 @@ const History = () => {
       });
       const result = await response.json();
       if (response.ok) {
+        toast.success('Filter success');
         setFilteredHistory(result);
         localStorage.setItem('filteredHistory', JSON.stringify(result));
         setError('');
       } else {
-        setError(result.error);
+        toast.error(result.error);
       }
     } catch (error) {
       setError(error);

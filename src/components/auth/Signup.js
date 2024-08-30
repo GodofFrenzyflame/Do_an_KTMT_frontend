@@ -16,13 +16,15 @@ export default function Signup({ onClose }) {
 
 
   const Signup = async () => {
+    let convert_username = username.toLowerCase();
+    let convert_email = email.toLowerCase();
     try {
       const response = await fetch('http://localhost:8080/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password, aioUser, aioKey, phone }),
+        body: JSON.stringify({ username: convert_username, email: convert_email, password, aioUser, aioKey, phone }),
       });
       const result = await response.json();
       if (response.ok) {

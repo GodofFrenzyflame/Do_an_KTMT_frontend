@@ -10,6 +10,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'; // Bi�
 import HomeIcon from '@mui/icons-material/Home'; // Biểu tượng cho Add to Home
 import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
 import './TwinToggle.css'
+import { toast } from 'react-toastify';
 
 const token = localStorage.getItem('accessToken');
 
@@ -85,7 +86,6 @@ const RelayGrid = () => {
     }
   };
 
-
   const loadData = () => {
     const storedRelayJSON = localStorage.getItem('relays');
     const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
@@ -107,6 +107,23 @@ const RelayGrid = () => {
 
   useEffect(() => {
     loadData();
+    const url = "ws://" + localStorage.getItem('webServerIp') + "/ws";
+    const websocket = new WebSocket(url);
+
+    websocket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.index !== undefined && data.state !== undefined) {
+        setRelays((prevRelays) =>
+          prevRelays.map((relay) =>
+            relay.relay_id === data.index ? { ...relay, state: data.state === 'ON' } : relay
+          )
+        );
+      }
+    };
+
+    return () => {
+      websocket.close();
+    };
   }, []);
 
   const fetchRelayAdd = async (relay_id, relay_name, state) => {
@@ -221,9 +238,11 @@ const RelayGrid = () => {
         setRelays(updatedRelays);
         loadData();
       } else {
+        toast.error(result.error);
         console.error('Error:', result.message);
       }
     } catch (error) {
+      toast.error(error);
       console.error('Error setting status:', error);
     }
   };

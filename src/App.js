@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { toast } from 'react-toastify';
 
 
 import Login from './components/auth/Login';
@@ -63,7 +64,9 @@ function App() {
       });
       const result = await response.json();
       if (response.ok) {
+        localStorage.setItem('connected', 'true');
         localStorage.setItem('connect', connect);
+        toast.success(`Connected to ${connect} successfully`);
       } else {
         console.error(result.error);
         if (response.status === 403) {
@@ -71,7 +74,7 @@ function App() {
         }
       }
     } catch (error) {
-      console.error('Error connecting to MQTT:', error);
+      toast.error(error);
     }
   };
 
@@ -191,16 +194,19 @@ function App() {
       });
       const result = await response.json();
       if (response.ok) {
-        localStorage.setItem('username', result.data.username);
-        localStorage.setItem('fullname', result.data.fullname);
-        localStorage.setItem('email', result.data.email);
-        localStorage.setItem('phone_number', result.data.phone_number);
-        localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME);
-        localStorage.setItem('AIO_KEY', result.data.AIO_KEY);
-        localStorage.setItem('webServerIp', result.data.webServerIp);
+        localStorage.setItem('username', result.data.username !== undefined ? result.data.username : '');
+        localStorage.setItem('fullname', result.data.fullname !== undefined ? result.data.fullname : '');
+        localStorage.setItem('email', result.data.email !== undefined ? result.data.email : '');
+        localStorage.setItem('phone_number', result.data.phone_number !== undefined ? result.data.phone_number : '');
+        localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME !== undefined ? result.data.AIO_USERNAME : '');
+        localStorage.setItem('AIO_KEY', result.data.AIO_KEY !== undefined ? result.data.AIO_KEY : '');
+        localStorage.setItem('webServerIp', result.data.webServerIp !== undefined ? result.data.webServerIp : '');
         if (result.data.avatar) {
           const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
           localStorage.setItem('avatar', avatarSrc);
+        }
+        else {
+          localStorage.setItem('avatar', '');
         }
       } else {
         console.error(result.error);
@@ -212,15 +218,20 @@ function App() {
 
   useEffect(() => {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
+    const accessToken = localStorage.getItem('accessToken');
     if (storedLoggedInStatus === 'true') {
-      const accessToken = localStorage.getItem('accessToken');
+      if (performance.navigation.type === 1) {
+        localStorage.setItem('connected', 'false');
+      }
       setIsLoggedIn(true);
       fetchRelayGet(accessToken);
       fetchRelayGetHome(accessToken);
       fetchProfileData(accessToken);
-      fetchConnect(accessToken, localStorage.getItem('connect'));
       const intervalId = setInterval(() => {
         fetchRelayGetHome(accessToken);
+        if (localStorage.getItem('connected') === 'false') {
+          fetchConnect(accessToken, localStorage.getItem('connect'));
+        }
       }, 1000);
       return () => clearInterval(intervalId);
     }
