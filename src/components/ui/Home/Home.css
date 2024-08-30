@@ -1,0 +1,33 @@
+.neon-effect {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+}
+
+.neon-effect::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  background: linear-gradient(90deg, #91b07c, #a9ba9c); /* Màu tươi sáng */
+  background-size: 200%;
+  border-radius: 8px; /* Phải lớn hơn border-radius của Paper */
+  z-index: -1;
+  filter: blur(8px);
+  animation: neon-glow 1.5s linear infinite;
+}
+
+.neon-effect.off::before {
+  background: linear-gradient(90deg, #556b2f, #667754); /* Màu sậm hơn */
+}
+
+@keyframes neon-glow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}

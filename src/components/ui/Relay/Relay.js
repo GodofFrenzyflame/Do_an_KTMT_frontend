@@ -9,7 +9,7 @@ import AppIcon from '@mui/icons-material/Apps';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'; // Biểu tượng cho Add New Relay
 import HomeIcon from '@mui/icons-material/Home'; // Biểu tượng cho Add to Home
 import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
-import './TwinToggle.css'
+import './Relay.css'
 import { toast } from 'react-toastify';
 
 const token = localStorage.getItem('accessToken');
@@ -24,8 +24,9 @@ const RelayCard = ({
   showDeleteIcons
 }) => (
   <Box
+    className={`neon-effect ${relay.state ? 'on' : 'off'}`}
     sx={{
-      border: '1px solid #ddd',
+      border: '4px solid transparent',
       borderRadius: '17px',
       padding: '16px',
       display: 'flex',
@@ -33,12 +34,18 @@ const RelayCard = ({
       margin: '8px',
       width: '100%',
       maxWidth: '600px',
-      boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-      backgroundColor: '#fff',
+      boxShadow: relay.state
+        ? '0px 8px 16px rgba(0, 255, 0, 0.5)' // Tươi sáng khi bật
+        : '0px 4px 8px rgba(0, 0, 0, 0.3)',   // Sậm màu khi tắt
+      backgroundColor: relay.state
+        ? '#fff'                               // Tươi sáng khi bật
+        : '#f0f0f0',                           // Sậm màu khi tắt
       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
       '&:hover': {
         transform: 'scale(1.02)',
-        boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.2)',
+        boxShadow: relay.state
+          ? '0px 12px 24px rgba(0, 255, 0, 0.6)' // Tươi sáng hơn khi hover và bật
+          : '0px 8px 16px rgba(0, 0, 0, 0.4)',   // Sậm màu hơn khi hover và tắt
       },
     }}
   >
@@ -450,20 +457,40 @@ const RelayGrid = () => {
         </div>
       )}
 
+      {relays.map((relay, index) => {
+        if (index % 2 === 0) {
+          return (
+            <Box key={relay.relay_id} sx={{ display: 'flex', width: '100%', justifyContent: 'center' }}>
+              {/* First Relay in the pair */}
+              <RelayCard
+                key={relay.relay_id}
+                relay={relay}
+                onToggle={handleToggle}
+                onEdit={handleEditRelay}
+                onDelete={handleDelete}
+                oncheckHome={handleCheckHome}
+                showCheckboxes={showCheckboxes}
+                showDeleteIcons={showDeleteIcons}
+              />
 
-
-      {relays.map((relay) => (
-        <RelayCard
-          key={relay.relay_id}
-          relay={relay}
-          onToggle={handleToggle}
-          onEdit={handleEditRelay}
-          onDelete={handleDelete}
-          oncheckHome={handleCheckHome}
-          showCheckboxes={showCheckboxes} // Truyền state showCheckboxes vào RelayCard
-          showDeleteIcons={showDeleteIcons} // Pass this prop here
-        />
-      ))}
+              {/* Second Relay in the pair (if exists) */}
+              {relays[index + 1] && (
+                <RelayCard
+                  key={relays[index + 1].relay_id}
+                  relay={relays[index + 1]}
+                  onToggle={handleToggle}
+                  onEdit={handleEditRelay}
+                  onDelete={handleDelete}
+                  oncheckHome={handleCheckHome}
+                  showCheckboxes={showCheckboxes}
+                  showDeleteIcons={showDeleteIcons}
+                />
+              )}
+            </Box>
+          );
+        }
+        return null; // Skip rendering the second relay individually
+      })}
 
       <Box
         sx={{

@@ -5,6 +5,7 @@ import { Box, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
 import TemperatureGauge from '../Charts/TemperatureGauge';
 import HumidityGauge from '../Charts/HumidityGauge';
+import './Home.css';
 
 const Home = () => {
 
@@ -43,11 +44,13 @@ const Home = () => {
           <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>
             <Paper
               elevation={3}
+              className={`neon-effect ${relay.state ? 'on' : 'off'}`}
               sx={{
                 p: '2%',
                 textAlign: 'center',
-                bgcolor: getBoxBackgroundColor(relay.state),
-                color: getWordColor(),
+                bgcolor: getBoxBackgroundColor(relay.state), // Có thể cần cập nhật để phù hợp với màu nền
+                color: getWordColor(), // Có thể cần cập nhật để phù hợp với màu chữ
+                position: 'relative', // Đảm bảo lớp ::before được căn đúng vị trí
               }}
             >
               <Typography variant="h6">{relay.relay_name}</Typography>
@@ -56,6 +59,7 @@ const Home = () => {
           </Grid>
         ))}
       </Grid>
+
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
