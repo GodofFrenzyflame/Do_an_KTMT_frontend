@@ -9,31 +9,13 @@ const TemperatureGauge = () => {
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
   const [temperature, setTemperature] = useState(null);
 
-  const fetchTemperaturData = async (token) => {
-    try {
-      const response = await fetch('http://localhost:8080/sensor/temp', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const result = await response.json();
-      if (response.ok) {
-        setTemperature(result.data);
-      } else {
-        console.error(result.error);
-      }
-    } catch (error) {
-      console.error('Error fetching temperature data:', error);
-    }
+  const loadData = () => {
+    setTemperature(localStorage.getItem('temperature'));
   };
-
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
-    fetchTemperaturData(accessToken);
+    loadData();
     const intervalId = setInterval(() => {
-      fetchTemperaturData(accessToken);
+      loadData();
     }, 1000);
     return () => clearInterval(intervalId);
   }, []);

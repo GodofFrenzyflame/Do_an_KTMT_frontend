@@ -1,12 +1,26 @@
 @keyframes rainbowBorder {
-    0% {
-      border-image-source: linear-gradient(90deg, rgb(248, 247, 247), rgb(129, 116, 91), yellow, green, blue, indigo, rgb(223, 10, 223));
-    }
-    50% {
-      border-image-source: linear-gradient(270deg, violet, indigo, blue, rgb(62, 250, 62), rgb(136, 136, 87), orange, red);
-    }
-    100% {
-      border-image-source: linear-gradient(450deg, red, orange, yellow, rgb(96, 37, 192), rgb(211, 245, 61), rgb(3, 255, 108), rgb(252, 251, 252));
-    }
+  0% {
+    border-image-source: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
   }
-  
+  14.28% {
+    border-image-source: linear-gradient(90deg, orange, yellow, green, blue, indigo, violet, red);
+  }
+  28.56% {
+    border-image-source: linear-gradient(90deg, yellow, green, blue, indigo, violet, red, orange);
+  }
+  42.84% {
+    border-image-source: linear-gradient(90deg, green, blue, indigo, violet, red, orange, yellow);
+  }
+  57.12% {
+    border-image-source: linear-gradient(90deg, blue, indigo, violet, red, orange, yellow, green);
+  }
+  71.40% {
+    border-image-source: linear-gradient(90deg, indigo, violet, red, orange, yellow, green, blue);
+  }
+  85.68% {
+    border-image-source: linear-gradient(90deg, violet, red, orange, yellow, green, blue, indigo);
+  }
+  100% {
+    border-image-source: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+  }
+}

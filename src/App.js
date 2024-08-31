@@ -22,6 +22,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+  const timePeriods = [7, 30, 90];
 
   const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
@@ -216,6 +217,102 @@ function App() {
     }
   };
 
+  const fetchHumidityData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/sensor/humi', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        localStorage.setItem('humidity', result.data);
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching humidity data:', error);
+    }
+  };
+
+  const fetchTemperaturData = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/sensor/temp', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        localStorage.setItem('temperature', result.data);
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching temperature data:', error);
+    }
+  };
+
+
+  const fetchTemperatureHumidityData = async (token, time) => {
+    try {
+      const tempResponse = await fetch('http://localhost:8080/log/temp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ time }),
+      });
+      if (!tempResponse.ok) {
+        throw new Error('Failed to fetch temperature data');
+      }
+      const humiResponse = await fetch('http://localhost:8080/log/humi', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ time }),
+      });
+
+      if (!humiResponse.ok) {
+        throw new Error('Failed to fetch humidity data');
+      }
+
+      const tempResult = await tempResponse.json();
+      const humiResult = await humiResponse.json();
+      const humidityDataString = JSON.stringify(humiResult);
+      const temperatureDataString = JSON.stringify(tempResult);
+
+      // if (time === 30 || time === 90) {
+
+      // console.log('humi_now', humi_now);
+      // console.log('temp_now', temp_now);
+      //   const currentDate = new Date().toISOString().split('T')[0];
+      //   tempResult.push({ date: currentDate, value: humi_now });
+      //   humiResult.push({ date: currentDate, value: temp_now });
+      //   const humidityDataString = JSON.stringify(humiResult);
+      //   const temperatureDataString = JSON.stringify(tempResult);
+      //   console.log('humi_now', humidityDataString);
+      //   console.log('temp_now', temperatureDataString);
+      // }
+
+      localStorage.setItem('chart_humi' + time, humidityDataString);
+      localStorage.setItem('chart_temp' + time, temperatureDataString);
+      // console.log('chart_humi' + time, localStorage.getItem('chart_humi' + time));
+      // console.log('chart_temp' + time, localStorage.getItem('chart_temp' + time));
+
+    } catch (error) {
+      console.error('Error fetching temperature and humidity data:', error);
+    }
+  };
+
+
   useEffect(() => {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
     const accessToken = localStorage.getItem('accessToken');
@@ -227,10 +324,17 @@ function App() {
       fetchRelayGet(accessToken);
       fetchRelayGetHome(accessToken);
       fetchProfileData(accessToken);
+      fetchTemperaturData(accessToken);
+      fetchHumidityData(accessToken);
       const intervalId = setInterval(() => {
         fetchRelayGetHome(accessToken);
+        fetchTemperaturData(accessToken);
+        fetchHumidityData(accessToken);
         if (localStorage.getItem('connected') === 'false') {
           fetchConnect(accessToken, localStorage.getItem('connect'));
+          fetchTemperatureHumidityData(accessToken, 7);
+          fetchTemperatureHumidityData(accessToken, 30);
+          fetchTemperatureHumidityData(accessToken, 90);
         }
       }, 1000);
       return () => clearInterval(intervalId);
