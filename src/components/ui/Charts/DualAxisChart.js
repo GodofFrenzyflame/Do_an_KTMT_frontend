@@ -21,30 +21,32 @@ const DualAxisChart = () => {
   const token = localStorage.getItem('accessToken');
 
   const loadData = async () => {
-    const humi_now = localStorage.getItem('humidity');
     const temp_now = localStorage.getItem('temperature');
+    const humi_now = localStorage.getItem('humidity');
 
-    let humidityData = [];
     let temperatureData = [];
-    const humidityDataString = localStorage.getItem('chart_humi' + time);
+    let humidityData = [];
+
     const temperatureDataString = localStorage.getItem('chart_temp' + time);
-    if (humidityDataString) {
-      humidityData = JSON.parse(humidityDataString);
-    }
+    const humidityDataString = localStorage.getItem('chart_humi' + time);
+
     if (temperatureDataString) {
       temperatureData = JSON.parse(temperatureDataString);
+    }
+    if (humidityDataString) {
+      humidityData = JSON.parse(humidityDataString);
     }
 
     if (time === 30 || time === 90) {
       const currentDate = new Date().toISOString().split('T')[0];
-      humidityData.push({ date: currentDate, value: humi_now });
       temperatureData.push({ date: currentDate, value: temp_now });
+      humidityData.push({ date: currentDate, value: humi_now });
     }
 
-    const combinedData = humidityData.map((tempEntry, index) => ({
+    const combinedData = temperatureData.map((tempEntry, index) => ({
       time: tempEntry.date,
       temperature: tempEntry.value,
-      humidity: temperatureData[index]?.value || 0,
+      humidity: humidityData[index]?.value || 0,
     }));
     setData(combinedData);
   };
@@ -124,7 +126,7 @@ const DualAxisChart = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-  
+
         {/* Humidity Chart */}
         <div style={{ width: '48%' }}>
           <ResponsiveContainer width="100%" height={300}>
@@ -160,12 +162,12 @@ const DualAxisChart = () => {
               />
             </LineChart>
           </ResponsiveContainer>
-          
+
         </div>
-        
+
       </div>
     </div>
   );
-};  
+};
 
 export default DualAxisChart;
