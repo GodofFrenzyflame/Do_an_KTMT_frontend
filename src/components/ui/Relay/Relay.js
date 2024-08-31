@@ -26,6 +26,7 @@ const RelayCard = ({
   <Box
     className={`neon-effect ${relay.state ? 'on' : 'off'}`}
     sx={{
+      
       border: '4px solid transparent',
       borderRadius: '17px',
       padding: '16px',
@@ -432,7 +433,7 @@ const RelayGrid = () => {
     }, 400);
   };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden',marginTop: '5%'  }}>
       {showCheckboxes && (
         <div className="twin-toggle-container">
           <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
@@ -446,16 +447,31 @@ const RelayGrid = () => {
       )}
 
       {showDeleteIcons && (
-        <div className="twin-toggle-container">
-          <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
-            <div className="twin-toggle-knob"></div>
-            <div className="twin-toggle-labels">
-              <span>Cancel</span>
-              <span>Delete</span>
-            </div>
-          </div>
-        </div>
-      )}
+                <div>
+                  <IconButton
+                    onClick={handleCancel}
+                    sx={{
+                      position: 'absolute', // Thêm position để z-index có hiệu lực
+                      zIndex: 2, // Đặt layer cao hơn cho IconButton
+                      top: '97px',
+                      right: '437px',
+                      height: '30px',
+                      backgroundColor: '#f44336',
+                      color:'#ffffff',
+                      '&:hover': {
+                        backgroundColor: '#d32f2f',
+                      },
+                      borderRadius: '8px',
+                      boxShadow: 2,
+                      transition: 'background-color 0.3s ease',
+                      fontSize: '16px',
+                    }}
+
+                  >
+                    Cancel
+                  </IconButton>
+                </div>
+              )}
 
       {relays.map((relay, index) => {
         if (index % 2 === 0) {
@@ -500,6 +516,7 @@ const RelayGrid = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          
         }}
       >
         {menuOpen && (
