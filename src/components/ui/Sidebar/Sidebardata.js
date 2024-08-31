@@ -3,6 +3,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PersonIcon from '@mui/icons-material/Person';
 import RelayIcon from '@mui/icons-material/Power';
+import AvTimerIcon from '@mui/icons-material/AvTimer';
 
 export const SidebarData = [
     {
@@ -19,6 +20,11 @@ export const SidebarData = [
       title: "Relay",
       link: "/relay",
       icon: <RelayIcon />
+    },
+    {
+      title: "Schedules",
+      link: "/schedules",
+      icon: <AvTimerIcon />
     },
     {
       title: "Profile",

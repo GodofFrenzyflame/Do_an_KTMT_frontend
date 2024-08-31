@@ -14,14 +14,16 @@ import History from './components/ui/History/History';
 import AuthenticatedLayout from './components/ui/Sidebar/Sidebarlayout';
 import Relay from './components/ui/Relay/Relay';
 import Setting from './components/ui/Setting/Setting';
-
+import UpgradeSide from './components/ui/Upgrade/upgrade'
 import AppContext from './components/ui/Setting/language/AppContext';
+import Schedules from './components/ui/Schedules/Schedules';
 
 function App() {
   const { settings } = useContext(AppContext);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
+
   const timePeriods = [7, 30, 90];
 
   const refreshAccessToken = async (state) => {
@@ -445,6 +447,22 @@ function App() {
             }
           />
           <Route path="/forget" element={<Forget />} />
+          <Route path="/upgrade" element={<UpgradeSide />} />
+          
+          <Route
+            path="/schedules"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <Schedules />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />
           <Route
             path="/setting"
             element={

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, Button, Typography, Avatar, Divider } from '@mui/material';
+import { Box, Button, Typography, Avatar, Divider, Grid } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom'; 
 import AppContext from '../Setting/language/AppContext';
 import '../../../Styles/Styles.css';
@@ -79,10 +79,9 @@ export default function Sidebar({ onLogout, isOpen }) {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'blur(4px)',
+          filter: 'blur(3px)',
           zIndex: -1,
-          borderTopLeftRadius: '12px',
-          borderTopRightRadius: '12px',
+        
         }}
       />
 
@@ -121,6 +120,7 @@ export default function Sidebar({ onLogout, isOpen }) {
 
       <Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
 
+      {/* Sidebar Links */}
       <Box
         sx={{
           flexGrow: 1,
@@ -131,7 +131,6 @@ export default function Sidebar({ onLogout, isOpen }) {
           mt: 'auto',
           position: 'relative',
           zIndex: 1,
-          backgroundColor: getSidebarBackgroundColor(), 
         }}
       >
         {SidebarData.map((val, index) => (
@@ -209,6 +208,50 @@ export default function Sidebar({ onLogout, isOpen }) {
         ))}
       </Box>
 
+      {/* Upgrade Section */}
+      <Grid
+        container
+        spacing={2}
+        justifyContent="center"
+        sx={{ 
+          mb: '10%',
+          ml: '10%',
+          width: '80%',
+          bgcolor: '#fc03f8', 
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <Box sx={{ width: '100%', textAlign: 'center', mb: 2 }}>
+          <Typography variant="h6" sx={{ color: getButtonColor(), fontWeight: 'bold' }}>
+            Upgrade to Premium
+          </Typography>
+        </Box>
+        <Box sx={{ width: '100%', textAlign: 'center', mb: 2 }}>
+          <Typography variant="body2" sx={{ color: getButtonColor() }}>
+            You can get a lot more by upgrading to premium. Get all features now.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          sx={{
+            bgcolor: '#1976d2',
+            color: '#fff',
+            '&:hover': {
+              bgcolor: '#1565c0',
+            },
+            padding: '10px 20px',
+            borderRadius: '8px',
+            fontSize: '0.9em',
+          }}
+          onClick={() => navigate('/upgrade')}
+        >
+          UPGRADE NOW
+        </Button>
+      </Grid>
+
+      {/* Logout Button */}
       <Button
         variant="contained"
         fullWidth
@@ -230,6 +273,7 @@ export default function Sidebar({ onLogout, isOpen }) {
       >
         {t('Log out')}
       </Button>
+
       <Box sx={{ height: '2%' }} />
     </Box>
   );

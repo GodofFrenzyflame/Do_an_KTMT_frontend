@@ -89,77 +89,83 @@ const DualAxisChart = () => {
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* Temperature Chart */}
-        <ResponsiveContainer width="48%" height={300}>
-          <LineChart data={displayData}>
-            <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
-            <XAxis dataKey="time" />
-            <YAxis
-              yAxisId="left"
-              orientation="left"
-              stroke="#ff0000"
-              domain={temperatureDomain}
-              label={{
-                value: '°C',
-                angle: 0,
-                position: 'insideLeft',
-                style: {
-                  textAnchor: 'middle',
-                  fill: '#ff0000',
-                  fontSize: 14,
-                  fontWeight: 'bold',
-                },
-                offset: 15,
-              }}
-            />
-            <Tooltip />
-            <Legend />
-            <Line
-              yAxisId="left"
-              type="monotone"
-              dataKey="temperature"
-              stroke="#ff0000"
-              strokeWidth={3}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-
+        <div style={{ width: '48%' }}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={displayData}>
+              <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
+              <XAxis dataKey="time" />
+              <YAxis
+                yAxisId="left"
+                orientation="left"
+                stroke="#ff0000"
+                domain={temperatureDomain}
+                label={{
+                  value: '°C',
+                  angle: 0,
+                  position: 'insideLeft',
+                  style: {
+                    textAnchor: 'middle',
+                    fill: '#ff0000',
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                  },
+                  offset: 15,
+                }}
+              />
+              <Tooltip />
+              <Legend />
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="temperature"
+                stroke="#ff0000"
+                strokeWidth={3}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+  
         {/* Humidity Chart */}
-        <ResponsiveContainer width="48%" height={300}>
-          <LineChart data={displayData}>
-            <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
-            <XAxis dataKey="time" />
-            <YAxis
-              yAxisId="left"
-              orientation="left"
-              stroke="#0000ff"
-              domain={humidityDomain}
-              label={{
-                value: '%',
-                angle: 0,
-                position: 'insideLeft',
-                style: {
-                  textAnchor: 'middle',
-                  fill: '#0000ff',
-                  fontSize: 14,
-                  fontWeight: 'bold',
-                },
-                offset: 15,
-              }}
-            />
-            <Tooltip />
-            <Legend />
-            <Line
-              yAxisId="left"
-              type="monotone"
-              dataKey="humidity"
-              stroke="#0000ff"
-              strokeWidth={3}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <div style={{ width: '48%' }}>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={displayData}>
+              <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
+              <XAxis dataKey="time" />
+              <YAxis
+                yAxisId="left"
+                orientation="left"
+                stroke="#0000ff"
+                domain={humidityDomain}
+                label={{
+                  value: '%',
+                  angle: 0,
+                  position: 'insideLeft',
+                  style: {
+                    textAnchor: 'middle',
+                    fill: '#0000ff',
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                  },
+                  offset: 15,
+                }}
+              />
+              <Tooltip />
+              <Legend />
+              <Line
+                yAxisId="left"
+                type="monotone"
+                dataKey="humidity"
+                stroke="#0000ff"
+                strokeWidth={3}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+          
+        </div>
+        
       </div>
     </div>
   );
-};
+};  
 
 export default DualAxisChart;
