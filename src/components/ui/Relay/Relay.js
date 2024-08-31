@@ -26,7 +26,7 @@ const RelayCard = ({
   <Box
     className={`neon-effect ${relay.state ? 'on' : 'off'}`}
     sx={{
-      
+
       border: '4px solid transparent',
       borderRadius: '17px',
       padding: '16px',
@@ -151,12 +151,13 @@ const RelayGrid = () => {
         const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
         storedRelayData.push({ relay_id, relay_name: finalRelayName, state });
         localStorage.setItem('relays', JSON.stringify(storedRelayData));
+        toast.success('Add successfully.');
         loadData();
       } else {
-        console.error('Error:', result.message);
+        toast.error(result.error);
       }
     } catch (error) {
-      console.error('Error adding relay:', error);
+      toast.error(error);
     }
   };
 
@@ -215,12 +216,13 @@ const RelayGrid = () => {
         let storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
         storedRelayData = storedRelayData.filter(relay => relay.relay_id !== relay_id);
         localStorage.setItem('relays', JSON.stringify(storedRelayData));
+        toast.success('Delete successfully.');
         loadData();
       } else {
-        console.error('Error:', result.message);
+        toast.error(result.error);
       }
     } catch (error) {
-      console.error('Error deleting relay:', error);
+      toast.error(error);
     }
   };
 
@@ -268,10 +270,10 @@ const RelayGrid = () => {
       const result = await response.json();
       if (response.ok) {
       } else {
-        console.error('Error:', result.message);
+        console.error('Error:', result.error);
       }
     } catch (error) {
-      console.error('Error setting relay home:', error);
+      console.error('Error setting home:', error);
     }
   };
 
@@ -308,7 +310,6 @@ const RelayGrid = () => {
       console.error('Relay not found:', id);
     }
   };
-
 
   const handleToggle = (id) => {
     const relay = relays.find(relay => relay.relay_id === id);
@@ -389,8 +390,11 @@ const RelayGrid = () => {
       ));
       const filteredRelays = storedRelayData.filter(relay => relay.relay_home === true);
       localStorage.setItem('relays_home', JSON.stringify(filteredRelays));
+      localStorage.removeItem('relays_home_add');
+      toast.success('Add to home successfully.');
       handleCancel();
     } catch (error) {
+      toast.error(error)
       console.error('Error in handleAccept:', error);
     }
   }
@@ -433,7 +437,7 @@ const RelayGrid = () => {
     }, 400);
   };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden',marginTop: '5%'  }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%' }}>
       {showCheckboxes && (
         <div className="twin-toggle-container">
           <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
@@ -447,31 +451,31 @@ const RelayGrid = () => {
       )}
 
       {showDeleteIcons && (
-                <div>
-                  <IconButton
-                    onClick={handleCancel}
-                    sx={{
-                      position: 'absolute', // Thêm position để z-index có hiệu lực
-                      zIndex: 2, // Đặt layer cao hơn cho IconButton
-                      top: '97px',
-                      right: '437px',
-                      height: '30px',
-                      backgroundColor: '#f44336',
-                      color:'#ffffff',
-                      '&:hover': {
-                        backgroundColor: '#d32f2f',
-                      },
-                      borderRadius: '8px',
-                      boxShadow: 2,
-                      transition: 'background-color 0.3s ease',
-                      fontSize: '16px',
-                    }}
+        <div>
+          <IconButton
+            onClick={handleCancel}
+            sx={{
+              position: 'absolute', // Thêm position để z-index có hiệu lực
+              zIndex: 2, // Đặt layer cao hơn cho IconButton
+              top: '97px',
+              right: '437px',
+              height: '30px',
+              backgroundColor: '#f44336',
+              color: '#ffffff',
+              '&:hover': {
+                backgroundColor: '#d32f2f',
+              },
+              borderRadius: '8px',
+              boxShadow: 2,
+              transition: 'background-color 0.3s ease',
+              fontSize: '16px',
+            }}
 
-                  >
-                    Cancel
-                  </IconButton>
-                </div>
-              )}
+          >
+            Cancel
+          </IconButton>
+        </div>
+      )}
 
       {relays.map((relay, index) => {
         if (index % 2 === 0) {
@@ -516,7 +520,7 @@ const RelayGrid = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          
+
         }}
       >
         {menuOpen && (
