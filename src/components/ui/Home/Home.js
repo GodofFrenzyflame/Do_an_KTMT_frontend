@@ -13,7 +13,7 @@ const Home = () => {
 
   const { settings } = useContext(AppContext);
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
-  const getBoxBackgroundColor = () => settings.color === 'dark' ? '#212121' : '#caccca';
+
 
   const gridItemWidths = {
     1: 12,
@@ -48,7 +48,6 @@ const Home = () => {
               sx={{
                 p: '2%',
                 textAlign: 'center',
-                bgcolor: getBoxBackgroundColor(relay.state), // Có thể cần cập nhật để phù hợp với màu nền
                 color: getWordColor(), // Có thể cần cập nhật để phù hợp với màu chữ
                 position: 'relative', // Đảm bảo lớp ::before được căn đúng vị trí
               }}
@@ -63,25 +62,33 @@ const Home = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
+          <Paper elevation={3} className="chart-container" sx={{background: `linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.6) 5%, 
+                    rgba(255, 255, 255, 1) 100%)`,}}>
             <TemperatureGauge />
           </Paper>
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Paper elevation={3} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
+          <Paper elevation={3} className="chart-container" sx={{ background: `linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.6) 5%, 
+                    rgba(255, 255, 255, 1) 100%)`, }}>
             <HumidityGauge />
           </Paper>
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Paper elevation={10} className="chart-container" sx={{ bgcolor: getBoxBackgroundColor() }}>
+          <Paper elevation={10} className="chart-container" sx={{ background: `linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.6) 5%, 
+                    rgba(255, 255, 255, 1) 100%)`,}}>
             <Map />
           </Paper>
         </Grid>
       </Grid>
 
-      <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', bgcolor: getBoxBackgroundColor(), color: getWordColor(), mt: '1%' }}>
+      <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', background: `linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.6) 5%, 
+                    rgba(255, 255, 255, 1) 100%)`, color: getWordColor(), mt: '1%' }}>
         <Typography variant="h6">Temperature & Humidity</Typography>
         <DualAxisChart /> {/* Replace History with DualAxisChart */}
       </Paper>

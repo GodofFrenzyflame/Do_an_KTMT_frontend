@@ -526,7 +526,7 @@ const RelayGrid = () => {
         {menuOpen && (
           <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {/* Nút Add New Card */}
-            <Tooltip title="Add new card" placement="left">
+            <Tooltip title="Add new Relay" placement="left">
               <IconButton
                 onClick={handleAddCard}
                 sx={{
@@ -544,7 +544,7 @@ const RelayGrid = () => {
             </Tooltip>
 
             {/* Nút Add to Home */}
-            <Tooltip title="Add to Home" placement="left">
+            <Tooltip title="Add Relay to Home" placement="left">
               <IconButton
                 onClick={handleAddToHome}
                 sx={{
@@ -562,7 +562,7 @@ const RelayGrid = () => {
             </Tooltip>
 
             {/* Nút Delete */}
-            <Tooltip title="Delete card" placement="left">
+            <Tooltip title="Delete Relay" placement="left">
               <IconButton
                 onClick={handleDeleteMode}
                 sx={{

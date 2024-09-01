@@ -48,6 +48,9 @@ export default function MiniSidebar({ onLogout, isOpen }) {
         padding: '10px', // Thêm khoảng trống bên trong
         boxSizing: 'border-box', // Đảm bảo padding không ảnh hưởng đến chiều rộng thực tế
         alignItems: 'center',
+        background: `linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0.6) 5%, 
+        rgba(255, 255, 255, 1) 100%)`,
       }}
     >
       {/* Avatar */}

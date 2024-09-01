@@ -18,6 +18,7 @@ export default function Sidebar({ onLogout, isOpen }) {
   const [avatar, setAvatar] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [coverPhoto, setCoverPhoto] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -25,8 +26,10 @@ export default function Sidebar({ onLogout, isOpen }) {
         const savedAvatar = localStorage.getItem('avatar');
         const savedUsername = localStorage.getItem('username');
         const savedEmail = localStorage.getItem('email');
+        const savedCoverPhoto = localStorage.getItem('coverPhoto');
 
         setAvatar(savedAvatar || '');
+        setCoverPhoto(savedCoverPhoto || '');
         setUsername(savedUsername || 'User');
         setEmail(savedEmail || 'user@example.com');
       } catch (error) {
@@ -62,10 +65,8 @@ export default function Sidebar({ onLogout, isOpen }) {
         overflow: 'hidden',
         transition: 'visibility 0.3s, width 0.3s',
         background: `linear-gradient(to bottom, 
-                    rgba(255, 255, 255, 0.6) 5%, 
-                    rgba(255, 255, 255, 0.6) 20%, 
-                    ${getSidebarBackgroundColor()} 20%, 
-                    ${getSidebarBackgroundColor()} 100%)`,
+                    rgba(255, 255, 255, 0.9) 5%, 
+                    rgba(255, 255, 255, 1) 100%)`,
       }}
     >
       <Box
@@ -156,7 +157,6 @@ export default function Sidebar({ onLogout, isOpen }) {
             ? {} // Do not apply hover styles when the item is active
             : {
                 border: '1.5px solid gray', // Gray border on hover if not active
-                backgroundColor: getSidebarBackgroundColor(), // Lighter background on hover for non-active items
               }),
         },
       }}

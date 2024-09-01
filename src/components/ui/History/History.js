@@ -9,8 +9,7 @@ const History = () => {
   const [filteredHistory, setFilteredHistory] = useState([]);
   const { settings } = useContext(AppContext);
   const [error, setError] = useState('');
-
-  const getBoxBackgroundColor = () => settings.color === 'dark' ? '#212121' : '#ffffff'; // Fixed color code
+  
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
 
   useEffect(() => {
@@ -91,9 +90,11 @@ const History = () => {
       <Paper sx={{
         p: 3, height: 'calc(100% - 64px)',
         overflowY: 'auto', width: '75%', mx: 'auto', mt: 3, border: '2px solid #ccc',
-        bgcolor: getBoxBackgroundColor(),
         color: getWordColor(),
         borderRadius: '16px',
+        background: `linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0.6) 5%, 
+        rgba(255, 255, 255, 1) 100%)`,
       }}>
         {error && (
           <Typography color="error" sx={{ mb: 3, textAlign: 'center', fontSize: '1.5rem' }}>

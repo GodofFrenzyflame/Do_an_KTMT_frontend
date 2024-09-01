@@ -4,24 +4,9 @@ import PasswordDialog from './ChangePass';
 import { InputAdornment } from '@mui/material';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 
 const token = localStorage.getItem('accessToken');
-
-// const showToast = (message, type) => {
-//   Toastify({
-//     text: message,
-//     duration: 4000,
-//     close: true,
-//     gravity: "top",
-//     position: "center",
-//     backgroundColor: type === 'success'
-//       ? 'linear-gradient(to right, #28a745, #218838)'
-//       : 'linear-gradient(to right, #dc3545, #c82333)',
-//     stopOnFocus: true,
-//     className: type,
-//     onClick: () => { }
-//   }).showToast();
-// };
 
 const showAlert = (message, type) => {
   Swal.fire({
@@ -43,6 +28,8 @@ const Profile = () => {
   const [aioKey, setAioPassword] = useState('');
   const [avatar, setAvatar] = useState('');
   const [originalAvatar, setOriginalAvatar] = useState('');
+  const [coverPhoto, setCoverPhoto] = useState('');
+  const [originalCoverPhoto, setOriginalCoverPhoto] = useState('');
   const [isEditable, setIsEditable] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
@@ -61,6 +48,13 @@ const Profile = () => {
     } else {
       setAvatar('');
       setOriginalAvatar('');
+    }
+    if (localStorage.getItem('coverPhoto')) {
+      setCoverPhoto(localStorage.getItem('coverPhoto'));
+      setOriginalCoverPhoto(localStorage.getItem('coverPhoto'));
+    } else {
+      setCoverPhoto('');
+      setOriginalCoverPhoto('');
     }
   };
 
@@ -81,9 +75,13 @@ const Profile = () => {
     formData.append('AIO_USERNAME', aioUser);
     formData.append('AIO_KEY', aioKey);
     formData.append('webServerIp', webServerIp);
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput && fileInput.files[0]) {
-      formData.append('avatar', fileInput.files[0]);
+    const fileInputAvatar = document.querySelector('input[name="avatar"]');
+    const fileInputCover = document.querySelector('input[name="coverPhoto"]');
+    if (fileInputAvatar && fileInputAvatar.files[0]) {
+      formData.append('avatar', fileInputAvatar.files[0]);
+    }
+    if (fileInputCover && fileInputCover.files[0]) {
+      formData.append('coverPhoto', fileInputCover.files[0]);
     }
     try {
       const response = await fetch('http://localhost:8080/profile/edit', {
@@ -107,6 +105,10 @@ const Profile = () => {
           const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
           localStorage.setItem('avatar', avatarSrc);
         }
+        if (result.data.coverPhoto) {
+          const coverPhotoSrc = `data:${result.data.coverPhoto.contentType};base64,${result.data.coverPhoto.data}`;
+          localStorage.setItem('coverPhoto', coverPhotoSrc);
+        }
         toast.success('Profile saved!');
         loadData();
       } else {
@@ -125,6 +127,7 @@ const Profile = () => {
     loadData();
     setIsEditable(false);
     setAvatar(originalAvatar);
+    setCoverPhoto(originalCoverPhoto);
   };
 
   const handleAvatarChange = (event) => {
@@ -133,6 +136,17 @@ const Profile = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCoverPhotoChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverPhoto(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -162,16 +176,86 @@ const Profile = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto', }}>
-      <Paper sx={{ p: 3, borderRadius: '17px' }}>
-        {/* Avatar Section */}
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <Avatar src={avatar} sx={{ width: 100, height: 100, mr: 2 }} />
+      <Paper sx={{ p: 3, borderRadius: '17px' ,background: `linear-gradient(to bottom, 
+                    rgba(255, 255, 255, 0.6) 5%, 
+                    rgba(255, 255, 255, 1) 100%)`,}}>
+        {/* Cover Photo Section */}
+        <Box
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: 200, // Adjust height as needed
+            backgroundImage: `url(${coverPhoto})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: '17px',
+            border: '1px solid #ddd', // Border around the cover photo
+            mb: 2,
+          }}
+        >
           {isEditable && (
-            <Button variant="contained" component="label">
-              Upload Avatar
-              <input type="file" hidden onChange={handleAvatarChange} />
+            <Button
+              variant="contained"
+              component="label"
+              sx={{
+                position: 'absolute',
+                bottom: 16,
+                right: 16,
+                bgcolor: '#ffffff',
+                color: '#000',
+                fontSize: '0.75rem', // Kích thước chữ nhỏ hơn
+                padding: '4px 8px', // Kích thước nút nhỏ hơn
+                '&:hover': {
+                  bgcolor: '#e0e0e0',
+                },
+              }}
+            >
+              Upload Cover Photo
+              <input
+                type="file"
+                name="coverPhoto"
+                hidden
+                onChange={handleCoverPhotoChange}
+              />
             </Button>
           )}
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              mb: 2,
+            }}
+          >
+            <Avatar src={avatar} sx={{ width: 100, height: 100,top:15, }} />
+            {isEditable && (
+              <Button
+                variant="contained"
+                component="label"
+                sx={{
+                  position: 'absolute',
+                  bottom: 0,
+                  right: 0,
+                  bgcolor: '#ffffff',
+                  color: '#000',
+                  padding: '1px 1px', // Kích thước nút nhỏ hơn
+                  borderRadius: '20px',
+                  '&:hover': {
+                    bgcolor: '#e0e0e0',
+                  },
+                }}
+              >
+                <CameraAltIcon />
+                <input
+                  type="file"
+                  name="avatar"
+                  hidden
+                  onChange={handleAvatarChange}
+                />
+              </Button>
+            )}
+          </Box>
         </Box>
 
         {/* Profile Form */}
@@ -231,9 +315,6 @@ const Profile = () => {
               }}
             />
           </Grid>
-          {/*Webserver  */}
-
-
           <Grid item xs={12}>
             <TextField
               label="Password"
@@ -259,7 +340,6 @@ const Profile = () => {
               }}
             />
           </Grid>
-
           <Grid item xs={12}>
             <TextField
               label="AIO User"
