@@ -122,91 +122,73 @@ export default function Sidebar({ onLogout, isOpen }) {
 
       {/* Sidebar Links */}
       <Box
+  sx={{
+    flexGrow: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+    mt: 'auto',
+    position: 'relative',
+    borderRadius: '12px',
+    zIndex: 1,
+  }}
+>
+  {SidebarData.map((val, index) => (
+    <Box
+      key={index}
+      onClick={() => navigate(val.link)}
+      sx={{
+        width: '90%',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '12px 0',
+        mb: 1,
+        borderRadius: '12px',
+        position: 'relative',
+        cursor: 'pointer',
+        overflow: 'hidden',
+        animation: isActive(val.link) ? 'rainbowBorder 5s infinite linear' : 'none', // Apply rainbow animation if active
+        border: isActive(val.link) ? '1.5px solid transparent' : '2px solid transparent', // Use a border and keep it transparent for animation
+        borderImage: isActive(val.link) ? 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet) 1' : 'none', // Set border image for active state
+        '&:hover': {
+          ...(isActive(val.link)
+            ? {} // Do not apply hover styles when the item is active
+            : {
+                border: '1.5px solid gray', // Gray border on hover if not active
+                backgroundColor: getSidebarBackgroundColor(), // Lighter background on hover for non-active items
+              }),
+        },
+      }}
+    >
+      <Box
         sx={{
-          flexGrow: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
-          mt: 'auto',
-          position: 'relative',
-          zIndex: 1,
+          color: getButtonColor(),
+          fontSize: '1.5em',
+          marginLeft: '17%',
+          mr: 2,
         }}
       >
-        {SidebarData.map((val, index) => (
-          <Box
-          key={index}
-          onClick={() => navigate(val.link)}
-          sx={{
-            width: '90%',
-            display: 'flex',
-            justifyContent: 'flex-start',
-            padding: '12px 0',
-            mb: 1,
-            borderRadius: '12px',
-            position: 'relative',
-            backgroundColor: getSidebarBackgroundColor(),
-            cursor: 'pointer',
-            transition: 'border 0.3s, border-image 0.3s',
-            zIndex: 0,
-            overflow: 'hidden',
-            
-            // Ensuring the border color remains consistent
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              borderRadius: '12px',
-              border: isActive(val.link) ? '2px solid transparent' : 'none',
-              borderImage: isActive(val.link) ? 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)' : 'none',
-              borderImageSlice: '1',
-              animation: isActive(val.link) ? 'rainbowBorder 5s infinite linear' : 'none',
-              zIndex: 0,
-              boxSizing: 'border-box',
-              pointerEvents: 'none',
-            },
-        
-            // Hover styles
-            '&:hover': {
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                borderRadius: '12px',
-                border: '2px solid gray', // Gray border on hover
-                borderImage: 'none',
-                zIndex: -1,
-              },
-            },
-          }}
-        >
-          <Box sx={{ color: getButtonColor(), fontSize: '1.5em', mr: 2, marginLeft: '17%' }}>
-            {val.icon}
-          </Box>
-          <Typography
-            variant="body1"
-            sx={{
-              color: getButtonColor(),
-              fontWeight: isActive(val.link) ? 'bold' : 'normal',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              textAlign: 'left',
-              marginLeft: '10%',
-            }}
-          >
-            {val.title}
-          </Typography>
-        </Box>
-        
-        ))}
+        {val.icon}
       </Box>
+      <Typography
+        variant="body1"
+        sx={{
+          color: getButtonColor(),
+          fontWeight: isActive(val.link) ? 'bold' : 'normal',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          textAlign: 'left',
+          marginLeft: '10%',
+        }}
+      >
+        {val.title}
+      </Typography>
+    </Box>
+  ))}
+</Box>
+<Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
 
       {/* Upgrade Section */}
       <Grid
