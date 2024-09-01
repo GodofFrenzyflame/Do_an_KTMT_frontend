@@ -8,6 +8,7 @@ import ProfileIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AppContext from '../Setting/language/AppContext';
+import AvTimerIcon from '@mui/icons-material/AvTimer';
 import '../../../Styles/Styles.css';
 
 export default function MiniSidebar({ onLogout, isOpen }) {
@@ -36,7 +37,7 @@ export default function MiniSidebar({ onLogout, isOpen }) {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: '350px', // Đặt chiều cao của sidebar để nó chiếm toàn bộ chiều cao màn hình
+        height: 'auto', // Đặt chiều cao của sidebar để nó chiếm toàn bộ chiều cao màn hình
         width: '60px', // Đặt chiều rộng phù hợp với kích thước của các nút
         backgroundColor: getSidebarBackgroundColor(),
         position: 'fixed',
@@ -111,6 +112,26 @@ export default function MiniSidebar({ onLogout, isOpen }) {
             }}
           >
             <RelayIcon />
+          </IconButton>
+        </Link>
+        
+        <Link to="/schedules" style={{ textDecoration: 'none' }}>
+          <IconButton
+            sx={{
+              bgcolor: getBackgroundColor(isActive('/schedules')),
+              color: getButtonColor(),
+              marginBottom: '10%',
+              '&:hover': {
+                bgcolor: settings.color === 'dark' ? '#2b35af' : '#2b35af',
+              },
+              fontSize: '1.5rem',
+              width: '100%',
+              height: '40px',
+              justifyContent: 'center',
+              zIndex: 1201,
+            }}
+          >
+            <AvTimerIcon />
           </IconButton>
         </Link>
 

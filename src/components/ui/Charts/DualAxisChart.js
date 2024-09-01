@@ -18,7 +18,7 @@ const DualAxisChart = () => {
   const { settings } = useContext(AppContext);
   const getWordColor = () => (settings.color === 'dark' ? '#ffffff' : '#000000');
 
-  const token = localStorage.getItem('accessToken');
+  // const token = localStorage.getItem('accessToken');
 
   const loadData = async () => {
     const temp_now = localStorage.getItem('temperature');

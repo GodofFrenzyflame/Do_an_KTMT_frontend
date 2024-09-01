@@ -24,7 +24,7 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
-  const timePeriods = [7, 30, 90];
+  // const timePeriods = [7, 30, 90];
 
   const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
