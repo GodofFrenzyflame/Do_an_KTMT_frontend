@@ -46,7 +46,6 @@ export default function Sidebar({ onLogout, isOpen }) {
 
   const getButtonColor = () => (settings.color === 'dark' ? '#fff' : '#000');
 
-  const getSidebarBackgroundColor = () => (settings.color === 'dark' ? '#333' : '#e6e3e3');
 
   return (
     <Box
@@ -55,7 +54,7 @@ export default function Sidebar({ onLogout, isOpen }) {
         width: sidebarWidth,
         display: 'flex',
         flexDirection: 'column',
-        height: '97vh',
+        height: '97%',
         position: 'fixed',
         top: 10,
         left: 10,
@@ -76,11 +75,11 @@ export default function Sidebar({ onLogout, isOpen }) {
           left: 0,
           width: '100%',
           height: '22%',
-          backgroundImage: `url(${avatar})`,
+          backgroundImage: `url(${coverPhoto})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'blur(3px)',
+          filter: 'blur(2px)',
           zIndex: -1,
         
         }}
@@ -91,14 +90,14 @@ export default function Sidebar({ onLogout, isOpen }) {
           display: 'flex',
           alignItems: 'center',
           padding: '10px',
-          mb: '20%',
+          mb: '10%',
           mt: '20%',
           visibility: visibility,
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2, ml: 4, mb: 1 }} />
+        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2, ml: 4 }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ color: getButtonColor() }}>
             {username}
@@ -110,8 +109,7 @@ export default function Sidebar({ onLogout, isOpen }) {
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              maxWidth: '180px',
-              mb: 1,
+              maxWidth: '160px',
             }}
           >
             {email}
@@ -119,76 +117,76 @@ export default function Sidebar({ onLogout, isOpen }) {
         </Box>
       </Box>
 
-      <Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
+      <Divider sx={{ width: '90%', margin: '0 auto', mb: 1, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
 
       {/* Sidebar Links */}
       <Box
-  sx={{
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    mt: 'auto',
-    position: 'relative',
-    borderRadius: '12px',
-    zIndex: 1,
-  }}
->
-  {SidebarData.map((val, index) => (
-    <Box
-      key={index}
-      onClick={() => navigate(val.link)}
-      sx={{
-        width: '90%',
-        display: 'flex',
-        alignItems: 'center',
-        padding: '12px 0',
-        mb: 1,
-        borderRadius: '12px',
-        position: 'relative',
-        cursor: 'pointer',
-        overflow: 'hidden',
-        animation: isActive(val.link) ? 'rainbowBorder 5s infinite linear' : 'none', // Apply rainbow animation if active
-        border: isActive(val.link) ? '1.5px solid transparent' : '2px solid transparent', // Use a border and keep it transparent for animation
-        borderImage: isActive(val.link) ? 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet) 1' : 'none', // Set border image for active state
-        '&:hover': {
-          ...(isActive(val.link)
-            ? {} // Do not apply hover styles when the item is active
-            : {
-                border: '1.5px solid gray', // Gray border on hover if not active
-              }),
-        },
-      }}
-    >
-      <Box
         sx={{
-          color: getButtonColor(),
-          fontSize: '1.5em',
-          marginLeft: '17%',
-          mr: 2,
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          width: '100%',
+          mt: 'auto',
+          position: 'relative',
+          borderRadius: '12px',
+          zIndex: 1,
         }}
       >
-        {val.icon}
+        {SidebarData.map((val, index) => (
+          <Box
+            key={index}
+            onClick={() => navigate(val.link)}
+            sx={{
+              width: '90%',
+              display: 'flex',
+              alignItems: 'center',
+              padding: '12px 0',
+              mb: 0.5,
+              borderRadius: '12px',
+              position: 'relative',
+              cursor: 'pointer',
+              overflow: 'hidden',
+              animation: isActive(val.link) ? 'rainbowBorder 5s infinite linear' : 'none', // Apply rainbow animation if active
+              border: isActive(val.link) ? '1.5px solid transparent' : '2px solid transparent', // Use a border and keep it transparent for animation
+              borderImage: isActive(val.link) ? 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet) 1' : 'none', // Set border image for active state
+              '&:hover': {
+                ...(isActive(val.link)
+                  ? {} // Do not apply hover styles when the item is active
+                  : {
+                      border: '1.5px solid gray', // Gray border on hover if not active
+                    }),
+              },
+            }}
+          >
+            <Box
+              sx={{
+                color: getButtonColor(),
+                fontSize: '1.5em',
+                marginLeft: '17%',
+                mr: 2,
+              }}
+            >
+              {val.icon}
+            </Box>
+            <Typography
+              variant="body1"
+              sx={{
+                color: getButtonColor(),
+                fontWeight: isActive(val.link) ? 'bold' : 'normal',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textAlign: 'left',
+                marginLeft: '10%',
+              }}
+            >
+              {val.title}
+            </Typography>
+          </Box>
+        ))}
       </Box>
-      <Typography
-        variant="body1"
-        sx={{
-          color: getButtonColor(),
-          fontWeight: isActive(val.link) ? 'bold' : 'normal',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          textAlign: 'left',
-          marginLeft: '10%',
-        }}
-      >
-        {val.title}
-      </Typography>
-    </Box>
-  ))}
-</Box>
-<Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
+      <Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
 
       {/* Upgrade Section */}
       <Grid
@@ -199,20 +197,36 @@ export default function Sidebar({ onLogout, isOpen }) {
           mb: '10%',
           ml: '10%',
           width: '80%',
-          bgcolor: '#fc03f8', 
           borderRadius: '12px',
           padding: '16px',
           boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+          zIndex: 2,
+          position: 'relative', // Thêm position relative để các phần tử con có thể định vị chính xác
         }}
       >
-        <Box sx={{ width: '100%', textAlign: 'center', mb: 2 }}>
-          <Typography variant="h6" sx={{ color: getButtonColor(), fontWeight: 'bold' }}>
-            Upgrade to Premium
+        <Box
+          sx={{ 
+            backgroundImage: 'url("/static/CardOCB.png")',
+            backgroundSize: 'cover', // Đảm bảo hình ảnh phủ toàn bộ phần tử
+            backgroundPosition: 'center', // Đặt hình ảnh ở giữa phần tử
+            filter: 'blur(1px)', // Làm mờ hình ảnh nền
+            borderRadius: '12px',
+            position: 'absolute', // Đặt hình ảnh nền ở phía dưới cùng
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 0, // Đặt hình ảnh nền dưới cùng
+          }}
+        />       
+        <Box sx={{ width: '100%', textAlign: 'center', mb: 1, position: 'relative', zIndex: 1 }}>
+          <Typography variant="h6" sx={{ color: getButtonColor(), fontWeight: 'bold', fontSize: '15px' }}>
+            {t('Upgrade to Premium')}
           </Typography>
         </Box>
-        <Box sx={{ width: '100%', textAlign: 'center', mb: 2 }}>
-          <Typography variant="body2" sx={{ color: getButtonColor() }}>
-            You can get a lot more by upgrading to premium. Get all features now.
+        <Box sx={{ width: '100%', textAlign: 'center', mb: 1, position: 'relative', zIndex: 1 }}>
+          <Typography variant="body2" sx={{ color: getButtonColor(), fontSize: '10px' }}>
+            {t('You can get a lot more by upgrading to premium. Get all features now.')}
           </Typography>
         </Box>
         <Button
@@ -225,11 +239,13 @@ export default function Sidebar({ onLogout, isOpen }) {
             },
             padding: '10px 20px',
             borderRadius: '8px',
-            fontSize: '0.9em',
+            fontSize: '0.5em',
+            position: 'relative', // Đảm bảo nút không bị ảnh hưởng bởi lớp phủ mờ
+            zIndex: 1,
           }}
           onClick={() => navigate('/upgrade')}
         >
-          UPGRADE NOW
+          {t('UPGRADE NOW')}
         </Button>
       </Grid>
 

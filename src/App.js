@@ -24,8 +24,6 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
-  // const timePeriods = [7, 30, 90];
-
   const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
     try {
@@ -204,13 +202,8 @@ function App() {
         localStorage.setItem('AIO_USERNAME', result.data.AIO_USERNAME !== undefined ? result.data.AIO_USERNAME : '');
         localStorage.setItem('AIO_KEY', result.data.AIO_KEY !== undefined ? result.data.AIO_KEY : '');
         localStorage.setItem('webServerIp', result.data.webServerIp !== undefined ? result.data.webServerIp : '');
-        if (result.data.avatar) {
-          const avatarSrc = `data:${result.data.avatar.contentType};base64,${result.data.avatar.data}`;
-          localStorage.setItem('avatar', avatarSrc);
-        }
-        else {
-          localStorage.setItem('avatar', '');
-        }
+        setImageInLocalStorage('avatar', result.data.avatar);
+        setImageInLocalStorage('coverPhoto', result.data.coverPhoto);
       } else {
         console.error(result.error);
       }
@@ -259,7 +252,6 @@ function App() {
     }
   };
 
-
   const fetchTemperatureHumidityData = async (token, time) => {
     try {
       const tempResponse = await fetch('http://localhost:8080/log/temp', {
@@ -291,29 +283,52 @@ function App() {
       const humidityDataString = JSON.stringify(humiResult);
       const temperatureDataString = JSON.stringify(tempResult);
 
-      // if (time === 30 || time === 90) {
-
-      // console.log('humi_now', humi_now);
-      // console.log('temp_now', temp_now);
-      //   const currentDate = new Date().toISOString().split('T')[0];
-      //   tempResult.push({ date: currentDate, value: humi_now });
-      //   humiResult.push({ date: currentDate, value: temp_now });
-      //   const humidityDataString = JSON.stringify(humiResult);
-      //   const temperatureDataString = JSON.stringify(tempResult);
-      //   console.log('humi_now', humidityDataString);
-      //   console.log('temp_now', temperatureDataString);
-      // }
-
       localStorage.setItem('chart_humi' + time, humidityDataString);
       localStorage.setItem('chart_temp' + time, temperatureDataString);
-      // console.log('chart_humi' + time, localStorage.getItem('chart_humi' + time));
-      // console.log('chart_temp' + time, localStorage.getItem('chart_temp' + time));
 
     } catch (error) {
       console.error('Error fetching temperature and humidity data:', error);
     }
   };
 
+  const fetchScheduleGet = async (token) => {
+    try {
+      const response = await fetch('http://localhost:8080/schedule/get', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      const result = await response.json();
+      if (response.ok) {
+        const scheduleToStore = result.map(schedule => ({
+          schedule_id: schedule.schedule_id,
+          schedule_name: schedule.schedule_name,
+          state: schedule.state,
+          day: schedule.day,
+          time: schedule.time,
+          schedule_actions: schedule.actions,
+        }));
+
+        const scheduleJSON = JSON.stringify(scheduleToStore);
+        localStorage.setItem('schedule', scheduleJSON);
+      } else {
+        console.error(result.error);
+      }
+    } catch (error) {
+      console.error('Error fetching status:', error);
+    }
+  }
+
+  const setImageInLocalStorage = (key, data) => {
+    if (data) {
+      const src = `data:${data.contentType};base64,${data.data}`;
+      localStorage.setItem(key, src);
+    } else {
+      localStorage.setItem(key, '');
+    }
+  };
 
   useEffect(() => {
     const storedLoggedInStatus = localStorage.getItem('isLoggedIn');
@@ -328,6 +343,7 @@ function App() {
       fetchProfileData(accessToken);
       fetchTemperaturData(accessToken);
       fetchHumidityData(accessToken);
+      fetchScheduleGet(accessToken);
       const intervalId = setInterval(() => {
         fetchRelayGetHome(accessToken);
         fetchTemperaturData(accessToken);
@@ -446,9 +462,20 @@ function App() {
                 : <Navigate to="/" />
             }
           />
-          <Route path="/forget" element={<Forget />} />
-          <Route path="/upgrade" element={<UpgradeSide />} />
-          
+          <Route
+            path="/upgrade"
+            element={
+              isLoggedIn ?
+                <AuthenticatedLayout
+                  isSidebarOpen={isSidebarOpen}
+                  toggleSidebar={toggleSidebar}
+                  onLogout={handleLogout}
+                >
+                  <UpgradeSide  />
+                </AuthenticatedLayout>
+                : <Navigate to="/" />
+            }
+          />  
           <Route
             path="/schedules"
             element={

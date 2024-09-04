@@ -14,15 +14,7 @@ import { toast } from 'react-toastify';
 
 const token = localStorage.getItem('accessToken');
 
-const RelayCard = ({
-  relay,
-  onToggle,
-  onEdit,
-  onDelete,
-  oncheckHome,
-  showCheckboxes,
-  showDeleteIcons
-}) => (
+const RelayCard = ({ relay,  onToggle,  onEdit,  onDelete,  oncheckHome,  showCheckboxes,  showDeleteIcons}) => (
   <Box
     className={`neon-effect ${relay.state ? 'on' : 'off'}`}
     sx={{
@@ -115,23 +107,24 @@ const RelayGrid = () => {
 
   useEffect(() => {
     loadData();
-    const url = "ws://" + localStorage.getItem('webServerIp') + "/ws";
-    const websocket = new WebSocket(url);
+    if (localStorage.getItem('connect') === 'WSV') {
+      const url = "ws://" + localStorage.getItem('webServerIp') + "/ws";
+      const websocket = new WebSocket(url);
 
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.index !== undefined && data.state !== undefined) {
-        setRelays((prevRelays) =>
-          prevRelays.map((relay) =>
-            relay.relay_id === data.index ? { ...relay, state: data.state === 'ON' } : relay
-          )
-        );
-      }
-    };
-
-    return () => {
-      websocket.close();
-    };
+      websocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.index !== undefined && data.state !== undefined) {
+          setRelays((prevRelays) =>
+            prevRelays.map((relay) =>
+              relay.relay_id === data.index ? { ...relay, state: data.state === 'ON' } : relay
+            )
+          );
+        }
+      };
+      return () => {
+        websocket.close();
+      };
+    }
   }, []);
 
   const fetchRelayAdd = async (relay_id, relay_name, state) => {
@@ -633,8 +626,21 @@ const RelayGrid = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveCard}>Save</Button>
+          <Button onClick={() => setDialogOpen(false)} sx={{ 
+            color: '#ff0000',
+            '&:hover': {
+                 bgcolor: '#ff0000' ,
+                 color: '#fff'
+            },
+          }}>Cancel</Button>
+          <Button onClick={handleSaveCard}  sx={{ 
+            color: '#0004ff',
+            bgcolor: '#fff',
+            '&:hover': {
+                 bgcolor: '#0004ff' ,
+                 color: '#fff'
+            },
+          }}>Save</Button>
         </DialogActions>
       </Dialog>
 
@@ -675,8 +681,21 @@ const RelayGrid = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveEdit}>Save</Button>
+          <Button onClick={() => setEditDialogOpen(false)} sx={{ 
+            color: '#ff0000',
+            '&:hover': {
+                 bgcolor: '#ff0000' ,
+                 color: '#fff'
+            },
+          }}>Cancel</Button>
+          <Button onClick={handleSaveEdit}  sx={{ 
+            color: '#0004ff',
+            bgcolor: '#fff',
+            '&:hover': {
+                 bgcolor: '#0004ff' ,
+                 color: '#fff'
+            },
+          }}>Save</Button>
         </DialogActions>
       </Dialog>
     </Box>

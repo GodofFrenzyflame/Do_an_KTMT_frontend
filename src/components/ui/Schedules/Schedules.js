@@ -1,32 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle,
-  Typography, IconButton, Switch, Checkbox, Tooltip
+  Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Typography, IconButton,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+  Switch, Checkbox, Tooltip, Grid
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AppIcon from '@mui/icons-material/Apps';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'; // Biểu tượng cho Add New Relay
-import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
-import './Schedules.css'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+
 import { toast } from 'react-toastify';
 
 const token = localStorage.getItem('accessToken');
 
-const ScheduleCard = ({
-  relay,
-  onToggle,
-  onEdit,
-  onDelete,
-  oncheckHome,
-  showCheckboxes,
-  showDeleteIcons
-}) => (
-
+const SchedulesCard = ({ schedule, onToggle, onEdit, onDelete, showDeleteIcons }) => (
   <Box
-    className={`neon-effect ${relay.state ? 'on' : 'off'}`}
+    className={`neon-effect ${schedule.state ? 'on' : 'off'}`}
     sx={{
-
       border: '4px solid transparent',
       borderRadius: '17px',
       padding: '16px',
@@ -35,122 +25,140 @@ const ScheduleCard = ({
       margin: '8px',
       width: '100%',
       maxWidth: '600px',
-      boxShadow: relay.state
-        ? '0px 8px 16px rgba(0, 255, 0, 0.5)' // Tươi sáng khi bật
-        : '0px 4px 8px rgba(0, 0, 0, 0.3)',   // Sậm màu khi tắt
-      backgroundColor: relay.state
-        ? '#fff'                               // Tươi sáng khi bật
-        : '#f0f0f0',                           // Sậm màu khi tắt
+      justifyContent: 'space-between',
+      boxShadow: schedule.state
+        ? '0px 8px 16px rgba(0, 255, 0, 0.5)'
+        : '0px 4px 8px rgba(0, 0, 0, 0.3)',
+      backgroundColor: schedule.state ? '#fff' : '#f0f0f0',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease',
       '&:hover': {
         transform: 'scale(1.02)',
-        boxShadow: relay.state
-          ? '0px 12px 24px rgba(0, 255, 0, 0.6)' // Tươi sáng hơn khi hover và bật
-          : '0px 8px 16px rgba(0, 0, 0, 0.4)',   // Sậm màu hơn khi hover và tắt
+        boxShadow: schedule.state
+          ? '0px 12px 24px rgba(0, 255, 0, 0.6)'
+          : '0px 8px 16px rgba(0, 0, 0, 0.4)',
       },
     }}
   >
-    {showCheckboxes && (
-      <Checkbox
-        checked={relay.relay_home}
-        onChange={(e) => oncheckHome(relay.relay_id, e.target.checked)}
-        sx={{ marginRight: '16px' }}
-      />
-    )}
-    <Typography sx={{ flex: 2, fontWeight: 'bold', fontSize: '1.2rem' }}>{relay.relay_name}</Typography>
-    <IconButton onClick={() => onEdit(relay.relay_id)} sx={{ marginRight: '16px' }}>
+    {/* Schedule Name */}
+    <Typography sx={{  fontWeight: 'bold', fontSize: '1.2rem' }}>
+      {schedule.schedule_name}
+    </Typography>
+    {/* Edit Icon */}
+    <IconButton onClick={() => onEdit(schedule.schedule_id)} >
       <EditIcon color="primary" />
     </IconButton>
-    <Typography sx={{ flex: 2, color: '#555' }}>{`Relay ${relay.relay_id}`}</Typography>
-    <Typography sx={{ flex: 1, color: relay.state ? 'green' : 'red', fontWeight: 'bold' }}>
-      {relay.state ? 'On' : 'Off'}
+    <Typography sx={{ color: '#555' }}>{`Id : ${schedule.schedule_id}`}</Typography>
+
+    {/* day */}
+<Typography sx={{ color: '#555' }}>
+  {schedule.day
+    ? schedule.day.map(day => day.slice(0, 3)).join(', ')
+    : ''}
+</Typography>
+
+
+    {/* Time */}
+    <Typography sx={{ color: '#555' }}>
+      {schedule.time}
     </Typography>
+    {/* Schedule State */}
+    <Typography sx={{ color: schedule.state ? 'green' : 'red', fontWeight: 'bold' }}>
+      {schedule.state ? 'On' : 'Off'}
+    </Typography>
+    {/* Toggle Switch */}
     <Switch
-      checked={relay.state}
-      onChange={() => onToggle(relay.relay_id)}
-      sx={{ marginLeft: 'auto' }}
+      checked={schedule.state}
+      onChange={() => onToggle(schedule.schedule_id)}
     />
+
+
+
+    {/* Delete Icon */}
     {showDeleteIcons && (
-      <IconButton onClick={() => onDelete(relay.relay_id)} sx={{ marginLeft: '16px' }}>
+      <IconButton onClick={() => onDelete(schedule.schedule_id)} sx={{ marginLeft: '16px' }}>
         <DeleteIcon color="error" />
       </IconButton>
     )}
   </Box>
 );
 
-const RelayGrid = () => {
-  const [relays, setRelays] = useState([]);
+const ScheduleGrid = () => {
+  const [schedules, setSchedules] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [newCard, setNewCard] = useState({ name: '', relayId: '' });
+  const [newCard, setNewCard] = useState({ schedule_name: '', schedule_id: '', day: [], time: '', actions: [{ relayId: '', action: '' }] });
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editRelay, setEditRelay] = useState(null);
+  const [editschedule, setEditschedule] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showCheckboxes, setShowCheckboxes] = useState(false); // State để quản lý hiển thị của checkbox
   const [showDeleteIcons, setShowDeleteIcons] = useState(false);
+  const [relaySelectionOpen, setRelaySelectionOpen] = useState(false);
+  const [relays, setRelays] = useState([]);
+  const [mode, setMode] = useState('');
+  const [editCard, setEditCard] = useState({});
 
-  const handleKeyDown = (e, saveFunction) => {
-    if (e.key === 'Enter') {
-      saveFunction();
-    }
-  };
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const loadData = () => {
-    const storedRelayJSON = localStorage.getItem('relays');
-    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-    setRelays(storedRelayData);
-    let relaysHome = JSON.parse(localStorage.getItem('relays_home'));
-    if (localStorage.getItem('relays_home_add')) {
-      localStorage.removeItem('relays_home_add');
+    if (localStorage.getItem('relays_schedule_add')) {
+      localStorage.removeItem('relays_schedule_add');
     }
-    if (relaysHome) {
-      let updatedRelaysHome = relaysHome.map(relay => {
-        relay.relay_home = true;
-        return relay;
-      });
-      localStorage.setItem('relays_home_add', JSON.stringify(updatedRelaysHome));
-    } else {
-      console.log('No relays_home data found in localStorage');
-    }
+    const storedSchedulesJSON = localStorage.getItem('schedule');
+    const storedSchedulesData = storedSchedulesJSON ? JSON.parse(storedSchedulesJSON) : [];
+    setSchedules(storedSchedulesData);
+    const storedRelaysJSON = localStorage.getItem('relays');
+    const storedRelaysData = storedRelaysJSON ? JSON.parse(storedRelaysJSON) : [];
+    const relays_schedule_add = storedRelaysData.map(relay => ({
+      ...relay,
+      state: false,
+      relay_schedule: false
+    }));
+    setRelays(relays_schedule_add);
+    localStorage.setItem('relays_schedule_add', JSON.stringify(relays_schedule_add));
   };
 
   useEffect(() => {
     loadData();
-    const url = "ws://" + localStorage.getItem('webServerIp') + "/ws";
-    const websocket = new WebSocket(url);
+    if (localStorage.getItem('connect') === 'WSV') {
+      const url = "ws://" + localStorage.getItem('webServerIp') + "/ws";
+      const websocket = new WebSocket(url);
 
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.index !== undefined && data.state !== undefined) {
-        setRelays((prevRelays) =>
-          prevRelays.map((relay) =>
-            relay.relay_id === data.index ? { ...relay, state: data.state === 'ON' } : relay
-          )
-        );
-      }
-    };
-
-    return () => {
-      websocket.close();
-    };
+      websocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.index !== undefined && data.state !== undefined) {
+          setSchedules((prevSchedules) =>
+            prevSchedules.map((schedule) =>
+              schedule.schedule_id === data.index ? { ...schedule, state: data.state === 'ON' } : schedule
+            )
+          );
+        }
+      };
+      return () => {
+        websocket.close();
+      };
+    }
   }, []);
 
-  const fetchRelayAdd = async (relay_id, relay_name, state) => {
+  const fetchScheduleAdd = async (schedule_name, day, time, actions) => {
     try {
-      const finalRelayName = relay_name || `Relay ${relay_id}`;
-      const response = await fetch('http://localhost:8080/relay/add', {
+      const response = await fetch('http://localhost:8080/schedule/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, relay_name: finalRelayName, state }),
+        body: JSON.stringify({ schedule_name, day, time, actions }),
       });
       const result = await response.json();
       if (response.ok) {
-        const storedRelayJSON = localStorage.getItem('relays');
-        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-        storedRelayData.push({ relay_id, relay_name: finalRelayName, state });
-        localStorage.setItem('relays', JSON.stringify(storedRelayData));
+        console.log('result', result);
+        const scheduleId = result.id;
+        const storedScheduleJSON = localStorage.getItem('schedule');
+        const storedScheduleData = storedScheduleJSON ? JSON.parse(storedScheduleJSON) : [];
+        storedScheduleData.push({ schedule_id: scheduleId, schedule_name, day, time, actions });
+        localStorage.setItem('schedule', JSON.stringify(storedScheduleData));
+        setNewCard({ schedule_name: '', day: [], time: '', actions: [] });
+        setDialogOpen(false);
         toast.success('Add successfully.');
         loadData();
       } else {
@@ -161,37 +169,46 @@ const RelayGrid = () => {
     }
   };
 
-  const fetchRelaySet = async (relay_id, relay_name, new_relay_id) => {
+  const fetchScheduleSet = async (schedule_id, schedule_name, day, time, actions) => {
     try {
-      const response = await fetch('http://localhost:8080/relay/set', {
+      const response = await fetch('http://localhost:8080/schedule/set', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, relay_name, new_relay_id }),
+        body: JSON.stringify({
+          schedule_id: schedule_id,
+          new_schedule_name: schedule_name,
+          new_day: day,
+          new_time: time,
+          new_actions: actions
+        }),
       });
       const result = await response.json();
       if (response.ok) {
-        const storedRelayJSON = localStorage.getItem('relays');
-        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+        toast.success('Edit successfully.');
 
-        const updatedRelays = storedRelayData.map((relay) => {
-          if (relay.relay_id === relay_id) {
+        const storedScheduleJSON = localStorage.getItem('schedule');
+        const storedScheduleData = storedScheduleJSON ? JSON.parse(storedScheduleJSON) : [];
+        const updatedSchedules = storedScheduleData.map((schedule) => {
+          if (schedule.schedule_id === schedule_id) {
             return {
-              ...relay,
-              relay_name: relay_name || relay.relay_name,
-              relay_id: new_relay_id || relay.relay_id,
+              ...schedule,
+              schedule_name: schedule_name !== undefined ? schedule_name : schedule.schedule_name,
+              day: day !== undefined ? day : schedule.day,
+              time: time !== undefined ? time : schedule.time,
+              actions: actions !== undefined ? actions : schedule.actions
             };
           }
-          return relay;
+          return schedule;
         });
-        localStorage.setItem('relays', JSON.stringify(updatedRelays));
-        setRelays(updatedRelays);
+        localStorage.setItem('schedule', JSON.stringify(updatedSchedules));
+        setNewCard({ schedule_name: '', day: [], time: '', actions: [] });
+        setDialogOpen(false);
         loadData();
-        setEditRelay(null);
-        setEditDialogOpen(false);
-      } else {
+      }
+      else {
         alert(result.error);
         console.error('Error:', result.error);
       }
@@ -200,52 +217,26 @@ const RelayGrid = () => {
     }
   };
 
-  const fetchRelayDelete = async (relay_id) => {
-    try {
-      const response = await fetch('http://localhost:8080/relay/delete', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ relay_id }),
-      });
-      const result = await response.json();
-      if (response.ok) {
-        const storedRelayJSON = localStorage.getItem('relays');
-        let storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-        storedRelayData = storedRelayData.filter(relay => relay.relay_id !== relay_id);
-        localStorage.setItem('relays', JSON.stringify(storedRelayData));
-        toast.success('Delete successfully.');
-        loadData();
-      } else {
-        toast.error(result.error);
-      }
-    } catch (error) {
-      toast.error(error);
-    }
-  };
-
-  const fetchStatusSet = async (relay_id, state) => {
+  const fetchStatusSet = async (schedule_id, state) => {
     const connect = localStorage.getItem('connect');
     try {
-      const response = await fetch('http://localhost:8080/relay/set-status', {
+      const response = await fetch('http://localhost:8080/schedule/set-status', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, state, connect }),
+        body: JSON.stringify({ schedule_id, state, connect }),
       });
       const result = await response.json();
       if (response.ok) {
-        const storedRelayJSON = localStorage.getItem('relays');
-        const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-        const updatedRelays = storedRelayData.map((relay) =>
-          relay.relay_id === relay_id ? { ...relay, state } : relay
+        const storedScheduleJSON = localStorage.getItem('schedule');
+        const storedScheduleData = storedScheduleJSON ? JSON.parse(storedScheduleJSON) : [];
+        const updatedSchedules = storedScheduleData.map((schedule) =>
+          schedule.schedule_id === schedule_id ? { ...schedule, state } : schedule
         );
-        localStorage.setItem('relays', JSON.stringify(updatedRelays));
-        setRelays(updatedRelays);
+        localStorage.setItem('schedule', JSON.stringify(updatedSchedules));
+        setSchedules(updatedSchedules);
         loadData();
       } else {
         toast.error(result.error);
@@ -257,244 +248,198 @@ const RelayGrid = () => {
     }
   };
 
-  const fetchRelayHomeSet = async (relay_id, relay_home, relay_name, state) => {
+  const fetchScheduleDelete = async (schedule_id) => {
     try {
-      const response = await fetch('http://localhost:8080/relay/set-home', {
-        method: 'PATCH',
+      const response = await fetch('http://localhost:8080/schedule/delete', {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, relay_home }),
+        body: JSON.stringify({ schedule_id }),
       });
       const result = await response.json();
       if (response.ok) {
+        const storedScheduleJSON = localStorage.getItem('schedule');
+        let storedScheduleData = storedScheduleJSON ? JSON.parse(storedScheduleJSON) : [];
+        storedScheduleData = storedScheduleData.filter(schedule => schedule.schedule_id !== schedule_id);
+        localStorage.setItem('schedule', JSON.stringify(storedScheduleData));
+        toast.success('Delete successfully.');
+        loadData();
       } else {
-        console.error('Error:', result.error);
+        toast.error(result.error);
       }
     } catch (error) {
-      console.error('Error setting home:', error);
-    }
-  };
-
-  const handleCheckHome = (id, checked) => {
-    const relay = relays.find((relay) => relay.relay_id === id);
-    const storedRelayJSON = localStorage.getItem('relays_home_add');
-    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-
-    if (relay) {
-      const existingRelay = storedRelayData.find((storedRelay) => storedRelay.relay_id === id);
-
-      if (checked) {
-        if (existingRelay) {
-          existingRelay.relay_home = true;
-        } else {
-          storedRelayData.push({
-            relay_id: relay.relay_id,
-            relay_name: relay.relay_name,
-            state: relay.state,
-            relay_home: true,
-          });
-        }
-      } else {
-        if (existingRelay) {
-          existingRelay.relay_home = false;
-        }
-      }
-      const updatedRelays = relays.map((relay) =>
-        relay.relay_id === id ? { ...relay, relay_home: checked } : relay
-      );
-      localStorage.setItem('relays_home_add', JSON.stringify(storedRelayData));
-      setRelays(updatedRelays);
-    } else {
-      console.error('Relay not found:', id);
-    }
-  };
-
-  const handleToggle = (id) => {
-    const relay = relays.find(relay => relay.relay_id === id);
-    if (relay) {
-      fetchStatusSet(id, !relay.state);
-    } else {
-      console.error('Relay not found:', id);
+      toast.error(error);
     }
   };
 
   const handleAddCard = () => {
     setDialogOpen(true);
     setMenuOpen(false);
+    setMode('add');
   };
 
   const handleSaveCard = () => {
-    if (!newCard.relayId) {
-      alert('Relay ID is required.');
+    const scheduledRelays = relays.filter(relay => relay.relay_schedule === true)
+      .map(relay => ({
+        relayId: relay.relay_id,
+        action: relay.state ? 'ON' : 'OFF'
+      }));
+    const editCard = {
+      ...newCard,
+      actions: scheduledRelays
+    };
+
+    if (!newCard.schedule_name) {
+      toast.error('Schedule name is required.');
       return;
     }
-    fetchRelayAdd(newCard.relayId, newCard.name, false);
-    setNewCard({ name: '', relayId: '' });
-    setDialogOpen(false);
-  };
-
-  const handleEditRelay = (id) => {
-    const relayToEdit = relays.find(relay => relay.relay_id === id);
-    setEditRelay(relayToEdit);
-    setEditDialogOpen(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (editRelay) {
-      fetchRelaySet(editRelay.relay_id, editRelay.name, editRelay.new_relay_id);
+    if (newCard.day.length === 0) {
+      toast.error('Select at least one day.');
+      return;
     }
+    if (!newCard.time) {
+      toast.error('Time is required.');
+      return;
+    }
+    if (newCard.actions.length === 0) {
+      toast.error('Select at least one actions.');
+      return;
+    }
+    if (mode === 'add') {
+      fetchScheduleAdd(editCard.schedule_name, editCard.day, editCard.time, editCard.actions);
+    }
+    else if (mode === 'edit') {
+      fetchScheduleSet(editCard.schedule_id, editCard.schedule_name, editCard.day, editCard.time, editCard.actions);
+    }
+  };
+
+  const handleCheckSchedule = (id, checked, state) => {
+    const storedRelayJSON = localStorage.getItem('relays_schedule_add');
+    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+    const relay = storedRelayData.find((relay) => relay.relay_id === id);
+    if (relay) {
+      const finalChecked = checked === undefined ? relay.relay_schedule : checked;
+      const finalState = state === undefined ? relay.state : state;
+      relay.relay_schedule = finalChecked;
+      relay.state = finalState;
+      localStorage.setItem('relays_schedule_add', JSON.stringify(storedRelayData));
+      setRelays(storedRelayData);
+    } else {
+      console.error('Relay not found:', id);
+    }
+  };
+
+  const handleToggle = (id) => {
+    const schedule = schedules.find(schedule => schedule.schedule_id === id);
+    if (schedule) {
+      fetchStatusSet(id, !schedule.state);
+    } else {
+      toast.error('Schedule not found:', id);
+    }
+  };
+
+  const handleEditSchedule = (id) => {
+    setMode('edit');
+    const schedule = schedules.find(schedule => schedule.schedule_id === id);
+    const relays = JSON.parse(localStorage.getItem('relays_schedule_add'));
+    if (schedule && schedule.schedule_actions) {
+      schedule.schedule_actions.forEach(item => {
+        relays.forEach(relay => {
+          if (relay.relay_id === item.relayId) {
+            relay.state = item.action === 'ON';
+            relay.relay_schedule = true;
+          }
+        });
+      });
+    }
+    setNewCard({
+      schedule_name: schedule.schedule_name,
+      schedule_id: schedule.schedule_id,
+      day: schedule.day,
+      time: schedule.time,
+      actions: schedule.schedule_actions
+    });
+    localStorage.setItem('relays_schedule_add', JSON.stringify(relays));
+    setRelays(relays);
+    setDialogOpen(true);
+    setMenuOpen(false);
   };
 
   const handleDelete = (id) => {
-    fetchRelayDelete(id);
-  };
-
-  const handleDeleteMode = () => {
-    setShowCheckboxes(false);
-    setShowDeleteIcons(true);
-    setMenuOpen(false);
+    fetchScheduleDelete(id);
   };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const handleAccpet = async () => {
-    const storedRelayJSON = localStorage.getItem('relays_home_add');
-    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-    const relayHomeCount = storedRelayData.filter(relay => relay.relay_home === true).length;
-    if (relayHomeCount > 4) {
-      alert('You cannot add more than 4 relays to home.');
-      return;
-    }
-    try {
-      await Promise.all(storedRelayData.map(relay =>
-        fetchRelayHomeSet(relay.relay_id, relay.relay_home, relay.relay_name, relay.state)
-      ));
-      const filteredRelays = storedRelayData.filter(relay => relay.relay_home === true);
-      localStorage.setItem('relays_home', JSON.stringify(filteredRelays));
-      localStorage.removeItem('relays_home_add');
-      toast.success('Add to home successfully.');
-      handleCancel();
-    } catch (error) {
-      toast.error(error)
-      console.error('Error in handleAccept:', error);
-    }
-  }
-
-  const handleCancel = async () => {
-    loadData();
-    setShowCheckboxes(false);
-    setShowDeleteIcons(false);
-    setMenuOpen(false);
-  }
-
-  const [position, setPosition] = useState('center');
-  const [color, setColor] = useState('center');
-  const [animating, setAnimating] = useState(false);
-
-  const handleClick = (event) => {
-    if (animating) return; // Không cho phép nhấp khi đang hoạt động
-
-    setAnimating(true);
-
-    const toggleWidth = event.currentTarget.offsetWidth;
-    const clickX = event.clientX - event.currentTarget.getBoundingClientRect().left;
-
-    if (clickX < toggleWidth / 3) {
-      setPosition('left');
-      setColor('left');
-      handleCancel();
-    } else if (clickX > (toggleWidth * 2) / 3) {
-      setPosition('right');
-      setColor('right');
-      handleAccpet();
-    } else {
-      setPosition('center');
-      setColor('center');
-    }
-    setTimeout(() => {
-      setPosition('center');
-      setColor('center');
-      setAnimating(false);
-    }, 400);
+  const handleDeleteMode = () => {
+    setShowDeleteIcons(!showDeleteIcons);
   };
+
+  const handleCancel = () => {
+    setNewCard({ schedule_name: '', schedule_id: '', day: [], time: '', actions: [] });
+    setShowDeleteIcons(false);
+    setDialogOpen(false)
+    setMode('');
+    loadData();
+  };
+
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%' }}>
-      {showCheckboxes && (
-        <div className="twin-toggle-container">
-          <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
-            <div className="twin-toggle-knob"></div>
-            <div className="twin-toggle-labels">
-              <span>Cancel</span>
-              <span>Accept</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {showDeleteIcons && (
         <div>
           <IconButton
             onClick={handleCancel}
             sx={{
-              position: 'absolute', // Thêm position để z-index có hiệu lực
-              zIndex: 2, // Đặt layer cao hơn cho IconButton
-              top: '97px',
+              position: 'absolute',
+              zIndex: 2,
+              top: '80px',
               right: '437px',
               height: '30px',
               backgroundColor: '#f44336',
               color: '#ffffff',
-              '&:hover': {
-                backgroundColor: '#d32f2f',
-              },
+              '&:hover': { backgroundColor: '#d32f2f' },
               borderRadius: '8px',
               boxShadow: 2,
               transition: 'background-color 0.3s ease',
               fontSize: '16px',
             }}
-
           >
             Cancel
           </IconButton>
         </div>
       )}
 
-      {relays.map((relay, index) => {
+      {schedules.map((schedule, index) => {
         if (index % 2 === 0) {
           return (
-            <Box key={relay.relay_id} sx={{ display: 'flex', width: '100%', justifyContent: 'center' }}>
-              {/* First Relay in the pair */}
-              <ScheduleCard
-                key={relay.relay_id}
-                relay={relay}
+            <Box key={schedule.schedule_id} sx={{ display: 'flex', width: '100%', justifyContent: 'center' }}>
+              <SchedulesCard
+                key={schedule.schedule_id}
+                schedule={schedule}
                 onToggle={handleToggle}
-                onEdit={handleEditRelay}
+                onEdit={handleEditSchedule}
                 onDelete={handleDelete}
-                oncheckHome={handleCheckHome}
-                showCheckboxes={showCheckboxes}
                 showDeleteIcons={showDeleteIcons}
               />
-
-              {/* Second Relay in the pair (if exists) */}
-              {relays[index + 1] && (
-                <ScheduleCard
-                  key={relays[index + 1].relay_id}
-                  relay={relays[index + 1]}
+              {schedules[index + 1] && (
+                <SchedulesCard
+                  key={schedules[index + 1].schedule_id}
+                  schedule={schedules[index + 1]}
                   onToggle={handleToggle}
-                  onEdit={handleEditRelay}
+                  onEdit={handleEditSchedule}
                   onDelete={handleDelete}
-                  oncheckHome={handleCheckHome}
-                  showCheckboxes={showCheckboxes}
                   showDeleteIcons={showDeleteIcons}
                 />
               )}
             </Box>
           );
         }
-        return null; // Skip rendering the second relay individually
+        return null;
       })}
 
       <Box
@@ -505,40 +450,38 @@ const RelayGrid = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-
         }}
       >
         {menuOpen && (
           <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {/* Nút Add New Card */}
-            <Tooltip title="Add new card" placement="left">
+            <Tooltip title="Add new schedule" placement="left">
               <IconButton
                 onClick={handleAddCard}
                 sx={{
                   width: '56px',
                   height: '56px',
                   borderRadius: '50%',
-                  backgroundColor: '#4caf50', // Xanh lá cây
+                  backgroundColor: '#4caf50',
                   color: '#fff',
                   mb: 1,
-                  '&:hover': { backgroundColor: '#388e3c' }, // Xanh lá cây đậm hơn
+                  '&:hover': { backgroundColor: '#388e3c' },
                 }}
               >
                 <AddCircleOutlineIcon />
               </IconButton>
             </Tooltip>
 
-            {/* Nút Delete */}
-            <Tooltip title="Delete card" placement="left">
+            <Tooltip title="Delete Mode" placement="left">
               <IconButton
                 onClick={handleDeleteMode}
                 sx={{
                   width: '56px',
                   height: '56px',
                   borderRadius: '50%',
-                  backgroundColor: '#f76ae7',
+                  backgroundColor: '#f44336',
                   color: '#fff',
-                  '&:hover': { backgroundColor: '#a30091' },
+                  mb: 1,
+                  '&:hover': { backgroundColor: '#d32f2f' },
                 }}
               >
                 <DeleteIcon />
@@ -547,107 +490,164 @@ const RelayGrid = () => {
           </Box>
         )}
 
-        {/* Nút Menu */}
         <IconButton
-          color="primary"
           onClick={toggleMenu}
           sx={{
             width: '64px',
             height: '64px',
             borderRadius: '50%',
-            backgroundColor: menuOpen ? '#f44336' : '#4800ff',
+            backgroundColor: '#1976d2',
             color: '#fff',
-            '&:hover': { backgroundColor: menuOpen ? '#f44336' : '#4800ff' },
-            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-            transition: 'transform 0.2s ease-in-out',
-            transform: menuOpen ? 'rotate(89deg)' : 'rotate(0deg)',
+            '&:hover': { backgroundColor: '#1565c0' },
           }}
         >
-          {menuOpen ? <CloseIcon /> : <AppIcon />}
+          <AppIcon />
         </IconButton>
       </Box>
 
-
-      {/* Dialog thêm mới Relay */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: '17px',
-          },
-        }}
-      >
-        <DialogTitle>Add New Schedules</DialogTitle>
+      {/* Add New Schedule Dialog */}
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>{mode === 'add' ? 'Add Schedule' : 'Edit Schedule'}</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
             margin="dense"
-            label="Schedules Name"
-            type="text"
+            label="Schedule Name"
+            value={newCard.schedule_name}
+            onChange={(e) => setNewCard({ ...newCard, schedule_name: e.target.value })}
             fullWidth
             variant="outlined"
-            value={newCard.name}
-            onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
+            InputLabelProps={{ shrink: true }} // Label always on top
           />
+
           <TextField
             margin="dense"
-            label="Relay ID"
-            type="text"
+            label="Schedule ID"
+            value={newCard.schedule_id}
+            onChange={(e) => setNewCard({ ...newCard, schedule_id: e.target.value })}
             fullWidth
             variant="outlined"
-            value={newCard.relayId}
-            onChange={(e) => setNewCard({ ...newCard, relayId: e.target.value })}
-            onKeyDown={(e) => handleKeyDown(e, handleSaveCard)}
+            InputProps={{
+              readOnly: true, // Read-only field
+            }}
+            InputLabelProps={{ shrink: true }} // Label always on top
           />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveCard}>Save</Button>
-        </DialogActions>
-      </Dialog>
 
-      {/* Dialog chỉnh sửa Relay */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: '17px',
-          },
-        }}
-      >
-        <DialogTitle>Edit Relay</DialogTitle>
-        <DialogContent >
-          {editRelay && (
-            <>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Relay Name"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={editRelay.name}
-                onChange={(e) => setEditRelay({ ...editRelay, name: e.target.value })}
-                onKeyDown={(e) => handleKeyDown(e, handleSaveEdit)}
-              />
-              <TextField
-                margin="dense"
-                label="New Relay ID (optional)"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={editRelay.new_relay_id || ''}
-                onChange={(e) => setEditRelay({ ...editRelay, new_relay_id: e.target.value })}
-                onKeyDown={(e) => handleKeyDown(e, handleSaveEdit)}
-              />
-            </>
-          )}
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>Select day</Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                {[
+                  { day: 'Monday', abbrev: 'Mon' },
+                  { day: 'Tuesday', abbrev: 'Tue' },
+                  { day: 'Wednesday', abbrev: 'Wed' },
+                  { day: 'Thursday', abbrev: 'Thu' },
+                  { day: 'Friday', abbrev: 'Fri' },
+                  { day: 'Saturday', abbrev: 'Sat' },
+                  { day: 'Sunday', abbrev: 'Sun' }
+                ].map(({ day, abbrev }) => (
+                  <Button
+                    key={day}
+                    variant={newCard.day.includes(day) ? 'contained' : 'outlined'}
+                    color="primary"
+                    onClick={() => {
+                      setNewCard(prev => ({
+                        ...prev,
+                        day: prev.day.includes(day)
+                          ? prev.day.filter(d => d !== day)
+                          : [...prev.day, day]
+                      }));
+                    }}
+                    sx={{
+                      fontSize: '0.75rem',
+                      borderRadius: '50%',
+                      minWidth: '60px',
+                      minHeight: '60px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {abbrev}
+                  </Button>
+                ))}
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <TextField
+                  label="Time"
+                  type="time"
+                  variant="outlined"
+                  margin="dense"
+                  InputLabelProps={{ shrink: true }}
+                  inputProps={{ step: 300 }}
+                  sx={{ width: '150px' }}
+                  value={newCard.time} // Synchronize with state
+                  onChange={(e) => setNewCard(prev => ({ ...prev, time: e.target.value }))} // Update time in state
+                />
+              </Box>
+            </Grid>
+          </Grid>
+
+
+          {/* Relay Selection Table */}
+          <Box sx={{ position: 'relative' }}>
+            <TableContainer component={Paper} sx={{ maxHeight: 300, overflowY: 'auto' }}>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Select</TableCell>
+                    <TableCell>Relay Name</TableCell>
+                    <TableCell> State</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {relays.map((relay) => (
+                    <TableRow key={relay.relay_id}>
+                      <TableCell>
+                        <Checkbox
+                          checked={relay.relay_schedule}
+                          onChange={(e) => handleCheckSchedule(relay.relay_id, e.target.checked, relay.state)}
+                        />
+                      </TableCell>
+                      <TableCell>{relay.relay_name}</TableCell>
+                      <TableCell>
+                        <Switch
+                          checked={relay.state}
+                          onChange={(e) => {
+                            const newState = e.target.checked;
+                            const updatedRelays = relays.map((r) =>
+                              r.relay_id === relay.relay_id ? { ...r, state: newState } : r
+                            );
+                            setRelays(updatedRelays);
+                            handleCheckSchedule(relay.relay_id, relay.relay_schedule, newState);
+                          }}
+                          color="primary"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+
+
+              </Table>
+            </TableContainer>
+
+          </Box>
         </DialogContent>
+
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button onClick={handleSaveEdit}>Save</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button onClick={handleSaveCard} variant="contained" color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
 };
 
-export default RelayGrid;
+
+export default ScheduleGrid;
+

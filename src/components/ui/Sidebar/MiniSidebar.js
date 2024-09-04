@@ -16,10 +16,15 @@ export default function MiniSidebar({ onLogout, isOpen }) {
   const location = useLocation();
   const [avatar, setAvatar] = useState('');
 
-  useEffect(() => {
-    // Lấy avatar từ localStorage khi component mount
+  const loadData = async () => {
     const savedAvatar = localStorage.getItem('avatar');
     setAvatar(savedAvatar || '');
+  }
+
+  useEffect(() => {
+    loadData();
+    const intervalId = setInterval(loadData, 1000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const isActive = (path) => location.pathname === path;
@@ -117,7 +122,7 @@ export default function MiniSidebar({ onLogout, isOpen }) {
             <RelayIcon />
           </IconButton>
         </Link>
-        
+
         <Link to="/schedules" style={{ textDecoration: 'none' }}>
           <IconButton
             sx={{

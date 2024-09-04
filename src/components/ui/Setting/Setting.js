@@ -55,11 +55,20 @@ const Settings = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: '500px', mx: 'auto' }}> {/* Giới hạn chiều rộng của Box */}
-      <Typography variant="h4" gutterBottom>Settings</Typography>
+    <Box sx={{ p: 3, maxWidth: '500px', mx: 'auto' ,
+      background: `linear-gradient(to bottom, 
+        rgba(255, 255, 255, 0) 5%, 
+        rgba(255, 255, 255, 0.3) 100%)`, 
+      borderRadius: '12px',
+      display: 'flex', // Sử dụng Flexbox để canh giữa
+      flexDirection: 'column', // Đặt theo chiều dọc
+      alignItems: 'center', // Canh giữa theo chiều ngang
+      
+      }}> {/* Giới hạn chiều rộng của Box */}
+      <Typography variant="h4" gutterBottom></Typography>
       <Box sx={{ mt: 2 }}>
         <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
-          <InputLabel>Mode</InputLabel>
+          <InputLabel>Theme</InputLabel>
           <Select
             value={mode}
             onChange={(e) => setMode(e.target.value)}
@@ -91,7 +100,7 @@ const Settings = () => {
             <MenuItem value="Webserver">Webserver</MenuItem>
           </Select>
         </FormControl>
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
+        <Box sx={{ mt: 2, textAlign: 'right' }}>
           <Button
             variant="contained"
             color="primary"

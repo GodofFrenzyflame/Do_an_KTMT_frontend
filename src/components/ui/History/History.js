@@ -82,7 +82,14 @@ const History = () => {
             }}
           />
         </Box>
-        <Button variant="contained" onClick={handleFilter}>
+        <Button variant="contained" onClick={handleFilter}  sx={{ 
+            bgcolor: '#0004ff' ,
+            color: '#fff',
+            '&:hover': {              
+                color: '#0004ff',
+                bgcolor: '#fff'
+            },
+          }}>
           Filter
         </Button>
       </Box>

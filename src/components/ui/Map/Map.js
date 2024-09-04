@@ -81,7 +81,7 @@ const Map = () => {
       const response = await fetch(`https://ipinfo.io/json?token=${apikey}`);
       const data = await response.json();
       if (response.ok) {
-        console.log('IP Info Data:', data);
+        // console.log('IP Info Data:', data);
         if (data.loc) {
           const [latitude, longitude] = data.loc.split(',');
           const newPosition = [parseFloat(latitude), parseFloat(longitude)];

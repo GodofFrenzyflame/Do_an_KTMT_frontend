@@ -21,41 +21,58 @@ const DualAxisChart = () => {
   // const token = localStorage.getItem('accessToken');
 
   const loadData = async () => {
-    const temp_now = localStorage.getItem('temperature');
-    const humi_now = localStorage.getItem('humidity');
-
+    const temp_now = parseFloat(localStorage.getItem('temperature') || '0'); // Chuyển đổi thành số
+    const humi_now = parseFloat(localStorage.getItem('humidity') || '0'); // Chuyển đổi thành số
+  
     let temperatureData = [];
     let humidityData = [];
-
+  
     const temperatureDataString = localStorage.getItem('chart_temp' + time);
     const humidityDataString = localStorage.getItem('chart_humi' + time);
-
+  
     if (temperatureDataString) {
       temperatureData = JSON.parse(temperatureDataString);
     }
     if (humidityDataString) {
       humidityData = JSON.parse(humidityDataString);
     }
-
-    if (time === 30 || time === 90) {
-      const currentDate = new Date().toISOString().split('T')[0];
-      temperatureData.push({ date: currentDate, value: temp_now });
-      humidityData.push({ date: currentDate, value: humi_now });
+  
+  
+    const currentDate = new Date().toISOString().split('T')[0];
+    temperatureData.push({ date: currentDate, value: temp_now });
+    humidityData.push({ date: currentDate, value: humi_now });
+   
+    // Đảm bảo dữ liệu có cùng độ dài
+    if (temperatureData.length > humidityData.length) {
+      while (humidityData.length < temperatureData.length) {
+        humidityData.push({ date: '', value: 0 });
+      }
+    } else if (humidityData.length > temperatureData.length) {
+      while (temperatureData.length < humidityData.length) {
+        temperatureData.push({ date: '', value: 0 });
+      }
     }
-
+  
     const combinedData = temperatureData.map((tempEntry, index) => ({
       time: tempEntry.date,
-      temperature: tempEntry.value,
-      humidity: humidityData[index]?.value || 0,
+      temperature: parseFloat(tempEntry.value), // Đảm bảo giá trị là số
+      humidity: parseFloat(humidityData[index]?.value || 0), // Đảm bảo giá trị là số
     }));
+  
     setData(combinedData);
   };
+  
+  // Định dạng lại trục Y cho đúng với định dạng số mong muốn
+  const formatYAxis = (tickItem) => {
+    return tickItem.toFixed(1); // Giới hạn số chữ số thập phân
+  };
+  
 
   useEffect(() => {
     loadData();
     const intervalId = setInterval(() => {
       loadData();
-    }, 1500);
+    }, 1000);
     return () => clearInterval(intervalId);
   }, [time]);
 
@@ -82,7 +99,7 @@ const DualAxisChart = () => {
           justifyContent: 'flex-end',
           marginBottom: '1%',
           marginRight: '5%',
-          marginTop: '1%',
+          marginTop: '0%',
         }}
       >
         <button onClick={() => handleTimeChange(7)}>7 Days</button>
@@ -90,10 +107,11 @@ const DualAxisChart = () => {
         <button onClick={() => handleTimeChange(90)}>90 Days</button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        
         {/* Temperature Chart */}
         <div style={{ width: '48%' }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={displayData}>
+          <ResponsiveContainer width="100%" height={340}>
+            <LineChart data={displayData} margin={{ top: 40, right: 30, left: 20, bottom: 0 }} >
               <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
               <XAxis dataKey="time" />
               <YAxis
@@ -101,17 +119,19 @@ const DualAxisChart = () => {
                 orientation="left"
                 stroke="#ff0000"
                 domain={temperatureDomain}
+                tickFormatter={formatYAxis} // Định dạng giá trị trục Y
                 label={{
                   value: '°C',
                   angle: 0,
-                  position: 'insideLeft',
+                  position: 'insideTopLeft',
+                  
                   style: {
                     textAnchor: 'middle',
                     fill: '#ff0000',
                     fontSize: 14,
                     fontWeight: 'bold',
                   },
-                  offset: 15,
+                  offset: -10,
                 }}
               />
               <Tooltip />
@@ -129,8 +149,8 @@ const DualAxisChart = () => {
 
         {/* Humidity Chart */}
         <div style={{ width: '48%' }}>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={displayData}>
+          <ResponsiveContainer width="100%" height={340}>
+            <LineChart data={displayData} margin={{ top: 40, right: 30, left: 20, bottom: 0 }} >
               <CartesianGrid stroke={getWordColor()} strokeDasharray="1 3" />
               <XAxis dataKey="time" />
               <YAxis
@@ -138,17 +158,19 @@ const DualAxisChart = () => {
                 orientation="left"
                 stroke="#0000ff"
                 domain={humidityDomain}
+                tickFormatter={formatYAxis} // Định dạng giá trị trục Y
                 label={{
                   value: '%',
                   angle: 0,
-                  position: 'insideLeft',
+                  position: 'insideTopLeft',
+                  
                   style: {
                     textAnchor: 'middle',
                     fill: '#0000ff',
                     fontSize: 14,
                     fontWeight: 'bold',
                   },
-                  offset: 15,
+                  offset: -10,
                 }}
               />
               <Tooltip />
