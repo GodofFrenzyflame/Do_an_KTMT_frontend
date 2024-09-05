@@ -389,7 +389,7 @@ const ScheduleGrid = () => {
 
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%', mb:'50%' }}>
       {showDeleteIcons && (
         <div>
           <IconButton

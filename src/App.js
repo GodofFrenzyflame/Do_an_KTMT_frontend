@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 import Login from './components/auth/Login';
 import Signup from './components/auth/Signup';
-import Forget from './components/auth/Forget';
+
 
 import Home from './components/ui/Home/Home';
 import Profile from './components/ui/Profile/Profile';
@@ -17,6 +17,7 @@ import Setting from './components/ui/Setting/Setting';
 import UpgradeSide from './components/ui/Upgrade/upgrade'
 import AppContext from './components/ui/Setting/language/AppContext';
 import Schedules from './components/ui/Schedules/Schedules';
+import Footer from './components/ui/Footer/Footer';
 
 function App() {
   const { settings } = useContext(AppContext);
@@ -385,7 +386,7 @@ function App() {
     <Box onMouseMove={handleMouseMove}
       sx={{
         background: getBackgroundColor(),
-        //...gradientStyle, // Sử dụng gradient dựa trên vị trí con trỏ chuột
+       
       }}>
       <Router >
         <Routes >
@@ -401,7 +402,7 @@ function App() {
           <Route
             path="/signup"
             element={
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100&' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <Signup />
               </Box>
             }
@@ -505,7 +506,9 @@ function App() {
             }
           />
         </Routes>
+        <Footer />
       </Router>
+      
     </Box>
   );
 }

@@ -27,7 +27,7 @@ const NotificationBell = () => {
       sx={{
         position: 'absolute',
         top: '10px',
-        right: '10px',
+        right: '20px',
         borderRadius: '50%',
         zIndex: 1100,
       }}
@@ -37,7 +37,9 @@ const NotificationBell = () => {
         onClick={handleClick}
         sx={{
           color: '#000',
-          backgroundColor: 'transparent',
+          background: `linear-gradient(to bottom, 
+          rgba(255, 255, 255, 0.6) 5%, 
+          rgba(255, 255, 255, 1) 100%)`,
         }}
       >
         <NotificationsIcon />

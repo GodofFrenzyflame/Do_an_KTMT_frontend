@@ -38,7 +38,7 @@ const Home = () => {
 
 
   return (
-    <Box sx={{ paddingLeft: '2%' ,paddingTop:'2%'}}>
+    <Box sx={{ paddingLeft: '2%' ,paddingTop:'2%',mb:'20%'}}>
       <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%' }}>
         {relaysHome.map((relay) => (
           <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>
@@ -92,6 +92,7 @@ const Home = () => {
         <Typography variant="h6">Temperature & Humidity</Typography>
         <DualAxisChart /> {/* Replace History with DualAxisChart */}
       </Paper>
+      
     </Box>
   );
 };

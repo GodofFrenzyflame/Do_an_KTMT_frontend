@@ -78,6 +78,7 @@ const Settings = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        mb:'50%'
       }}
     >
           

@@ -33,14 +33,18 @@ const Clock = () => {
       sx={{
         position: 'absolute',
         top: '10px',
-        right: '60px', // Adjusted to make space for the notification bell
+        right: '70px', // Adjusted to make space for the notification bell
         padding: '5px 15px',
         color: '#000', // Black text
         zIndex: 1100,
         display: 'flex',
         alignItems: 'center',
         gap: '10px',
-        backgroundColor: 'transparent', // No background
+        borderRadius: '20px',
+        boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
+        background: `linear-gradient(to bottom, 
+          rgba(255, 255, 255, 0.6) 5%, 
+          rgba(255, 255, 255, 1) 100%)`,
       }}
     >
       <Typography variant="h6">{formatDate(time)}</Typography>

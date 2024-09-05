@@ -29,7 +29,7 @@ const AuthenticatedLayout = ({ onLogout, children }) => {
   const sidebarWidth = isSidebarOpen ? '18%' : '0%';
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
+    <Box sx={{ display: 'flex', overflow: 'hidden', position: 'relative' }}>
       <Sidebar 
         isOpen={isSidebarOpen} 
         onLogout={onLogout}

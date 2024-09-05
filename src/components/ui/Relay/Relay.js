@@ -430,7 +430,7 @@ const RelayGrid = () => {
     }, 400);
   };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%', mb:'50%' }}>
       {showCheckboxes && (
         <div className="twin-toggle-container">
           <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
