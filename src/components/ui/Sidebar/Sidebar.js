@@ -12,7 +12,7 @@ export default function Sidebar({ onLogout, isOpen }) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate(); 
-  const sidebarWidth = isOpen ? '19%' : '0';
+  const sidebarWidth = isOpen ? '18%' : '0';
   const visibility = isOpen ? 'visible' : 'hidden';
 
   const [avatar, setAvatar] = useState('');
@@ -56,8 +56,8 @@ export default function Sidebar({ onLogout, isOpen }) {
         flexDirection: 'column',
         height: '97%',
         position: 'fixed',
-        top: 10,
-        left: 10,
+        top: '1.5%',
+        left: '1%',
         borderRadius: '12px',
         zIndex: 1200,
         visibility: visibility,
@@ -74,7 +74,7 @@ export default function Sidebar({ onLogout, isOpen }) {
           top: 0,
           left: 0,
           width: '100%',
-          height: '22%',
+          height: '20%',
           backgroundImage: `url(${coverPhoto})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -90,14 +90,14 @@ export default function Sidebar({ onLogout, isOpen }) {
           display: 'flex',
           alignItems: 'center',
           padding: '10px',
-          mb: '10%',
+          mb: '15%',
           mt: '20%',
           visibility: visibility,
           position: 'relative',
           zIndex: 1,
         }}
       >
-        <Avatar src={avatar} sx={{ width: 60, height: 60, mr: 2, ml: 4 }} />
+        <Avatar src={avatar} sx={{ width: '20%', height: '90%', mr: '2%', ml: '10%' }} />
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant="subtitle1" sx={{ color: getButtonColor() }}>
             {username}
@@ -117,7 +117,7 @@ export default function Sidebar({ onLogout, isOpen }) {
         </Box>
       </Box>
 
-      <Divider sx={{ width: '90%', margin: '0 auto', mb: 1, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
+      <Divider sx={{ width: '90%', margin: '0 auto', mb: '1%', backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
 
       {/* Sidebar Links */}
       <Box
@@ -141,8 +141,8 @@ export default function Sidebar({ onLogout, isOpen }) {
               width: '90%',
               display: 'flex',
               alignItems: 'center',
-              padding: '12px 0',
-              mb: 0.5,
+              padding: '2% 0',
+              mb: '1%',
               borderRadius: '12px',
               position: 'relative',
               cursor: 'pointer',
@@ -163,8 +163,8 @@ export default function Sidebar({ onLogout, isOpen }) {
               sx={{
                 color: getButtonColor(),
                 fontSize: '1.5em',
-                marginLeft: '17%',
-                mr: 2,
+                marginLeft: '25%',
+                mr: '5%',
               }}
             >
               {val.icon}
@@ -186,7 +186,7 @@ export default function Sidebar({ onLogout, isOpen }) {
           </Box>
         ))}
       </Box>
-      <Divider sx={{ width: '90%', margin: '0 auto', mb: 4, backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
+      <Divider sx={{ width: '90%', margin: '0 auto', mb: '10%', backgroundColor: '#bdbdbd', position: 'relative', zIndex: 1 }} />
 
       {/* Upgrade Section */}
       <Grid
@@ -195,10 +195,10 @@ export default function Sidebar({ onLogout, isOpen }) {
         justifyContent="center"
         sx={{ 
           mb: '10%',
-          ml: '10%',
-          width: '80%',
+          ml: '5%',
+          width: '90%',
           borderRadius: '12px',
-          padding: '16px',
+          padding: '13%',
           boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
           zIndex: 2,
           position: 'relative', // Thêm position relative để các phần tử con có thể định vị chính xác
@@ -219,12 +219,12 @@ export default function Sidebar({ onLogout, isOpen }) {
             zIndex: 0, // Đặt hình ảnh nền dưới cùng
           }}
         />       
-        <Box sx={{ width: '100%', textAlign: 'center', mb: 1, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ width: '100%', textAlign: 'center', mb: 'ayto', position: 'relative', zIndex: 1 }}>
           <Typography variant="h6" sx={{ color: getButtonColor(), fontWeight: 'bold', fontSize: '15px' }}>
             {t('Upgrade to Premium')}
           </Typography>
         </Box>
-        <Box sx={{ width: '100%', textAlign: 'center', mb: 1, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ width: '100%', textAlign: 'center', mb: 'auto', position: 'relative', zIndex: 1 }}>
           <Typography variant="body2" sx={{ color: getButtonColor(), fontSize: '10px' }}>
             {t('You can get a lot more by upgrading to premium. Get all features now.')}
           </Typography>
@@ -237,9 +237,9 @@ export default function Sidebar({ onLogout, isOpen }) {
             '&:hover': {
               bgcolor: '#1565c0',
             },
-            padding: '10px 20px',
+            padding: '2px auto',
             borderRadius: '8px',
-            fontSize: '0.5em',
+            fontSize: '0.6em',
             position: 'relative', // Đảm bảo nút không bị ảnh hưởng bởi lớp phủ mờ
             zIndex: 1,
           }}

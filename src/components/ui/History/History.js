@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Paper, List, ListItem } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
 import { toast } from 'react-toastify';
+import LoadingSpinner from '../Loading/LoadingSpinner'; // Import LoadingSpinner
 
 const History = () => {
   const [startDate, setStartDate] = useState('');
@@ -9,7 +10,8 @@ const History = () => {
   const [filteredHistory, setFilteredHistory] = useState([]);
   const { settings } = useContext(AppContext);
   const [error, setError] = useState('');
-  
+  const [loading, setLoading] = useState(false); // Thêm trạng thái loading
+
   const getWordColor = () => settings.color === 'dark' ? '#fff' : '#000';
 
   useEffect(() => {
@@ -32,6 +34,7 @@ const History = () => {
     }
 
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/log/get', {
         method: 'POST',
         headers: {
@@ -51,6 +54,8 @@ const History = () => {
       }
     } catch (error) {
       setError(error);
+    }finally {
+      setLoading(false); // Kết thúc trạng thái loading
     }
   };
 
@@ -120,8 +125,12 @@ const History = () => {
               </Box>
             </ListItem>
           ))}
+          {/* Hiển thị spinner nếu đang loading */}
+          {loading && <LoadingSpinner />}
         </List>
       </Paper>
+      
+
     </Box>
   );
 };

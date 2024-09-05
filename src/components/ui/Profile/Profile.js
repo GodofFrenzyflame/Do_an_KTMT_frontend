@@ -5,7 +5,7 @@ import { InputAdornment } from '@mui/material';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
-
+import LoadingSpinner from '../Loading/LoadingSpinner';
 const token = localStorage.getItem('accessToken');
 
 const showAlert = (message, type) => {
@@ -33,7 +33,7 @@ const Profile = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
-
+  const [loading, setLoading] = useState(false); 
   const loadData = () => {
     setUsername(localStorage.getItem('username'));
     setFullName(localStorage.getItem('fullname'));
@@ -84,6 +84,7 @@ const Profile = () => {
       formData.append('coverPhoto', fileInputCover.files[0]);
     }
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/profile/edit', {
         method: 'PATCH',
         headers: {
@@ -116,6 +117,8 @@ const Profile = () => {
       }
     } catch (error) {
       console.error('Error fetching profile data:', error);
+    }finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
@@ -404,7 +407,7 @@ const Profile = () => {
                 </Button>
 
                 <Button variant="contained" color="primary" onClick={handleSave}>
-                  Save
+                {loading ? <LoadingSpinner /> : 'Save'}
                 </Button>
               </>
             )}

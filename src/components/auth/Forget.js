@@ -3,7 +3,7 @@ import {
   TextField, Button, Box, Typography,
   Dialog, DialogActions, DialogContent, DialogTitle
 } from '@mui/material';
-
+import LoadingSpinner from '../ui/Loading/LoadingSpinner';
 export default function Forget({ open, onClose }) {
   const [step, setStep] = useState('request'); // Các bước: 'request', 'verify', 'resetPassword'
   const [emailOrusername, setEmailOrUsername] = useState('');
@@ -12,9 +12,12 @@ export default function Forget({ open, onClose }) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [loading, setLoading] = useState(false); 
+
 
   const handleRequest = async () => {
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/email/send-code', {
         method: 'POST',
         headers: {
@@ -32,11 +35,14 @@ export default function Forget({ open, onClose }) {
       }
     } catch (error) {
       setError(error);
+    }finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
   const handleVerify = async () => {
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/email/confirm-code', {
         method: 'POST',
         headers: {
@@ -55,6 +61,9 @@ export default function Forget({ open, onClose }) {
     } catch (error) {
       setError(error);
     }
+    finally {
+      setLoading(false); // Kết thúc loading
+    }
   };
 
   const handleResetPassword = async () => {
@@ -64,6 +73,7 @@ export default function Forget({ open, onClose }) {
     }
     emailOrusername = emailOrusername.toLowerCase();
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/forgot-password', {
         method: 'PATCH',
         headers: {
@@ -84,6 +94,9 @@ export default function Forget({ open, onClose }) {
       }
     } catch (error) {
       setError(error);
+    }
+    finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
@@ -151,17 +164,17 @@ export default function Forget({ open, onClose }) {
         <Button onClick={onClose}>Close</Button>
         {step === 'request' && (
           <Button variant="contained" color="primary" onClick={handleRequest}>
-            Submit
+           {loading ? <LoadingSpinner /> : 'Submit'} 
           </Button>
         )}
         {step === 'verify' && (
           <Button variant="contained" color="primary" onClick={handleVerify}>
-            Verify
+            {loading ? <LoadingSpinner /> : 'Verify'}
           </Button>
         )}
         {step === 'resetPassword' && (
           <Button variant="contained" color="primary" onClick={handleResetPassword}>
-            Reset Password
+            {loading ? <LoadingSpinner /> : 'Reset Password'}
           </Button>
         )}
       </DialogActions>

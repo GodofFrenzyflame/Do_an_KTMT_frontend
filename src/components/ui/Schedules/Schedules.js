@@ -86,14 +86,14 @@ const ScheduleGrid = () => {
   const [schedules, setSchedules] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newCard, setNewCard] = useState({ schedule_name: '', schedule_id: '', day: [], time: '', actions: [{ relayId: '', action: '' }] });
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editschedule, setEditschedule] = useState(null);
+  // const [editDialogOpen, setEditDialogOpen] = useState(false);
+  // const [editschedule, setEditschedule] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDeleteIcons, setShowDeleteIcons] = useState(false);
-  const [relaySelectionOpen, setRelaySelectionOpen] = useState(false);
+  // const [relaySelectionOpen, setRelaySelectionOpen] = useState(false);
   const [relays, setRelays] = useState([]);
   const [mode, setMode] = useState('');
-  const [editCard, setEditCard] = useState({});
+  // const [editCard, setEditCard] = useState({});
 
   useEffect(() => {
     loadData();

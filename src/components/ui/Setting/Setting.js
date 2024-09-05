@@ -2,13 +2,14 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AppContext from './language/AppContext'; // Import context
 import { toast } from 'react-toastify';
+import LoadingSpinner from '../Loading/LoadingSpinner';
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);
   const [mode, setMode] = useState(settings.mode || 'light');
   const [language, setLanguage] = useState(settings.language);
   const [connect, setConnect] = useState(settings.connect || 'MQTT');
-
+  const [loading, setLoading] = useState(false); 
   const token = localStorage.getItem('accessToken');
 
   const loadData = async () => {
@@ -18,53 +19,67 @@ const Settings = () => {
 
     if (storedMode) setMode(storedMode);
     if (storedLanguage) setLanguage(storedLanguage);
-    storedConnect === 'MQTT' ? setConnect('MQTT') : setConnect('Webserver');
-  }
-
+    if (storedConnect) setConnect(storedConnect);
+  };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const fetchConnect = async (connect) => {
-    console.log('Connecting ...');
+  const fetchConnect = async (newConnect) => {
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/connect', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ connect }),
+        body: JSON.stringify({ connect: newConnect }),
       });
       const result = await response.json();
       if (response.ok) {
-        localStorage.setItem('connect', connect);
-        toast.success(`Connected to ${connect} successfully`);
+        localStorage.setItem('connect', newConnect);
+        toast.success(`Connected to ${newConnect} successfully`);
       } else {
         toast.error(result.error);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSave = () => {
+    // Lưu `mode` và `language` ngay lập tức
     setSettings({ mode, language, connect });
-    fetchConnect(connect === 'MQTT' ? 'MQTT' : 'WSV');
+    localStorage.setItem('mode', mode);
+    localStorage.setItem('language', language);
+
+    const storedConnect = localStorage.getItem('connect');
+
+    // Chỉ gọi fetchConnect nếu kết nối thay đổi
+    if (storedConnect !== connect) {
+      fetchConnect(connect);
+    } else {
+      toast.info('No changes in connection settings');
+    }
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: '500px', mx: 'auto' ,
-      background: `linear-gradient(to bottom, 
-        rgba(255, 255, 255, 0) 5%, 
-        rgba(255, 255, 255, 0.3) 100%)`, 
-      borderRadius: '12px',
-      display: 'flex', // Sử dụng Flexbox để canh giữa
-      flexDirection: 'column', // Đặt theo chiều dọc
-      alignItems: 'center', // Canh giữa theo chiều ngang
-      
-      }}> {/* Giới hạn chiều rộng của Box */}
+    <Box
+      sx={{
+        p: 3, maxWidth: '500px', mx: 'auto',
+        background: `linear-gradient(to bottom, 
+          rgba(255, 255, 255, 0) 5%, 
+          rgba(255, 255, 255, 0.3) 100%)`,
+        borderRadius: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <Typography variant="h4" gutterBottom></Typography>
       <Box sx={{ mt: 2 }}>
         <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
@@ -105,9 +120,9 @@ const Settings = () => {
             variant="contained"
             color="primary"
             sx={{ mt: 1 }}
-            onClick={handleSave} // Đảm bảo handleSave được gọi khi nhấn nút
+            onClick={handleSave}
           >
-            Save Settings
+            {loading ? <LoadingSpinner /> : 'Save Settings'}
           </Button>
         </Box>
       </Box>

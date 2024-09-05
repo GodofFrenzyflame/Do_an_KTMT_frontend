@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TextField, Button, Box, Typography, Modal, Paper } from '@mui/material';
-
+import LoadingSpinner from '../ui/Loading/LoadingSpinner';
 export default function Signup({ onClose }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -13,12 +13,13 @@ export default function Signup({ onClose }) {
   const [success, setSuccess] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
-
+  const [loading, setLoading] = useState(false); 
 
   const Signup = async () => {
     let convert_username = username.toLowerCase();
     let convert_email = email.toLowerCase();
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/register', {
         method: 'POST',
         headers: {
@@ -43,6 +44,8 @@ export default function Signup({ onClose }) {
     }
     catch (error) {
       setError('Failed to connect to the server');
+    }finally {
+      setLoading(false); // Kết thúc loading
     }
   }
 
@@ -54,6 +57,7 @@ export default function Signup({ onClose }) {
     }
 
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/email/send-code', {
         method: 'POST',
         headers: {
@@ -75,6 +79,8 @@ export default function Signup({ onClose }) {
     } catch (error) {
       console.error('Error:', error);
       setError('Failed to connect to the server');
+    }finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
@@ -82,6 +88,7 @@ export default function Signup({ onClose }) {
     e.preventDefault();
 
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:8080/email/confirm-code', {
         method: 'POST',
         headers: {
@@ -101,6 +108,9 @@ export default function Signup({ onClose }) {
     } catch (error) {
       console.error('Error:', error);
       setError('Failed to connect to the server');
+    }
+    finally {
+      setLoading(false); // Kết thúc loading
     }
   };
 
@@ -176,7 +186,7 @@ export default function Signup({ onClose }) {
       >
         <Paper sx={{ p: 4, maxWidth: '400px', margin: 'auto', mt: '10%', textAlign: 'center' }}>
           <Typography id="verification-modal-title" variant="h6" component="h2">
-            Enter Verification Code
+          {loading ? <LoadingSpinner /> : 'Enter Verification Code'}
           </Typography>
           <TextField
             label="Verification Code"
@@ -188,7 +198,7 @@ export default function Signup({ onClose }) {
           {error && <Typography color="error" sx={{ mb: 2 }}>{error}</Typography>}
           {success && <Typography color="success" sx={{ mb: 2 }}>{success}</Typography>}
           <Button variant="contained" color="primary" onClick={handleVerifyCode} fullWidth>
-            Verify Code
+          {loading ? <LoadingSpinner /> : 'Verify Code'}
           </Button>
         </Paper>
       </Modal>
