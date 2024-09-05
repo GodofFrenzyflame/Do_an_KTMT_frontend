@@ -80,7 +80,8 @@ const Settings = () => {
         alignItems: 'center',
       }}
     >
-      <Typography variant="h4" gutterBottom></Typography>
+          
+      
       <Box sx={{ mt: 2 }}>
         <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
           <InputLabel>Theme</InputLabel>
@@ -115,16 +116,24 @@ const Settings = () => {
             <MenuItem value="Webserver">Webserver</MenuItem>
           </Select>
         </FormControl>
-        <Box sx={{ mt: 2, textAlign: 'right' }}>
+
+        <Box sx={{ mt: 2, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+          {/* Spinner aligned with the button */}
+          {loading && (
+            <Typography sx={{ mr: 7 }}>
+              <LoadingSpinner />
+            </Typography>
+          )}
           <Button
             variant="contained"
             color="primary"
             sx={{ mt: 1 }}
             onClick={handleSave}
           >
-            {loading ? <LoadingSpinner /> : 'Save Settings'}
+            Save
           </Button>
         </Box>
+
       </Box>
     </Box>
   );

@@ -1,12 +1,8 @@
 import React from 'react';
-import './LoadingSpinner.css'; // Import file CSS chứa cài đặt cho spinner
+import './LoadingSpinner.css'; // Import the CSS file
 
 const LoadingSpinner = () => {
-  return (
-    <div className="spinner-container">
-      <div className="spinner"></div>
-    </div>
-  );
+  return <div className="loader"></div>;
 };
 
 export default LoadingSpinner;

@@ -385,7 +385,11 @@ const Profile = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Grid
+            item
+            xs={12}
+            sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
             {!isEditable ? (
               <Button variant="contained" onClick={() => setIsEditable(true)}>
                 Edit
@@ -398,7 +402,7 @@ const Profile = () => {
                     bgcolor: '#ff0505',
                     color: '#fff',
                     '&:hover': {
-                      bgcolor: '#b50000', // Màu đỏ đậm khi di chuột vào
+                      bgcolor: '#b50000', // Dark red on hover
                     },
                   }}
                   onClick={handleCancel}
@@ -406,12 +410,22 @@ const Profile = () => {
                   Cancel
                 </Button>
 
+                {/* Container for LoadingSpinner to not affect layout */}
+                <Box sx={{ position: 'relative', width: '50px', height: '50px', alignItems: 'center' }}>
+                  {loading && (
+                    <Box sx={{ position: 'absolute', top: 0, left: 0 }}>
+                      <LoadingSpinner />
+                    </Box>
+                  )}
+                </Box>
+
                 <Button variant="contained" color="primary" onClick={handleSave}>
-                {loading ? <LoadingSpinner /> : 'Save'}
+                  Save
                 </Button>
               </>
             )}
           </Grid>
+
         </Grid>
       </Paper>
 

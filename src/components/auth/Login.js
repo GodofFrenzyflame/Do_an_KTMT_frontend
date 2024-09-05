@@ -106,7 +106,7 @@ export default function Login({ onLogin }) {
         }}
       >
        
-        <Typography variant="h4" sx={{ mb: 3 }}>
+        <Typography variant="h4" sx={{ mb: 3, }}>
           Login
         </Typography>
         
@@ -133,7 +133,7 @@ export default function Login({ onLogin }) {
               </Button>
             </Box>
             {error && <Typography color="error" sx={{ mb: 3 }}>{error}</Typography>}
-            <Button sx={{ mt: 3 }} variant="contained" color="primary" onClick={handleLogin} fullWidth>
+            <Button sx={{ mt: 3, height: 55,}} variant="contained" color="primary" onClick={handleLogin} fullWidth>
               {loading ? <LoadingSpinner /> : 'Login'}
             </Button>
             <Typography sx={{ mt: 2 }}>
