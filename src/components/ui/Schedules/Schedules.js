@@ -15,94 +15,87 @@ const token = localStorage.getItem('accessToken');
 
 const SchedulesCard = ({ schedule, onToggle, onEdit, onDelete, showDeleteIcons }) => (
   <Box
-    className={`neon-effect ${schedule.state ? 'on' : 'off'}`}
-    sx={{
-      border: '4px solid transparent',
-      borderRadius: '17px',
-      padding: '16px',
-      display: 'flex',
-      alignItems: 'center',
-      margin: '8px',
-      width: '100%',
-      maxWidth: '600px',
-      justifyContent: 'space-between',
+  className={`neon-effect ${schedule.state ? 'on' : 'off'}`}
+  sx={{
+    border: '4px solid transparent',
+    borderRadius: '17px',
+    padding: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    margin: '8px',
+    width: '100%',
+    maxWidth: '600px',
+    justifyContent: 'space-between',
+    boxShadow: schedule.state
+      ? '0px 8px 16px rgba(0, 255, 0, 0.5)'
+      : '0px 4px 8px rgba(0, 0, 0, 0.3)',
+    backgroundColor: schedule.state ? '#fff' : '#f0f0f0',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    '&:hover': {
+      transform: 'scale(1.02)',
       boxShadow: schedule.state
-        ? '0px 8px 16px rgba(0, 255, 0, 0.5)'
-        : '0px 4px 8px rgba(0, 0, 0, 0.3)',
-      backgroundColor: schedule.state ? '#fff' : '#f0f0f0',
-      transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-      '&:hover': {
-        transform: 'scale(1.02)',
-        boxShadow: schedule.state
-          ? '0px 12px 24px rgba(0, 255, 0, 0.6)'
-          : '0px 8px 16px rgba(0, 0, 0, 0.4)',
-      },
-    }}
-  >
-    {/* Schedule Name */}
-    <Typography sx={{  fontWeight: 'bold', fontSize: '1.2rem' }}>
-      {schedule.schedule_name}
-    </Typography>
-    {/* Edit Icon */}
-    <IconButton onClick={() => onEdit(schedule.schedule_id)} >
-      <EditIcon color="primary" />
-    </IconButton>
-    <Typography sx={{ color: '#555' }}>{`Id : ${schedule.schedule_id}`}</Typography>
+        ? '0px 12px 24px rgba(0, 255, 0, 0.6)'
+        : '0px 8px 16px rgba(0, 0, 0, 0.4)',
+    },
+  }}
+>
+  {/* Schedule Name */}
+  <Typography sx={{  fontWeight: 'bold', fontSize: '1.2rem' }}>
+    {schedule.schedule_name}
+  </Typography>
+  {/* Edit Icon */}
+  <IconButton onClick={() => onEdit(schedule.schedule_id)} >
+    <EditIcon color="primary" />
+  </IconButton>
+  <Typography sx={{ color: '#555' }}>{`Id : ${schedule.schedule_id}`}</Typography>
 
-    {/* day */}
+  {/* day */}
 <Typography sx={{ color: '#555' }}>
-  {schedule.day
-    ? schedule.day.map(day => day.slice(0, 3)).join(', ')
-    : ''}
+{schedule.day
+  ? schedule.day.map(day => day.slice(0, 3)).join(', ')
+  : ''}
 </Typography>
 
 
-    {/* Time */}
-    <Typography sx={{ color: '#555' }}>
-      {schedule.time}
-    </Typography>
-    {/* Schedule State */}
-    <Typography sx={{ color: schedule.state ? 'green' : 'red', fontWeight: 'bold' }}>
-      {schedule.state ? 'On' : 'Off'}
-    </Typography>
-    {/* Toggle Switch */}
-    <Switch
-      checked={schedule.state}
-      onChange={() => onToggle(schedule.schedule_id)}
-    />
+  {/* Time */}
+  <Typography sx={{ color: '#555' }}>
+    {schedule.time}
+  </Typography>
+  {/* Schedule State */}
+  <Typography sx={{ color: schedule.state ? 'green' : 'red', fontWeight: 'bold' }}>
+    {schedule.state ? 'On' : 'Off'}
+  </Typography>
+  {/* Toggle Switch */}
+  <Switch
+    checked={schedule.state}
+    onChange={() => onToggle(schedule.schedule_id)}
+  />
 
 
 
-    {/* Delete Icon */}
-    {showDeleteIcons && (
-      <IconButton onClick={() => onDelete(schedule.schedule_id)} sx={{ marginLeft: '16px' }}>
-        <DeleteIcon color="error" />
-      </IconButton>
-    )}
-  </Box>
+  {/* Delete Icon */}
+  {showDeleteIcons && (
+    <IconButton onClick={() => onDelete(schedule.schedule_id)} sx={{ marginLeft: '16px' }}>
+      <DeleteIcon color="error" />
+    </IconButton>
+  )}
+</Box>
 );
 
 const ScheduleGrid = () => {
   const [schedules, setSchedules] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newCard, setNewCard] = useState({ schedule_name: '', schedule_id: '', day: [], time: '', actions: [{ relayId: '', action: '' }] });
-  // const [editDialogOpen, setEditDialogOpen] = useState(false);
-  // const [editschedule, setEditschedule] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showDeleteIcons, setShowDeleteIcons] = useState(false);
-  // const [relaySelectionOpen, setRelaySelectionOpen] = useState(false);
   const [relays, setRelays] = useState([]);
   const [mode, setMode] = useState('');
-  // const [editCard, setEditCard] = useState({});
 
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = () => {
-    if (localStorage.getItem('relays_schedule_add')) {
-      localStorage.removeItem('relays_schedule_add');
-    }
     const storedSchedulesJSON = localStorage.getItem('schedule');
     const storedSchedulesData = storedSchedulesJSON ? JSON.parse(storedSchedulesJSON) : [];
     setSchedules(storedSchedulesData);
@@ -155,7 +148,7 @@ const ScheduleGrid = () => {
         const scheduleId = result.id;
         const storedScheduleJSON = localStorage.getItem('schedule');
         const storedScheduleData = storedScheduleJSON ? JSON.parse(storedScheduleJSON) : [];
-        storedScheduleData.push({ schedule_id: scheduleId, schedule_name, day, time, actions });
+        storedScheduleData.push({ schedule_id: scheduleId, schedule_name, day, time, schedule_actions: actions });
         localStorage.setItem('schedule', JSON.stringify(storedScheduleData));
         setNewCard({ schedule_name: '', day: [], time: '', actions: [] });
         setDialogOpen(false);
@@ -195,10 +188,10 @@ const ScheduleGrid = () => {
           if (schedule.schedule_id === schedule_id) {
             return {
               ...schedule,
-              schedule_name: schedule_name !== undefined ? schedule_name : schedule.schedule_name,
-              day: day !== undefined ? day : schedule.day,
-              time: time !== undefined ? time : schedule.time,
-              actions: actions !== undefined ? actions : schedule.actions
+              schedule_name: schedule_name,
+              day: day,
+              time: time,
+              actions: actions,
             };
           }
           return schedule;
@@ -291,19 +284,19 @@ const ScheduleGrid = () => {
       actions: scheduledRelays
     };
 
-    if (!newCard.schedule_name) {
+    if (!editCard.schedule_name) {
       toast.error('Schedule name is required.');
       return;
     }
-    if (newCard.day.length === 0) {
+    if (editCard.day.length === 0) {
       toast.error('Select at least one day.');
       return;
     }
-    if (!newCard.time) {
+    if (!editCard.time) {
       toast.error('Time is required.');
       return;
     }
-    if (newCard.actions.length === 0) {
+    if (editCard.actions.length === 0) {
       toast.error('Select at least one actions.');
       return;
     }
@@ -389,7 +382,7 @@ const ScheduleGrid = () => {
 
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%', mb:'50%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%' ,mb:'50%'}}>
       {showDeleteIcons && (
         <div>
           <IconButton
