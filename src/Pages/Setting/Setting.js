@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Box, Typography, Button, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import AppContext from './language/AppContext'; // Import context
 import { toast } from 'react-toastify';
-import LoadingSpinner from '../Loading/LoadingSpinner';
+import LoadingSpinner from '../../components/ui/Loading/LoadingSpinner';
 
 const Settings = () => {
   const { settings, setSettings } = useContext(AppContext);

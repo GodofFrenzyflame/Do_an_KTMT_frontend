@@ -9,7 +9,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AppContext from '../Setting/language/AppContext';
 import AvTimerIcon from '@mui/icons-material/AvTimer';
-import '../../../Styles/Styles.css';
+import '../../Styles/Styles.css';
 
 export default function MiniSidebar({ onLogout, isOpen }) {
   const { settings } = useContext(AppContext);

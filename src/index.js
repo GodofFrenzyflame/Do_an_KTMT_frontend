@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client'; // Sử dụng `react-dom/client` thay vì `react-dom`
 import App from './App';
 import './Styles/Styles.css';
-import { AppProvider } from '../src/components/ui/Setting/language/AppContext.jsx'; // Import AppProvider
-import '../src/components/ui/Setting/language/i18n.jsx';
+import { AppProvider } from './Pages/Setting/language/AppContext.jsx'; // Import AppProvider
+import './Pages/Setting/language/i18n.jsx';
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

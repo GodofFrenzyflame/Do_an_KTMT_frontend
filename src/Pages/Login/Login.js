@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import {
   TextField, Button, Box, Typography, Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
-import Signup from './Signup';
-import Forget from './Forget';
-import LoadingSpinner from '../ui/Loading/LoadingSpinner'; // Import LoadingSpinner
+import Signup from '../../components/auth/Signup';
+import Forget from '../../components/auth/Forget';
+import LoadingSpinner from '../../components/ui/Loading/LoadingSpinner'; // Import LoadingSpinner
 
 export default function Login({ onLogin }) {
   const [emailOrusername, setEmailOrUsername] = useState('');

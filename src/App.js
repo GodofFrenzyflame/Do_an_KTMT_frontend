@@ -4,19 +4,19 @@ import { Box } from '@mui/material';
 import { toast } from 'react-toastify';
 
 
-import Login from './components/auth/Login';
+import Login from './Pages/Login/Login';
 import Signup from './components/auth/Signup';
 
 
-import Home from './components/ui/Home/Home';
-import Profile from './components/ui/Profile/Profile';
-import History from './components/ui/History/History';
-import AuthenticatedLayout from './components/ui/Sidebar/Sidebarlayout';
-import Relay from './components/ui/Relay/Relay';
-import Setting from './components/ui/Setting/Setting';
-import UpgradeSide from './components/ui/Upgrade/upgrade'
-import AppContext from './components/ui/Setting/language/AppContext';
-import Schedules from './components/ui/Schedules/Schedules';
+import Home from './Pages/Home/Home';
+import Profile from './Pages/Profile/Profile';
+import History from './Pages/History/History';
+import SidebarLayout from './Pages/Sidebar/Sidebarlayout';
+import Relay from './Pages/Relay/Relay';
+import Setting from './Pages/Setting/Setting';
+import UpgradeSide from './components/ui/Upgrade/upgrade';
+import AppContext from './Pages/Setting/language/AppContext';
+import Schedules from './Pages/Schedules/Schedules';
 import Footer from './components/ui/Footer/Footer';
 
 function App() {
@@ -411,13 +411,13 @@ function App() {
             path="/home"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <Home />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />
@@ -425,13 +425,13 @@ function App() {
             path="/profile"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <Profile />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />
@@ -439,13 +439,13 @@ function App() {
             path="/history"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <History />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />
@@ -453,13 +453,13 @@ function App() {
             path="/relay"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <Relay />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />
@@ -467,13 +467,13 @@ function App() {
             path="/upgrade"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <UpgradeSide  />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />  
@@ -481,13 +481,13 @@ function App() {
             path="/schedules"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <Schedules />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />
@@ -495,13 +495,13 @@ function App() {
             path="/setting"
             element={
               isLoggedIn ?
-                <AuthenticatedLayout
+                <SidebarLayout
                   isSidebarOpen={isSidebarOpen}
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
                   <Setting />
-                </AuthenticatedLayout>
+                </SidebarLayout>
                 : <Navigate to="/" />
             }
           />

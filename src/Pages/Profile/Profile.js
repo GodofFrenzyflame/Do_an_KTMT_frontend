@@ -5,7 +5,7 @@ import { InputAdornment } from '@mui/material';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
-import LoadingSpinner from '../Loading/LoadingSpinner';
+import LoadingSpinner from '../../components/ui/Loading/LoadingSpinner';
 const token = localStorage.getItem('accessToken');
 
 const showAlert = (message, type) => {

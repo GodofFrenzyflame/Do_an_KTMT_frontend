@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import DualAxisChart from '../Charts/DualAxisChart'; // Import the new chart component
-import Map from '../Map/Map';
+import DualAxisChart from '../../components/ui/Charts/DualAxisChart'; // Import the new chart component
+import Map from '../../components/ui/Map/Map';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
-import TemperatureGauge from '../Charts/TemperatureGauge';
-import HumidityGauge from '../Charts/HumidityGauge';
+import TemperatureGauge from '../../components/ui/Charts/TemperatureGauge';
+import HumidityGauge from '../../components/ui/Charts/HumidityGauge';
 import './Home.css';
 
 const Home = () => {

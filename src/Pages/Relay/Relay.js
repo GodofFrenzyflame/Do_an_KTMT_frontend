@@ -11,10 +11,20 @@ import HomeIcon from '@mui/icons-material/Home'; // Biểu tượng cho Add to H
 import CloseIcon from '@mui/icons-material/Close'; // Biểu tượng cho đóng
 import './Relay.css'
 import { toast } from 'react-toastify';
+import Swal from 'sweetalert2';
 
 const token = localStorage.getItem('accessToken');
 
-const RelayCard = ({ relay,  onToggle,  onEdit,  onDelete,  oncheckHome,  showCheckboxes,  showDeleteIcons}) => (
+const showAlert = (message, type) => {
+  Swal.fire({
+    icon: type,
+    title: type === 'error' ? 'Oops...' : 'Success',
+    text: message,
+    confirmButtonText: 'OK',
+  });
+};
+
+const RelayCard = ({ relay, onToggle, onEdit, onDelete, oncheckHome, showCheckboxes, showDeleteIcons }) => (
   <Box
     className={`neon-effect ${relay.state ? 'on' : 'off'}`}
     sx={{
@@ -74,11 +84,11 @@ const RelayGrid = () => {
   const [relays, setRelays] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newCard, setNewCard] = useState({ name: '', relayId: '' });
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [editRelay, setEditRelay] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showCheckboxes, setShowCheckboxes] = useState(false); // State để quản lý hiển thị của checkbox
   const [showDeleteIcons, setShowDeleteIcons] = useState(false);
+  const [mode, setMode] = useState('');
+  const [currentID, setCurrentID] = useState(null);
 
   const handleKeyDown = (e, saveFunction) => {
     if (e.key === 'Enter') {
@@ -87,22 +97,24 @@ const RelayGrid = () => {
   };
 
   const loadData = () => {
+    setNewCard({ name: '', relayId: '' });
+    setDialogOpen(false);
+    setMenuOpen(false);
+    setShowCheckboxes(false);
+    setShowDeleteIcons(false);
+    setCurrentID(null);
+
     const storedRelayJSON = localStorage.getItem('relays');
     const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-    setRelays(storedRelayData);
-    let relaysHome = JSON.parse(localStorage.getItem('relays_home'));
-    if (localStorage.getItem('relays_home_add')) {
-      localStorage.removeItem('relays_home_add');
-    }
-    if (relaysHome) {
-      let updatedRelaysHome = relaysHome.map(relay => {
-        relay.relay_home = true;
-        return relay;
-      });
-      localStorage.setItem('relays_home_add', JSON.stringify(updatedRelaysHome));
-    } else {
-      console.log('No relays_home data found in localStorage');
-    }
+    const relaysHome = JSON.parse(localStorage.getItem('relays_home')) || [];
+    const updatedRelays = storedRelayData.map((relay) => {
+      const isHomeRelay = relaysHome.some(homeRelay => homeRelay.relay_id === relay.relay_id);
+      return {
+        ...relay,
+        relay_home: isHomeRelay
+      };
+    });
+    setRelays(updatedRelays);
   };
 
   useEffect(() => {
@@ -154,7 +166,11 @@ const RelayGrid = () => {
     }
   };
 
-  const fetchRelaySet = async (relay_id, relay_name, new_relay_id) => {
+  const fetchRelaySet = async (relay_name, new_relay_id) => {
+    if (!currentID) {
+      alert('Please select a relay to edit.');
+      return;
+    }
     try {
       const response = await fetch('http://localhost:8080/relay/set', {
         method: 'PATCH',
@@ -162,7 +178,7 @@ const RelayGrid = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ relay_id, relay_name, new_relay_id }),
+        body: JSON.stringify({ relay_id: currentID, relay_name, new_relay_id }),
       });
       const result = await response.json();
       if (response.ok) {
@@ -170,7 +186,7 @@ const RelayGrid = () => {
         const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
 
         const updatedRelays = storedRelayData.map((relay) => {
-          if (relay.relay_id === relay_id) {
+          if (relay.relay_id === currentID) {
             return {
               ...relay,
               relay_name: relay_name || relay.relay_name,
@@ -181,15 +197,13 @@ const RelayGrid = () => {
         });
         localStorage.setItem('relays', JSON.stringify(updatedRelays));
         setRelays(updatedRelays);
+        toast.success('Edit successfully.');
         loadData();
-        setEditRelay(null);
-        setEditDialogOpen(false);
       } else {
-        alert(result.error);
-        console.error('Error:', result.error);
+        toast.error(result.error);
       }
     } catch (error) {
-      console.error('Error setting relay:', error);
+      toast.error(error);
     }
   };
 
@@ -242,11 +256,9 @@ const RelayGrid = () => {
         loadData();
       } else {
         toast.error(result.error);
-        console.error('Error:', result.message);
       }
     } catch (error) {
       toast.error(error);
-      console.error('Error setting status:', error);
     }
   };
 
@@ -263,44 +275,42 @@ const RelayGrid = () => {
       const result = await response.json();
       if (response.ok) {
       } else {
-        console.error('Error:', result.error);
+        toast.error(result.error);
       }
     } catch (error) {
-      console.error('Error setting home:', error);
+      toast.error(error);
     }
   };
 
-  const handleCheckHome = (id, checked) => {
-    const relay = relays.find((relay) => relay.relay_id === id);
-    const storedRelayJSON = localStorage.getItem('relays_home_add');
-    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+  const handleAddCard = () => {
+    setDialogOpen(true);
+    setMenuOpen(false);
+    setMode('add');
+  };
 
-    if (relay) {
-      const existingRelay = storedRelayData.find((storedRelay) => storedRelay.relay_id === id);
+  const handleEditRelay = (id) => {
+    const relayToEdit = relays.find(relay => relay.relay_id === id);
+    setNewCard({ name: relayToEdit.relay_name, relayId: relayToEdit.relay_id });
+    setDialogOpen(true);
+    setMenuOpen(false)
+    setMode('edit');
+    setCurrentID(id);
+  };
 
-      if (checked) {
-        if (existingRelay) {
-          existingRelay.relay_home = true;
-        } else {
-          storedRelayData.push({
-            relay_id: relay.relay_id,
-            relay_name: relay.relay_name,
-            state: relay.state,
-            relay_home: true,
-          });
-        }
-      } else {
-        if (existingRelay) {
-          existingRelay.relay_home = false;
-        }
+  const handleSaveCard = () => {
+    if (mode === 'add') {
+      if (!newCard.relayId) {
+        alert('Relay ID is required.');
+        return;
       }
-      const updatedRelays = relays.map((relay) =>
-        relay.relay_id === id ? { ...relay, relay_home: checked } : relay
-      );
-      localStorage.setItem('relays_home_add', JSON.stringify(storedRelayData));
-      setRelays(updatedRelays);
-    } else {
-      console.error('Relay not found:', id);
+      fetchRelayAdd(newCard.relayId, newCard.name, false);
+    }
+    else if (mode === 'edit') {
+      if (!newCard.relayId) {
+        alert('Relay ID is required.');
+        return;
+      }
+      fetchRelaySet(newCard.name, newCard.relayId);
     }
   };
 
@@ -309,34 +319,7 @@ const RelayGrid = () => {
     if (relay) {
       fetchStatusSet(id, !relay.state);
     } else {
-      console.error('Relay not found:', id);
-    }
-  };
-
-  const handleAddCard = () => {
-    setDialogOpen(true);
-    setMenuOpen(false);
-  };
-
-  const handleSaveCard = () => {
-    if (!newCard.relayId) {
-      alert('Relay ID is required.');
-      return;
-    }
-    fetchRelayAdd(newCard.relayId, newCard.name, false);
-    setNewCard({ name: '', relayId: '' });
-    setDialogOpen(false);
-  };
-
-  const handleEditRelay = (id) => {
-    const relayToEdit = relays.find(relay => relay.relay_id === id);
-    setEditRelay(relayToEdit);
-    setEditDialogOpen(true);
-  };
-
-  const handleSaveEdit = () => {
-    if (editRelay) {
-      fetchRelaySet(editRelay.relay_id, editRelay.name, editRelay.new_relay_id);
+      alert('Relay not found: ', id);
     }
   };
 
@@ -344,59 +327,65 @@ const RelayGrid = () => {
     fetchRelayDelete(id);
   };
 
-  const handleAddToHome = () => {
-    const storedRelayJSON = localStorage.getItem('relays_home_add');
-    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
+  const handleCheckHome = (id, checked) => {
     const updatedRelays = relays.map((relay) => {
-      const isRelayInHome = storedRelayData.some(
-        (storedRelay) => storedRelay.relay_id === relay.relay_id && storedRelay.relay_home === true
-      );
-      return { ...relay, relay_home: isRelayInHome };
+      if (relay.relay_id === id) {
+        return { ...relay, relay_home: checked };
+      }
+      return relay;
     });
     setRelays(updatedRelays);
+  }
+
+  const handleAddToHome = () => {
+    loadData();
     setShowCheckboxes(true);
     setShowDeleteIcons(false);
     setMenuOpen(false);
+  };
+
+  const handleAccpet = async () => {
+    const relayHomeCount = relays.filter((relay) => relay.relay_home === true).length;
+    if (relayHomeCount > 4) {
+      showAlert('You cannot add more than 4 relays to home.');
+      return;
+    }
+    try {
+      await Promise.all(
+        relays.map(relay =>
+          fetchRelayHomeSet(relay.relay_id, relay.relay_home, relay.relay_name, relay.state)
+        )
+      );
+      const filteredRelays = relays.filter(relay => relay.relay_home === true);
+      localStorage.setItem('relays_home', JSON.stringify(filteredRelays));
+      toast.success('Add to home successfully.');
+      handleCancel();
+    } catch (error) {
+      toast.error(error)
+    }
+  }
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
   };
 
   const handleDeleteMode = () => {
     setShowCheckboxes(false);
     setShowDeleteIcons(true);
     setMenuOpen(false);
+    setDialogOpen(false);
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const handleAccpet = async () => {
-    const storedRelayJSON = localStorage.getItem('relays_home_add');
-    const storedRelayData = storedRelayJSON ? JSON.parse(storedRelayJSON) : [];
-    const relayHomeCount = storedRelayData.filter(relay => relay.relay_home === true).length;
-    if (relayHomeCount > 4) {
-      alert('You cannot add more than 4 relays to home.');
-      return;
-    }
-    try {
-      await Promise.all(storedRelayData.map(relay =>
-        fetchRelayHomeSet(relay.relay_id, relay.relay_home, relay.relay_name, relay.state)
-      ));
-      const filteredRelays = storedRelayData.filter(relay => relay.relay_home === true);
-      localStorage.setItem('relays_home', JSON.stringify(filteredRelays));
-      localStorage.removeItem('relays_home_add');
-      toast.success('Add to home successfully.');
+  const handleClose = (event, reason) => {
+    if (reason === 'backdropClick') {
       handleCancel();
-    } catch (error) {
-      toast.error(error)
-      console.error('Error in handleAccept:', error);
+    } else {
+      setDialogOpen(false);
     }
-  }
+  };
 
-  const handleCancel = async () => {
+  const handleCancel = () => {
     loadData();
-    setShowCheckboxes(false);
-    setShowDeleteIcons(false);
-    setMenuOpen(false);
   }
 
   const [position, setPosition] = useState('center');
@@ -404,7 +393,7 @@ const RelayGrid = () => {
   const [animating, setAnimating] = useState(false);
 
   const handleClick = (event) => {
-    if (animating) return; // Không cho phép nhấp khi đang hoạt động
+    if (animating) return;
 
     setAnimating(true);
 
@@ -430,7 +419,7 @@ const RelayGrid = () => {
     }, 400);
   };
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '5%', mb:'50%' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', alignItems: 'center', overflow: 'hidden', marginTop: '7%', mb: '50%' }}>
       {showCheckboxes && (
         <div className="twin-toggle-container">
           <div className={`twin-toggle ${position} ${color}`} onClick={handleClick} >
@@ -463,7 +452,6 @@ const RelayGrid = () => {
               transition: 'background-color 0.3s ease',
               fontSize: '16px',
             }}
-
           >
             Cancel
           </IconButton>
@@ -595,19 +583,19 @@ const RelayGrid = () => {
 
 
       {/* Dialog thêm mới Relay */}
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}
+      <Dialog open={dialogOpen} onClose={handleClose}
         PaperProps={{
           sx: {
             borderRadius: '17px',
           },
         }}
       >
-        <DialogTitle>Add New Relay</DialogTitle>
+        <DialogTitle>{mode === 'add' ? 'Add Relay' : 'Edit Relay'}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Relay Name"
+            label={mode === 'add' ? 'Relay Name' : 'New Relay Name'}
             type="text"
             fullWidth
             variant="outlined"
@@ -616,7 +604,7 @@ const RelayGrid = () => {
           />
           <TextField
             margin="dense"
-            label="Relay ID"
+            label={mode === 'add' ? 'Relay ID' : 'New Relay ID'}
             type="text"
             fullWidth
             variant="outlined"
@@ -626,74 +614,19 @@ const RelayGrid = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)} sx={{ 
+          <Button onClick={() => setDialogOpen(false)} sx={{
             color: '#ff0000',
             '&:hover': {
-                 bgcolor: '#ff0000' ,
-                 color: '#fff'
+              bgcolor: '#ff0000',
+              color: '#fff'
             },
           }}>Cancel</Button>
-          <Button onClick={handleSaveCard}  sx={{ 
+          <Button onClick={handleSaveCard} sx={{
             color: '#0004ff',
             bgcolor: '#fff',
             '&:hover': {
-                 bgcolor: '#0004ff' ,
-                 color: '#fff'
-            },
-          }}>Save</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Dialog chỉnh sửa Relay */}
-      <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)}
-        PaperProps={{
-          sx: {
-            borderRadius: '17px',
-          },
-        }}
-      >
-        <DialogTitle>Edit Relay</DialogTitle>
-        <DialogContent >
-          {editRelay && (
-            <>
-              <TextField
-                autoFocus
-                margin="dense"
-                label="Relay Name"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={editRelay.name}
-                onChange={(e) => setEditRelay({ ...editRelay, name: e.target.value })}
-                onKeyDown={(e) => handleKeyDown(e, handleSaveEdit)}
-              />
-              <TextField
-                margin="dense"
-                label="New Relay ID (optional)"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={editRelay.new_relay_id || ''}
-                onChange={(e) => setEditRelay({ ...editRelay, new_relay_id: e.target.value })}
-                onKeyDown={(e) => handleKeyDown(e, handleSaveEdit)}
-              />
-            </>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)} sx={{ 
-            color: '#ff0000',
-            '&:hover': {
-                 bgcolor: '#ff0000' ,
-                 color: '#fff'
-            },
-          }}>Cancel</Button>
-          <Button onClick={handleSaveEdit}  sx={{ 
-            color: '#0004ff',
-            bgcolor: '#fff',
-            '&:hover': {
-                 bgcolor: '#0004ff' ,
-                 color: '#fff'
+              bgcolor: '#0004ff',
+              color: '#fff'
             },
           }}>Save</Button>
         </DialogActions>

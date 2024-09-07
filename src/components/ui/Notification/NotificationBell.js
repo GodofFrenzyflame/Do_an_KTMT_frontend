@@ -4,7 +4,7 @@ import { IconButton, Popper, Typography, Box, Grid ,Button} from '@mui/material'
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useClickAway } from 'react-use'; // Ensure this package is installed
 import { useTranslation } from 'react-i18next';
-import AppContext from '../Setting/language/AppContext';
+import AppContext from '../../../Pages/Setting/language/AppContext';
 import { useNavigate } from 'react-router-dom'; 
 const NotificationBell = () => {
   const [open, setOpen] = useState(false);

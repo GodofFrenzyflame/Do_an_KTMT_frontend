@@ -1,12 +1,12 @@
-// src/components/AuthenticatedLayout.js
+// src/components/SidebarLayout.js
 import React, { useState, useEffect } from 'react';
 import { Box, IconButton } from '@mui/material';
 import Sidebar from './Sidebar';
-import Clock from '../Clock/Clock'; // Import Clock component
-import NotificationBell from '../Notification/NotificationBell'; // Import NotificationBell component
+import Clock from '../../components/ui/Clock/Clock'; // Import Clock component
+import NotificationBell from '../../components/ui/Notification/NotificationBell'; // Import NotificationBell component
 import MiniSidebar from './MiniSidebar';
 
-const AuthenticatedLayout = ({ onLogout, children }) => {
+const SidebarLayout = ({ onLogout, children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
@@ -69,4 +69,4 @@ const AuthenticatedLayout = ({ onLogout, children }) => {
   );
 };
 
-export default AuthenticatedLayout;
+export default SidebarLayout;

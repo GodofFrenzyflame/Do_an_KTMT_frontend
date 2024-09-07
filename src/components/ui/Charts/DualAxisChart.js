@@ -10,7 +10,7 @@ import {
   Legend,
 } from 'recharts';
 
-import AppContext from '../Setting/language/AppContext';
+import AppContext from '../../../Pages/Setting/language/AppContext';
 
 const DualAxisChart = () => {
   const [data, setData] = useState(null);

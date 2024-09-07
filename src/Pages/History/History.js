@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Paper, List, ListItem } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
 import { toast } from 'react-toastify';
-import LoadingSpinner from '../Loading/LoadingSpinner'; // Import LoadingSpinner
+import LoadingSpinner from '../../components/ui/Loading/LoadingSpinner'; // Import LoadingSpinner
 
 const History = () => {
   const [startDate, setStartDate] = useState('');

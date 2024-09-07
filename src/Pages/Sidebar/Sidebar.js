@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Box, Button, Typography, Avatar, Divider, Grid } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom'; 
 import AppContext from '../Setting/language/AppContext';
-import '../../../Styles/Styles.css';
+import '../../Styles/Styles.css';
 import { useTranslation } from 'react-i18next';
 import { SidebarData } from './Sidebardata';
 import './Sidebar.css';

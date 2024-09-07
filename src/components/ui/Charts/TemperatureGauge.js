@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { Box, Typography } from '@mui/material';
-import AppContext from '../Setting/language/AppContext';
+import AppContext from '../../../Pages/Setting/language/AppContext';
 import LoadingSpinner from '../Loading/LoadingSpinner';
 
 const TemperatureGauge = () => {
