@@ -178,7 +178,7 @@ const Profile = () => {
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto', }}>
+    <Box sx={{ p: 3, maxWidth: '600px', margin: 'auto',mb:'50%' }}>
       <Paper sx={{ p: 2, borderRadius: '17px' ,background: `linear-gradient(to bottom, 
                     rgba(255, 255, 255, 0.6) 5%, 
                     rgba(255, 255, 255, 1) 100%)`,}}>

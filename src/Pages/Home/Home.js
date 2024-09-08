@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useContext } from 'react';
-import DualAxisChart from '../../components/ui/Charts/DualAxisChart'; // Import the new chart component
 import Map from '../../components/ui/Map/Map';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import AppContext from '../Setting/language/AppContext';
 import TemperatureGauge from '../../components/ui/Charts/TemperatureGauge';
 import HumidityGauge from '../../components/ui/Charts/HumidityGauge';
 import './Home.css';
+
+
+import HumidityChart from '../../components/ui/Charts/HumidityChart';
+import TemperatureChart from '../../components/ui/Charts/TemperatureChart';
 
 const Home = () => {
 
@@ -38,7 +41,7 @@ const Home = () => {
 
 
   return (
-    <Box sx={{ paddingLeft: '2%' ,paddingTop:'2%',mb:'20%'}}>
+    <Box sx={{ paddingLeft: '2%' ,paddingTop:'2%',mb:'50%'}}>
       <Grid container spacing={2} justifyContent="center" sx={{ mb: '1%' }}>
         {relaysHome.map((relay) => (
           <Grid item xs={12} sm={gridItemWidths[relaysHome.length]} key={relay.relay_id}>
@@ -86,13 +89,35 @@ const Home = () => {
         </Grid>
       </Grid>
 
-      <Paper elevation={3} sx={{ p: '2%', textAlign: 'center', background: `linear-gradient(to bottom, 
-                    rgba(255, 255, 255, 0.6) 5%, 
-                    rgba(255, 255, 255, 1) 100%)`, color: getWordColor(), mt: '1%' }}>
-        <Typography variant="h6">Temperature & Humidity</Typography>
-        <DualAxisChart /> {/* Replace History with DualAxisChart */}
-      </Paper>
-      
+      {/* Humidity and Temperature Charts */}
+      <Grid container spacing={2} justifyContent="center" sx={{ mt: '2%' }}>
+        {/* Humidity Chart */}
+        <Grid item xs={12} sm={6}>
+          <Paper
+            elevation={3}
+            sx={{
+              background: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 5%, rgba(255, 255, 255, 1) 100%)`,
+              p: 2,
+            }}
+          >
+            <HumidityChart />
+          </Paper>
+        </Grid>
+
+        {/* Temperature Chart */}
+        <Grid item xs={12} sm={6}>
+          <Paper
+            elevation={10}
+            sx={{
+              background: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 5%, rgba(255, 255, 255, 1) 100%)`,
+              p: 2,
+            }}
+          >
+            <TemperatureChart />
+          </Paper>
+        </Grid>
+      </Grid>
+
     </Box>
   );
 };

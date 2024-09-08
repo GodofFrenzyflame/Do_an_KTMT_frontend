@@ -25,6 +25,28 @@ function App() {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [backgroundPosition, setBackgroundPosition] = useState({ x: 0, y: 0 });
 
+  const verryAccessToken = async (token) => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    try {
+      const response = await fetch('http://localhost:8080/verify-token', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        if (refreshToken) {
+          await refreshAccessToken('connect');
+        } else {
+          console.error('No refresh token available');
+        }
+      }
+    }
+    catch (error) {
+      console.error('Error during access token refresh:', error);
+    }
+  };
+
   const refreshAccessToken = async (state) => {
     const refreshToken = localStorage.getItem('refreshToken');
     try {
@@ -345,10 +367,12 @@ function App() {
       fetchTemperaturData(accessToken);
       fetchHumidityData(accessToken);
       fetchScheduleGet(accessToken);
+      verryAccessToken(accessToken);
       const intervalId = setInterval(() => {
         fetchRelayGetHome(accessToken);
         fetchTemperaturData(accessToken);
         fetchHumidityData(accessToken);
+        verryAccessToken(accessToken);
         if (localStorage.getItem('connected') === 'false') {
           fetchConnect(accessToken, localStorage.getItem('connect'));
           fetchTemperatureHumidityData(accessToken, 7);
@@ -386,7 +410,7 @@ function App() {
     <Box onMouseMove={handleMouseMove}
       sx={{
         background: getBackgroundColor(),
-       
+
       }}>
       <Router >
         <Routes >
@@ -472,11 +496,11 @@ function App() {
                   toggleSidebar={toggleSidebar}
                   onLogout={handleLogout}
                 >
-                  <UpgradeSide  />
+                  <UpgradeSide />
                 </SidebarLayout>
                 : <Navigate to="/" />
             }
-          />  
+          />
           <Route
             path="/schedules"
             element={
@@ -508,7 +532,7 @@ function App() {
         </Routes>
         <Footer />
       </Router>
-      
+
     </Box>
   );
 }

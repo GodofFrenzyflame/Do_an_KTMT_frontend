@@ -72,8 +72,8 @@ const Settings = () => {
       sx={{
         p: 3, maxWidth: '500px', mx: 'auto',
         background: `linear-gradient(to bottom, 
-          rgba(255, 255, 255, 0.5) 5%, 
-          rgba(255, 255, 255, 1) 100%)`,
+          rgba(255, 255, 255, 0.4) 5%, 
+          rgba(255, 255, 255, 0.7) 100%)`,
         borderRadius: '12px',
         display: 'flex',
         flexDirection: 'column',
