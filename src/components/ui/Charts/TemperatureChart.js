@@ -65,28 +65,29 @@ const TempChart = () => {
   return (
     <div>
       <Box className="Chart-button-group">
-        <Button
-          variant={time === 7 ? 'contained' : 'outlined'}
-          className="Chart-button"
-          onClick={() => handleTimeChange(7)}
-        >
-          7 Days
-        </Button>
-        <Button
-          variant={time === 30 ? 'contained' : 'outlined'}
-          className="Chart-button"
-          onClick={() => handleTimeChange(30)}
-        >
-          30 Days
-        </Button>
-        <Button
-          variant={time === 90 ? 'contained' : 'outlined'}
-          className="chart-button"
-          onClick={() => handleTimeChange(90)}
-        >
-          90 Days
-        </Button>
-      </Box>
+          <Button
+            variant={time === 7 ? 'contained' : 'outlined'}
+            className={`Chart-button ${time === 7 ? 'active-button' : ''}`}
+            onClick={() => handleTimeChange(7)}
+          >
+            7 Days
+          </Button>
+          <Button
+            variant={time === 30 ? 'contained' : 'outlined'}
+            className={`Chart-button ${time === 30 ? 'active-button' : ''}`}
+            onClick={() => handleTimeChange(30)}
+          >
+            30 Days
+          </Button>
+          <Button
+            variant={time === 90 ? 'contained' : 'outlined'}
+            className={`Chart-button ${time === 90 ? 'active-button' : ''}`}
+            onClick={() => handleTimeChange(90)}
+          >
+            90 Days
+          </Button>
+        </Box>
+
 
 
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>

@@ -1,16 +1,22 @@
 .Chart-button-group {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 0%;
-    margin-right: 5%;
-    margin-top: 0%;
-  }
-  
-  .Chart-button {
-    padding: 3px 8px; 
-    font-size: 10px; 
-    margin-left: 8px;
-    border-radius: 17px;
-  }
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0%;
+  margin-right: 5%;
+  margin-top: 0%;
+}
 
-  
+.Chart-button {
+  padding: 1px 8px;
+  font-size: auto;
+  margin-left: 8px;
+  border-radius: 17px;
+}
+
+.active-button {
+  background: linear-gradient(to bottom, 
+  rgba(153, 195, 250, 0.9) 5%, 
+  rgb(56, 83, 231) 50%),
+  rgba(153, 195, 250, 0.9) 100%;
+  color: #fff !important;
+}
