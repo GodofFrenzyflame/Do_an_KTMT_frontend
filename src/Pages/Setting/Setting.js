@@ -78,13 +78,14 @@ const Settings = () => {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        mb:'50%'
+        justifyContent: 'center',
+        mb:'50%',
       }}
     >
           
       
-      <Box sx={{ mt: 2 }}>
-        <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
+      <Box sx={{ mt: 2 ,display: 'flex',    flexDirection: 'column',    alignItems: 'center',    justifyContent: 'center',}}>
+        <FormControl fullWidth variant="outlined" sx={{ mb: 2, width: '400px'}}>
           <InputLabel>Theme</InputLabel>
           <Select
             value={mode}
@@ -95,7 +96,7 @@ const Settings = () => {
             <MenuItem value="dark">Dark</MenuItem>
           </Select>
         </FormControl>
-        <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
+        <FormControl fullWidth variant="outlined" sx={{ mb: 2, width: '400px'}}>
           <InputLabel>Language</InputLabel>
           <Select
             value={language}
@@ -106,11 +107,11 @@ const Settings = () => {
             <MenuItem value="vi">Vietnamese</MenuItem>
           </Select>
         </FormControl>
-        <FormControl fullWidth variant="outlined" sx={{ mb: 2, maxWidth: '300px' }}>
+        <FormControl fullWidth variant="outlined" sx={{ mb: 2, width: '400px' }}>
           <InputLabel>Connect</InputLabel>
           <Select
             value={connect}
-            onChange={(e) => setConnect(e.target.value)}
+            onChange={(e) => setConnect(e.target.value)}  
             label="Connect"
           >
             <MenuItem value="MQTT">MQTT</MenuItem>
@@ -118,7 +119,11 @@ const Settings = () => {
           </Select>
         </FormControl>
 
-        <Box sx={{ mt: 2, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <Box sx={{ mt: 3,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end', // Căn các phần tử sang bên phải
+        width: '100%',  }}>
           {/* Spinner aligned with the button */}
           {loading && (
             <Typography sx={{ mr: 7 }}>
