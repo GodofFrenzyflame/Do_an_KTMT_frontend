@@ -65,7 +65,7 @@ const Home = () => {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={4}>
-          <Paper elevation={3} className="chart-container" sx={{background: `linear-gradient(to bottom, 
+          <Paper elevation={3} className="chart-container" sx={{borderRadius: '17px',background: `linear-gradient(to bottom, 
                     rgba(255, 255, 255, 0.6) 5%, 
                     rgba(255, 255, 255, 1) 100%)`,}}>
             <TemperatureGauge />
@@ -73,7 +73,7 @@ const Home = () => {
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Paper elevation={3} className="chart-container" sx={{ background: `linear-gradient(to bottom, 
+          <Paper elevation={3} className="chart-container" sx={{borderRadius: '17px', background: `linear-gradient(to bottom, 
                     rgba(255, 255, 255, 0.6) 5%, 
                     rgba(255, 255, 255, 1) 100%)`, }}>
             <HumidityGauge />
@@ -81,7 +81,7 @@ const Home = () => {
         </Grid>
 
         <Grid item xs={12} sm={4}>
-          <Paper elevation={10} className="chart-container" sx={{ background: `linear-gradient(to bottom, 
+          <Paper elevation={10} className="chart-container" sx={{borderRadius: '17px', background: `linear-gradient(to bottom, 
                     rgba(255, 255, 255, 0.6) 5%, 
                     rgba(255, 255, 255, 1) 100%)`,}}>
             <Map />
@@ -96,6 +96,7 @@ const Home = () => {
           <Paper
             elevation={3}
             sx={{
+              borderRadius: '17px',
               background: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 5%, rgba(255, 255, 255, 1) 100%)`,
               p: 2,
             }}
@@ -109,6 +110,7 @@ const Home = () => {
           <Paper
             elevation={10}
             sx={{
+              borderRadius: '17px',
               background: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 5%, rgba(255, 255, 255, 1) 100%)`,
               p: 2,
             }}

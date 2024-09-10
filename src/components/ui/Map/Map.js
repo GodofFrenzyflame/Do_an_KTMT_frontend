@@ -120,11 +120,11 @@ const Map = () => {
   }, [position]);
 
   return (
-    <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+    <div style={{ position: 'relative', height: '100%', width: '100%' ,}}>
       <MapContainer
         center={position || [0, 0]} // Đặt trung tâm bản đồ nếu position đã có
         zoom={13}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%',borderRadius: '12px', }}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
